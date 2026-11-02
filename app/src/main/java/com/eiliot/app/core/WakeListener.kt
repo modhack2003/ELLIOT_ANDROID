@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 /** One capture: restricted KWS at idle; full streaming ASR only during an utterance. */
 object WakeListener {
+    @Volatile var calibrationActive=false
     val status=MutableStateFlow("Preparing offline listening")
     val echoStatus=MutableStateFlow("Echo cancellation is checked when voice starts")
     val liveCall=VoiceSession.gate.isLiveCallMode
@@ -31,7 +32,7 @@ object WakeListener {
     private val resetMode=AtomicBoolean(false)
     private val resume=Runnable { resumeWhenIdle() }
     fun hasModel(c:Context)=runCatching { c.assets.open("models/manifest.json").close();true }.getOrDefault(false)
-    fun available()=running && ready && input!=null && capture?.isActive==true && SentinelRuntime.microphoneReady
+    fun available()=!calibrationActive && running && ready && input!=null && capture?.isActive==true && SentinelRuntime.microphoneReady
     fun setLiveCall(context:Context,enabled:Boolean):Boolean {
         if(enabled && (!SentinelRuntime.alive() || !SentinelRuntime.microphoneReady)) { status.value="Allow the microphone and turn ELLIOT on to start a call";return false }
         VoiceSession.gate.setLiveCallMode(enabled)
@@ -70,6 +71,7 @@ object WakeListener {
     }
     fun resumeWhenIdle() {
         main.removeCallbacks(resume)
+        if(calibrationActive)return
         if(!running || !SentinelRuntime.alive() || (!SentinelRuntime.store.wakeEnabled && !liveCall.value))return
         if(NativeSpeechClient.blocked(SentinelRuntime.context)) {status.value="Offline speech needs Repair offline voice in Settings";return}
         if(VoiceIo.usesDeviceRecognizer()) { main.postDelayed(resume,500);return }
@@ -84,7 +86,8 @@ object WakeListener {
                 status.value="Getting your offline voice ready"
                 val root=ModelAssets.await(SentinelRuntime.context)
                 NativeSpeechClient.connect(SentinelRuntime.context)
-                val spotter=RemoteKeywordSpotter()
+                val calibration=VoiceCalibrationStore.load(SentinelRuntime.context)
+                val spotter=RemoteKeywordSpotter(calibration?.score,calibration?.threshold)
                 kws=spotter;val keywordStream=spotter.createStream();kwsStream=keywordStream
                 val asr=RemoteRecognizer()
                 recognizer=asr
@@ -94,7 +97,7 @@ object WakeListener {
                 val apps=withContext(Dispatchers.Main) { PhoneTools.apps().take(80).map { it.name } }
                 val hotwords=(listOf("ELLIOT","BATTERY","VOLUME","TIMER","SCROLL","CLICK","YOUTUBE","WHATSAPP")+apps.map { it.uppercase().replace(Regex("[^A-Z0-9 ]")," ") }).filter(String::isNotBlank).distinct().joinToString("\n")
                 ensureActive();check(gen==generation && SentinelRuntime.alive(epoch))
-                audio=VoiceAudioInput(SentinelRuntime.context,com.eiliot.app.BuildConfig.VOICE_REFERENCE_CAPTURE) { }
+                audio=VoiceAudioInput(SentinelRuntime.context,calibration?.referenceCapture?:com.eiliot.app.BuildConfig.VOICE_REFERENCE_CAPTURE) { }
                 ensureActive();check(gen==generation && SentinelRuntime.alive(epoch))
                 input=audio;ready=true
                 if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "capture ready; live=${liveCall.value}; wake=${SentinelRuntime.store.wakeEnabled}; echo=${audio.echoEnabled}")

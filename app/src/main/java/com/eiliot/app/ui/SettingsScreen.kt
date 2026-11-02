@@ -55,6 +55,7 @@ import kotlinx.coroutines.*
     var provider by remember {mutableStateOf("Custom")};var mode by remember {mutableStateOf(store.inferenceMode)}
     var root by remember {mutableStateOf(store.baseUrl)};var key by remember {mutableStateOf(store.apiKey)};var model by remember {mutableStateOf(store.model)}
     var voiceOptions by remember {mutableStateOf(false)};var pitch by remember {mutableFloatStateOf(store.ttsPitch)};var rate by remember {mutableFloatStateOf(store.ttsRate)}
+    var calibrating by remember {mutableStateOf(false)}
     var showApps by remember {mutableStateOf(false)};var notices by remember {mutableStateOf("")}
     var showNotices by remember {mutableStateOf(false)}
     var permissionEpoch by remember {mutableLongStateOf(0)}
@@ -73,6 +74,7 @@ import kotlinx.coroutines.*
     LaunchedEffect(showNotices) {if(showNotices)notices=withContext(Dispatchers.IO) {runCatching {context.assets.open("models/NOTICES.md").bufferedReader().use {it.readText()}}.getOrDefault("Model notices are included with the complete source.")}}
     // Reading revision makes external grant callbacks re-read current persisted switches.
     val redraw=revision
+    if(calibrating)VoiceCalibrationDialog {calibrating=false;changed()}
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(18.dp),verticalArrangement=Arrangement.spacedBy(16.dp)) {
         item {Text("Make him yours.",style=MaterialTheme.typography.headlineSmall,color=EiliotColors.TextPrimary,maxLines=1,overflow=TextOverflow.Ellipsis)}
         item {GlassPanel {
@@ -130,6 +132,10 @@ import kotlinx.coroutines.*
             }
             if(!voiceReady)TextButton(onClick={ModelAssets.retry(context);com.eiliot.app.voice.remote.NativeSpeechClient.retry(context)}) {Text("Repair offline voice",maxLines=1)}
             ControlSwitch("Listen after a reply","A short follow-up window without another wake phrase",store.followUpEnabled) {store.followUpEnabled=it;changed()}
+            TextButton(onClick={SentinelRuntime.startAndArmMic(context){calibrating=true}},enabled=enabled) {Text("Calibrate my wake phrase")}
+            if(VoiceCalibrationStore.load(context)!=null)TextButton(onClick={
+                VoiceCalibrationStore.clear(context);WakeListener.stop();WakeListener.start(context);changed()
+            }) {Text("Reset wake calibration")}
             TextButton(onClick={voiceOptions=!voiceOptions}) {Text(if(voiceOptions)"Hide voice options" else "Voice options",maxLines=1)}
             if(voiceOptions) {
                 Text("ELLIOT · Ryan · offline male voice",color=EiliotColors.TextSecondary,maxLines=1,overflow=TextOverflow.Ellipsis)

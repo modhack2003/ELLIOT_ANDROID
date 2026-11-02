@@ -103,9 +103,9 @@ object NativeSpeechClient {
 }
 
 data class SpeechHandle(val id:Long,val session:Long)
-private fun newHandle(kind:String):SpeechHandle {
+private fun newHandle(kind:String,options:Bundle=Bundle()):SpeechHandle {
     val token=NativeSpeechClient.session
-    return SpeechHandle(NativeSpeechClient.call(kind,expected=token).getLong("id"),token)
+    return SpeechHandle(NativeSpeechClient.call(kind,options,expected=token).getLong("id"),token)
 }
 open class RemoteObject(private val key:SpeechHandle) {
     val handle get()=key.id
@@ -118,14 +118,16 @@ class RemoteStream(key:SpeechHandle):RemoteObject(key) {
     fun acceptWaveform(pcm:FloatArray,rate:Int) {require(rate==16000);rpc("accept",args().apply {putFloatArray("pcm",pcm)})}
 }
 data class RemoteResult(val text:String) {val keyword get()=text}
-open class RemoteDecoder(kind:String):RemoteObject(newHandle(kind)) {
+open class RemoteDecoder(kind:String,options:Bundle=Bundle()):RemoteObject(newHandle(kind,options)) {
     fun createStream(hotwords:String="")=RemoteStream(SpeechHandle(rpc("stream",args().apply {putString("hotwords",hotwords)}).getLong("id"),session))
     fun isReady(stream:RemoteStream)=rpc("ready",args(stream)).getBoolean("value")
     fun decode(stream:RemoteStream) {rpc("decode",args(stream))}
     fun getResult(stream:RemoteStream)=RemoteResult(rpc("result",args(stream)).getString("text").orEmpty())
     fun reset(stream:RemoteStream) {rpc("reset",args(stream))}
 }
-class RemoteKeywordSpotter:RemoteDecoder("kws")
+class RemoteKeywordSpotter(score:Float?=null,threshold:Float?=null):RemoteDecoder("kws",Bundle().apply {
+    score?.let {putFloat("score",it)};threshold?.let {putFloat("threshold",it)}
+})
 class RemoteRecognizer:RemoteDecoder("asr") {
     fun isEndpoint(stream:RemoteStream)=rpc("endpoint",args(stream)).getBoolean("value")
 }

@@ -15,6 +15,26 @@ import org.junit.runner.RunWith
 /** Actual Android JNI/process checks; these do not certify microphone/acoustic quality. */
 @RunWith(AndroidJUnit4::class)
 class NativeSpeechDeviceTest {
+    @Test fun calibrationReplayAndProfileRoundTrip()=runBlocking {
+        val previous=VoiceCalibrationStore.load(app)
+        try {
+            withContext(Dispatchers.IO) {
+                NativeSpeechClient.connect(app)
+                val tts=RemoteTts();val chunks=mutableListOf<FloatArray>()
+                tts.generateWithCallback("Hey Elliot. What is my battery level?",0,1f){chunks.add(it.copyOf());1}
+                val source=FloatArray(chunks.sumOf{it.size});var at=0
+                chunks.forEach{it.copyInto(source,at);at+=it.size}
+                val audio=FloatArray(source.size*16000/tts.sampleRate()){i->source[minOf((i.toLong()*tts.sampleRate()/16000).toInt(),source.lastIndex)]}
+                assertTrue(WakeCalibration.detect(WakeSetting(false),audio))
+                assertTrue(WakeCalibration.detect(WakeSetting(true,2.5f,.1f),audio))
+                assertTrue(WakeCalibration.transcribe(audio).contains("battery",ignoreCase=true))
+                val setting=WakeSetting(true,2.5f,.1f)
+                VoiceCalibrationStore.save(app,setting);assertEquals(setting,VoiceCalibrationStore.load(app))
+                VoiceCalibrationStore.clear(app);assertNull(VoiceCalibrationStore.load(app))
+                assertTrue(runCatching{RemoteKeywordSpotter(4f,.1f)}.isFailure)
+            }
+        }finally{if(previous==null)VoiceCalibrationStore.clear(app)else VoiceCalibrationStore.save(app,previous)}
+    }
     @Test fun wakeDetectorRecognizesSpokenName()=runBlocking {
         withContext(Dispatchers.IO) {
             NativeSpeechClient.connect(app)

@@ -15,8 +15,8 @@ android {
         minSdk = 26
         targetSdk = 36
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        versionCode = 11
-        versionName = "0.6.3-dev.1"
+        versionCode = 12
+        versionName = "0.6.3-dev.2"
         buildConfigField("boolean", "VOICE_REFERENCE_CAPTURE", "false")
         buildConfigField("boolean", "VOICE_DIAGNOSTICS", "false")
     }
