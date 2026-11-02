@@ -1,10 +1,11 @@
 {
-  "release": "0.6.2",
+  "release": "0.6.3-dev.1",
+  "version_code": 11,
   "files": [
     {
       "path": ".gitignore",
-      "bytes": 98,
-      "sha256": "8f9949893807803430026924567fe8a30635a6831b9be7e948d8d0eda7dcf058"
+      "bytes": 177,
+      "sha256": "a773ea491a6180dab1b9f7751c4ab366b0c4e5874bc9476622db6ba5bd562181"
     },
     {
       "path": "BUILD_PLAN.md",
@@ -33,8 +34,8 @@
     },
     {
       "path": "MODEL_SOURCES.json",
-      "bytes": 1788,
-      "sha256": "d1e3fe90e4c2dfd3b887d68d59ec65cf79261466cea77f72c9823c14a6ce2c6f"
+      "bytes": 1832,
+      "sha256": "95977d1bd342686ee6cfa02a151014366e597a4851c25ec19da6fbb87df3667b"
     },
     {
       "path": "NEXT_BUILD_PLAN.md",
@@ -73,8 +74,8 @@
     },
     {
       "path": "app/build.gradle.kts",
-      "bytes": 4455,
-      "sha256": "9aa890dd6c25d5c636dabf5a620e772e6843cc12b2456ddb84105c213ccc119e"
+      "bytes": 5059,
+      "sha256": "ecdc40673d60efc09c4e0452e50e7d9a65fb1106e16a196d95a6ddb20ca3e163"
     },
     {
       "path": "app/libs/sherpa-onnx-1.13.8.aar",
@@ -83,8 +84,8 @@
     },
     {
       "path": "app/src/androidTest/java/com/eiliot/app/NativeSpeechDeviceTest.kt",
-      "bytes": 3430,
-      "sha256": "724da9273ef24ec6d8b5d2ed7e752dee78ed7855311e2e359961b1e3d27db5f6"
+      "bytes": 5046,
+      "sha256": "203c8aa9fc2f570f34c04c36b1a316307e88ed46e9c2eeab93aad34a0ab79f9c"
     },
     {
       "path": "app/src/main/AndroidManifest.xml",
@@ -2058,8 +2059,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/core/WakeListener.kt",
-      "bytes": 10587,
-      "sha256": "8917b8f73a0e55779830742c588595b7b5fef285d862b3e6e5e405797944bd3d"
+      "bytes": 13716,
+      "sha256": "3245f288985ac83c7fecc97e67b01cc42223257803816ca4625b166ddab4a813"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/data/CryptoVault.kt",
@@ -2302,6 +2303,11 @@
       "sha256": "92ca6fef1b1fff60fb17e086391dc6239a382f7623fa6ebf559bff649a700f91"
     },
     {
+      "path": "app/src/main/java/com/eiliot/app/voice/ListeningPolicy.kt",
+      "bytes": 1017,
+      "sha256": "d9e7d11fdac033a1b938645f3495ef4933154975088854a61b0a249e8b7ee82d"
+    },
+    {
       "path": "app/src/main/java/com/eiliot/app/voice/ModelAssets.kt",
       "bytes": 3727,
       "sha256": "52b6b7b5922ab15f0d251edbbfad5b6aff7a7eefd090149750bdfdc9049d01ad"
@@ -2323,8 +2329,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/VoiceAudioInput.kt",
-      "bytes": 3830,
-      "sha256": "5b680f36440c2ac7e3795df8f20155561e14dc2d756029bc8c0dc73effd2f562"
+      "bytes": 4058,
+      "sha256": "913742b74f400be76c7d7b61c40a409eda11edb93cb758eb4d02dac652c97e0f"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/VoiceIo.kt",
@@ -2353,8 +2359,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/SpeechEngineService.kt",
-      "bytes": 6721,
-      "sha256": "d19e8d5a9c8e7e2a95f96fca7c73920e56778605a2cb77eb97c9b3cc87f6509d"
+      "bytes": 6808,
+      "sha256": "2a22013ea22b0c95a79e03dbe69e22e000e0a21627a2738384c60875f641402b"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/SpeechWire.kt",
@@ -2442,6 +2448,11 @@
       "sha256": "44a17fe6bbea713eaf15a8699ebc80110c141dcbdab51b07145a1be7d1b3a275"
     },
     {
+      "path": "app/src/test/java/com/eiliot/app/ListeningPolicyTest.kt",
+      "bytes": 1350,
+      "sha256": "636bf18a31e7f5b93e23e521ebbef18c1e005e7003aa01300533fa5bf17edbec"
+    },
+    {
       "path": "app/src/test/java/com/eiliot/app/LlmClientTest.kt",
       "bytes": 8085,
       "sha256": "da333ab20529ee97b001401152430a38401f908da5faa98900a95c1a75fc50de"
@@ -2510,6 +2521,11 @@
       "path": "build.gradle.kts",
       "bytes": 373,
       "sha256": "85801bff5ce6d11ca7ab5779185d818167f6e350665fc330a5790131439a674c"
+    },
+    {
+      "path": "docs/VOICE_IMPLEMENTATION_STATUS.md",
+      "bytes": 2394,
+      "sha256": "b8427f3798201d786067a6ad449ca5802e6b59fa38b5f4aeb32e0619efd3c2d4"
     },
     {
       "path": "docs/archive/0.6.0/FEATURE_REVIEW.md",
@@ -2882,6 +2898,16 @@
       "sha256": "aea4788c49278a55a3ee8bac2d3c4117df0996f2cc2f5ef4122b916959db4866"
     },
     {
+      "path": "evaluation/voice/README.md",
+      "bytes": 2065,
+      "sha256": "644b8606444da75e635b1dba27e5e40b39ec96f25c1fa87255e6ab80836657c9"
+    },
+    {
+      "path": "evaluation/voice/prompts.json",
+      "bytes": 3763,
+      "sha256": "bfd5a38b1fd53c83a2eb3e91379871a67593e30c9983fc149e392a351caac26b"
+    },
+    {
       "path": "gradle.properties",
       "bytes": 197,
       "sha256": "6e8a4f95e46109869c617e59e7fa25aef2118544299e85a5209858bfdc7a0c31"
@@ -2917,15 +2943,29 @@
       "sha256": "6eb07776f78a74a80de8c40c62fd891104155cae25c64a6055208ac9b368d1af"
     },
     {
+      "path": "tools/evaluate_voice.py",
+      "bytes": 3984,
+      "sha256": "1fda0a9909f7bd91c98972f729db2a147961870f2de03ebd7dbfd97386dbf5f7"
+    },
+    {
+      "path": "tools/test_evaluate_voice.py",
+      "bytes": 1665,
+      "sha256": "fbf29f7059f0a51374890fc5eed895a2cc5c513264660d0807e85457a33588af"
+    },
+    {
+      "path": "tools/voice_build_manifest.py",
+      "bytes": 1599,
+      "sha256": "352c2afdc7b43761969210537dae6255f647f63e8ff3fd7d424e8c6ac5566909"
+    },
+    {
       "path": "tools/voice_smoke.py",
-      "bytes": 4351,
-      "sha256": "52f757a1faf375d36444d811ecba612f307f0620035f6050acbb983c25ea6c80"
+      "bytes": 4410,
+      "sha256": "69832348d77219226cdc1a22eef06c643b2cfea6461444b1c56f484bfe378ad8"
     },
     {
       "path": "vps/setup-android-sdk.sh",
       "bytes": 1887,
       "sha256": "4ff9b50b850611786fe5fef4d1b4423c516afbac12edd5b0614ffbce61a0a046"
     }
-  ],
-  "revision": "speech-callback-fix"
+  ]
 }

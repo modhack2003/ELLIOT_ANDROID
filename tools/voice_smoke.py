@@ -32,14 +32,15 @@ kw=so.KeywordSpotter.__init__.__globals__
 family='zipformer' if '--regression-wrong-loader' in sys.argv else spec['kws']['model_type']
 config=kw['OnlineModelConfig'](transducer=kw['OnlineTransducerModelConfig'](**paths('kws')),tokens=str(root/'kws/tokens.txt'),num_threads=spec['threads'],model_type=family,modeling_unit=spec['kws']['modeling_unit'],bpe_vocab=spec['kws']['bpe_vocab'],provider_config=kw['ProviderConfig'](provider='cpu'))
 spotter=so.KeywordSpotter.__new__(so.KeywordSpotter)
-spotter.keyword_spotter=kw['_KeywordSpotter'](kw['KeywordSpotterConfig'](feat_config=kw['FeatureExtractorConfig'](sampling_rate=16000,feature_dim=80),model_config=config,max_active_paths=4,num_trailing_blanks=1,keywords_score=1.5,keywords_threshold=.25,keywords_file=str(root/'kws/keywords.txt')))
+spotter.keyword_spotter=kw['_KeywordSpotter'](kw['KeywordSpotterConfig'](feat_config=kw['FeatureExtractorConfig'](sampling_rate=16000,feature_dim=80),model_config=config,max_active_paths=4,num_trailing_blanks=1,keywords_score=2.0,keywords_threshold=.15,keywords_file=str(root/'kws/keywords.txt')))
 
 ks=spotter.create_stream();hits=[]
 for i in range(0,len(samples),512):
  ks.accept_waveform(16000,samples[i:i+512])
- while spotter.is_ready(ks):spotter.decode_stream(ks)
- hit=spotter.get_result(ks)
- if hit: hits.append(hit);spotter.reset_stream(ks)
+ while spotter.is_ready(ks):
+  spotter.decode_stream(ks)
+  hit=spotter.get_result(ks)
+  if hit: hits.append(hit);spotter.reset_stream(ks)
 assert hits,hits
 vad=so.VoiceActivityDetector(so.VadModelConfig(silero_vad=so.SileroVadModelConfig(model=str(root/'silero_vad.onnx'),threshold=.65,min_speech_duration=.192,window_size=512),sample_rate=16000,num_threads=1),buffer_size_in_seconds=20)
 detected=0

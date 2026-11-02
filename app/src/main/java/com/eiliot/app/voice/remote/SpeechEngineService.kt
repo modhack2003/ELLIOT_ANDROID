@@ -52,7 +52,7 @@ class SpeechEngineService:Service() {
         check(initialized)
         when(op) {
             "kws"->out.putLong("id",hold(KeywordSpotter(config=KeywordSpotterConfig(modelConfig=model("kws"),keywordsFile="${root.path}/kws/keywords.txt",keywordsScore=2f,keywordsThreshold=.15f,numTrailingBlanks=1))))
-            "asr"->out.putLong("id",hold(OnlineRecognizer(config=OnlineRecognizerConfig(modelConfig=model("asr"),decodingMethod="modified_beam_search",maxActivePaths=4,hotwordsScore=1.5f,enableEndpoint=true,endpointConfig=EndpointConfig(EndpointRule(false,2.4f,0f),EndpointRule(true,.65f,0f),EndpointRule(false,0f,60f))))))
+            "asr"->out.putLong("id",hold(OnlineRecognizer(config=OnlineRecognizerConfig(modelConfig=model("asr"),decodingMethod="modified_beam_search",maxActivePaths=4,hotwordsScore=1.5f,enableEndpoint=true,endpointConfig=EndpointConfig(EndpointRule(false,2.4f,0f),EndpointRule(true,1.4f,0f),EndpointRule(false,0f,60f))))))
             "vad"->out.putLong("id",hold(Vad(config=VadModelConfig(sileroVadModelConfig=SileroVadModelConfig(model="${root.path}/silero_vad.onnx",threshold=.65f,minSilenceDuration=.5f,minSpeechDuration=.192f,windowSize=512),sampleRate=16000,numThreads=1))))
             "stream"->out.putLong("id",hold(when(val owner=objects[id]) {is KeywordSpotter->owner.createStream();is OnlineRecognizer->owner.createStream(a.getString("hotwords").orEmpty());else->error("Invalid stream owner")}))
             "accept"->{val pcm=checkNotNull(a.getFloatArray("pcm"));require(pcm.size<=16000);obj<OnlineStream>(id).acceptWaveform(pcm,16000)}

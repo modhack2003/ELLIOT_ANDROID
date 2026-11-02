@@ -14,7 +14,7 @@ import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
 
 /** One PCM capture shared by wake and command recognition; audio is never written to disk. */
-class VoiceAudioInput(context: Context, private val beforeRead: () -> Unit) : InputStream() {
+class VoiceAudioInput(context: Context, private val referenceCapture: Boolean = false, private val beforeRead: () -> Unit) : InputStream() {
     private val closed = AtomicBoolean(false)
     private val recorder: AudioRecord
     private val echo: AcousticEchoCanceler?
@@ -29,15 +29,15 @@ class VoiceAudioInput(context: Context, private val beforeRead: () -> Unit) : In
         if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) throw SecurityException("Grant microphone access before arming voice")
         val minimum = AudioRecord.getMinBufferSize(16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
         check(minimum > 0) { "16 kHz microphone input is unavailable" }
-        val record = AudioRecord.Builder().setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
+        val record = AudioRecord.Builder().setAudioSource(if(referenceCapture) MediaRecorder.AudioSource.MIC else MediaRecorder.AudioSource.VOICE_COMMUNICATION)
             .setAudioFormat(AudioFormat.Builder().setSampleRate(16000).setChannelMask(AudioFormat.CHANNEL_IN_MONO).setEncoding(AudioFormat.ENCODING_PCM_16BIT).build())
             .setBufferSizeInBytes(maxOf(minimum * 2, 12800)).build()
         recorder = record
         if (record.state != AudioRecord.STATE_INITIALIZED) { record.release(); error("Microphone could not initialize") }
-        echo = runCatching { if (AcousticEchoCanceler.isAvailable()) AcousticEchoCanceler.create(record.audioSessionId)?.also { it.enabled = true } else null }.getOrNull()
+        echo = runCatching { if(!referenceCapture && AcousticEchoCanceler.isAvailable()) AcousticEchoCanceler.create(record.audioSessionId)?.also { it.enabled = true } else null }.getOrNull()
         echoEnabled = echo?.enabled == true
-        noise = runCatching { if(NoiseSuppressor.isAvailable()) NoiseSuppressor.create(record.audioSessionId)?.also { it.enabled=true } else null }.getOrNull()
-        gain = runCatching { if(AutomaticGainControl.isAvailable()) AutomaticGainControl.create(record.audioSessionId)?.also { it.enabled=true } else null }.getOrNull()
+        noise = runCatching { if(!referenceCapture && NoiseSuppressor.isAvailable()) NoiseSuppressor.create(record.audioSessionId)?.also { it.enabled=true } else null }.getOrNull()
+        gain = runCatching { if(!referenceCapture && AutomaticGainControl.isAvailable()) AutomaticGainControl.create(record.audioSessionId)?.also { it.enabled=true } else null }.getOrNull()
         try { record.startRecording(); check(record.recordingState == AudioRecord.RECORDSTATE_RECORDING) { "Microphone is in use or blocked" } }
         catch (e: Exception) { echo?.release();noise?.release();gain?.release();record.release();throw e }
     }

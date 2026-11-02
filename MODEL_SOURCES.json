@@ -1,6 +1,6 @@
 {
-  "release": "0.6.2",
-  "version_code": 9,
+  "release": "0.6.3-dev.1",
+  "version_code": 11,
   "runtime": {
     "name": "sherpa-onnx",
     "version": "1.13.8",

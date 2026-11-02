@@ -22,7 +22,7 @@ object WakeListener {
     @Volatile private var running=false
     @Volatile private var generation=0L
     @Volatile private var ready=false
-    private data class Turn(val ticket:Long,val epoch:Long,val origin:String)
+    private data class Turn(val ticket:Long,val epoch:Long,val origin:String,val deadline:ListeningDeadline)
     @Volatile private var turn:Turn?=null
     private var timeout:Runnable?=null
     private var lastTrigger=0L
@@ -49,11 +49,17 @@ object WakeListener {
         if(!available() || !SentinelRuntime.alive())return false
         cancelTurn()
         val ticket=VoiceIo.beginLocalListening(origin)
-        turn=Turn(ticket,SentinelRuntime.epoch,origin);reset.set(true)
-        val expiry=Runnable {
-            if(turn?.ticket==ticket) { turn=null;VoiceIo.endLocalListening(ticket);EiliotBrain.notice("I'm here when you need me") }
+        val deadline=ListeningDeadline(android.os.SystemClock.elapsedRealtime(),if(origin=="live call")75000 else 18000)
+        turn=Turn(ticket,SentinelRuntime.epoch,origin,deadline);reset.set(true)
+        val expiry=object:Runnable {
+            override fun run() {
+                if(turn?.ticket!=ticket)return
+                val remaining=deadline.remaining(android.os.SystemClock.elapsedRealtime())
+                if(remaining>0) {main.postDelayed(this,remaining);return}
+                turn=null;timeout=null;VoiceIo.endLocalListening(ticket);EiliotBrain.notice("I'm here when you need me")
+            }
         }
-        timeout=expiry;main.postDelayed(expiry,if(origin=="live call")75000 else 18000)
+        timeout=expiry;main.postDelayed(expiry,deadline.remaining(android.os.SystemClock.elapsedRealtime()))
         status.value=if(liveCall.value)"Live call · listening" else "Listening to your request"
         return true
     }
@@ -88,10 +94,10 @@ object WakeListener {
                 val apps=withContext(Dispatchers.Main) { PhoneTools.apps().take(80).map { it.name } }
                 val hotwords=(listOf("ELLIOT","BATTERY","VOLUME","TIMER","SCROLL","CLICK","YOUTUBE","WHATSAPP")+apps.map { it.uppercase().replace(Regex("[^A-Z0-9 ]")," ") }).filter(String::isNotBlank).distinct().joinToString("\n")
                 ensureActive();check(gen==generation && SentinelRuntime.alive(epoch))
-                audio=VoiceAudioInput(SentinelRuntime.context) { }
+                audio=VoiceAudioInput(SentinelRuntime.context,com.eiliot.app.BuildConfig.VOICE_REFERENCE_CAPTURE) { }
                 ensureActive();check(gen==generation && SentinelRuntime.alive(epoch))
                 input=audio;ready=true
-                android.util.Log.i("ElliotWake", "capture ready; live=${liveCall.value}; wake=${SentinelRuntime.store.wakeEnabled}; echo=${audio.echoEnabled}")
+                if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "capture ready; live=${liveCall.value}; wake=${SentinelRuntime.store.wakeEnabled}; echo=${audio.echoEnabled}")
                 var diagnosticAt=android.os.SystemClock.elapsedRealtime()
                 var diagnosticFrames=0
                 var diagnosticPeak=0f
@@ -99,11 +105,13 @@ object WakeListener {
                 echoStatus.value=if(audio.echoEnabled)"Device echo cancellation is on" else "Headphones can help avoid speaker echo"
                 audio.onFrame={ frame ->
                     if(gen!=generation || !SentinelRuntime.alive(epoch))throw CancellationException()
-                    diagnosticFrames++
-                    for(sample in frame) {diagnosticPeak=maxOf(diagnosticPeak,kotlin.math.abs(sample));diagnosticEnergy+=sample.toDouble()*sample}
+                    if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS) {
+                        diagnosticFrames++
+                        for(sample in frame) {diagnosticPeak=maxOf(diagnosticPeak,kotlin.math.abs(sample));diagnosticEnergy+=sample.toDouble()*sample}
+                    }
                     val diagnosticNow=android.os.SystemClock.elapsedRealtime()
-                    if(diagnosticNow-diagnosticAt>=5000) {
-                        android.util.Log.i("ElliotWake", "frames=$diagnosticFrames elapsedMs=${diagnosticNow-diagnosticAt} peak=$diagnosticPeak rms=${kotlin.math.sqrt(diagnosticEnergy/(diagnosticFrames*512))} live=${liveCall.value} turn=${turn?.origin ?: "idle"}")
+                    if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS && diagnosticNow-diagnosticAt>=5000) {
+                        if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "frames=$diagnosticFrames elapsedMs=${diagnosticNow-diagnosticAt} peak=$diagnosticPeak rms=${kotlin.math.sqrt(diagnosticEnergy/(diagnosticFrames*512))} live=${liveCall.value} turn=${turn?.origin ?: "idle"}")
                         diagnosticAt=diagnosticNow;diagnosticFrames=0;diagnosticPeak=0f;diagnosticEnergy=0.0
                     }
                     if(resetMode.getAndSet(false)) {
@@ -112,6 +120,7 @@ object WakeListener {
                     preroll.add(frame)
                     val probability=detector.compute(frame)
                     val current=turn
+                    if(probability>.65f)current?.deadline?.speech(android.os.SystemClock.elapsedRealtime())
                     val eligible=liveCall.value && current==null && !VoiceIo.usesDeviceRecognizer()
                     if(onset.accept(probability,eligible) && activationPending.compareAndSet(false,true)) {
                         main.post {
@@ -126,21 +135,21 @@ object WakeListener {
                     }
                     if(current==null && !liveCall.value) {
                         keywordStream.acceptWaveform(frame,16000)
-                        while(spotter.isReady(keywordStream))spotter.decode(keywordStream)
-                        val wake=spotter.getResult(keywordStream).keyword
-                        if(wake.isNotBlank())android.util.Log.i("ElliotWake", "wake detected: $wake")
+                        drainWakeResults({spotter.isReady(keywordStream)},{spotter.decode(keywordStream)},
+                            {spotter.getResult(keywordStream).keyword},{spotter.reset(keywordStream)}) { wake ->
+                        if(wake.isNotBlank())if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "wake detected: $wake")
                         if(!liveCall.value && wake.isNotBlank() && activationPending.compareAndSet(false,true)) {
-                            spotter.reset(keywordStream)
                             main.post {
                                 try {
                                     val now=android.os.SystemClock.elapsedRealtime()
                                     if(gen==generation && SentinelRuntime.alive(epoch) && now-lastTrigger>=900) {
                                         lastTrigger=now;EiliotBrain.interruptForWake();val started=beginInput("wake")
-                                        android.util.Log.i("ElliotWake", "wake listening started=$started")
+                                        if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "wake listening started=$started")
                                         if(!SentinelRuntime.foreground)OverlayManager.openPanel()
                                     }
                                 }finally { activationPending.set(false) }
                             }
+                        }
                         }
                     } else if(current!=null && VoiceSession.gate.accepts(current.ticket,current.epoch)) {
                         val needsReset=reset.getAndSet(false)
@@ -164,7 +173,7 @@ object WakeListener {
                                         // The pre-roll can contain just the wake phrase. Keep the
                                         // same listening ticket open for the following command.
                                         VoiceIo.localTranscript(current.ticket, "")
-                                        android.util.Log.i("ElliotWake", "wake-only utterance; waiting for command")
+                                        if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "wake-only utterance; waiting for command")
                                     }
                                 }
                             }

@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "status": "Starter prompts only; user must approve references and add held-out trials. No audio collected.",
+  "script_policy": "English in Latin script; Hindi in Devanagari and Bengali in Bengali script, preserving English code-switched words. Do not translate.",
+  "execution_policy": "Transcription evaluation only. Do not automatically execute these prompts.",
+  "prompts": [
+    {"id":"wake-only","category":"wake","indian_english":"Hey Elliot","hindi_english":"Hey Elliot","bengali_english":"Hey Elliot"},
+    {"id":"battery","category":"command","indian_english":"What is my battery level?","hindi_english":"मेरे phone का battery level कितना है?","bengali_english":"আমার phone এর battery level কত?"},
+    {"id":"volume","category":"number","indian_english":"Set the volume to thirty percent.","hindi_english":"Volume तीस percent कर दो।","bengali_english":"Volume তিরিশ percent করে দাও।"},
+    {"id":"negation","category":"negation","indian_english":"Do not open YouTube.","hindi_english":"YouTube मत खोलो।","bengali_english":"YouTube খুলবে না।"},
+    {"id":"name","category":"proper_name","indian_english":"How do you spell Kolkata?","hindi_english":"Kolkata की spelling क्या है?","bengali_english":"Kolkata এর spelling কী?"},
+    {"id":"explain","category":"sentence","indian_english":"Explain the difference between memory and storage.","hindi_english":"Memory और storage में क्या अंतर है?","bengali_english":"Memory আর storage এর মধ্যে পার্থক্য কী?"},
+    {"id":"pause","category":"natural_pause","instruction":"Pause naturally after the first clause; annotate actual pause duration.","indian_english":"I have a question about my phone. Why does the battery drain quickly?","hindi_english":"मेरे phone के बारे में एक सवाल है। Battery जल्दी खत्म क्यों होती है?","bengali_english":"আমার phone নিয়ে একটা প্রশ্ন আছে। Battery এত তাড়াতাড়ি শেষ হয় কেন?"},
+    {"id":"continuous","category":"wake_plus_command","indian_english":"Hey Elliot what is my battery level?","hindi_english":"Hey Elliot मेरे phone का battery level कितना है?","bengali_english":"Hey Elliot আমার phone এর battery level কত?"},
+    {"id":"sequence","category":"long_sentence","indian_english":"First explain the problem, then tell me which settings I should check.","hindi_english":"पहले problem समझाओ फिर बताओ कौन सी settings check करनी चाहिए।","bengali_english":"আগে problem বুঝিয়ে বলো তারপর কোন settings check করব বলো।"},
+    {"id":"negative-greeting","category":"negative_wake","expected_wake":false,"indian_english":"Hello, how are you today?","hindi_english":"नमस्ते आज आप कैसे हैं?","bengali_english":"নমস্কার আজ কেমন আছো?"},
+    {"id":"negative-weather","category":"negative_wake","expected_wake":false,"indian_english":"The weather is pleasant today.","hindi_english":"आज weather अच्छा है।","bengali_english":"আজ weather ভালো আছে।"},
+    {"id":"negation-number","category":"negation_and_number","indian_english":"I said thirteen, not thirty.","hindi_english":"मैंने thirteen कहा था thirty नहीं।","bengali_english":"আমি thirteen বলেছি thirty নয়।"}
+  ]
+}

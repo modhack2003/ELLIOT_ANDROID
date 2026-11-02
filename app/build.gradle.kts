@@ -15,8 +15,10 @@ android {
         minSdk = 26
         targetSdk = 36
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        versionCode = 10
-        versionName = "0.6.2"
+        versionCode = 11
+        versionName = "0.6.3-dev.1"
+        buildConfigField("boolean", "VOICE_REFERENCE_CAPTURE", "false")
+        buildConfigField("boolean", "VOICE_DIAGNOSTICS", "false")
     }
 
     buildTypes {
@@ -29,12 +31,15 @@ android {
             applicationIdSuffix = ".preview"
             signingConfig = signingConfigs.getByName("debug")
             matchingFallbacks += listOf("release")
+            buildConfigField("boolean", "VOICE_REFERENCE_CAPTURE", providers.gradleProperty("voiceReferenceCapture").orElse("false").get().toBooleanStrict().toString())
+            buildConfigField("boolean", "VOICE_DIAGNOSTICS", providers.gradleProperty("voiceDiagnostics").orElse("false").get().toBooleanStrict().toString())
         }
     }
 
     testBuildType = "preview"
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     // All weights are streamed into verified internal files, so APK compression is safe.
     packaging { jniLibs.useLegacyPackaging = true }

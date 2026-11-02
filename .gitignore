@@ -7,3 +7,7 @@ local.properties
 *.apk
 *.idsig
 download-receipt.json
+__pycache__/
+*.pyc
+evaluation/voice/trials*.jsonl
+evaluation/voice/recordings/
