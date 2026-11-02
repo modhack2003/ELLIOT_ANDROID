@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <application android:label="ELLIOT" tools:replace="android:label">
+        <service android:name="com.eiliot.app.core.SentinelCoreService"
+            android:exported="false" android:foregroundServiceType="specialUse|microphone" />
+        <service android:name="com.eiliot.app.core.EiliotNotificationListener"
+            android:label="ELLIOT notifications" tools:replace="android:label" />
+        <service android:name="com.eiliot.app.core.ScreenReader"
+            android:label="ELLIOT screen reader" tools:replace="android:label" />
+    </application>
+</manifest>

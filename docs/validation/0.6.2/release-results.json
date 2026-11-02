@@ -1,0 +1,48 @@
+{
+  "release": "0.6.2",
+  "version_code": 10,
+  "tests": {
+    "tests": 154,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lint": {
+    "release": {
+      "Error": 0,
+      "Fatal": 0,
+      "Warning": 84
+    },
+    "preview": {
+      "Error": 0,
+      "Fatal": 0,
+      "Warning": 83
+    }
+  },
+  "artifacts": [
+    {
+      "name": "ELLIOT_v0.6.2.apk",
+      "bytes": 93268860,
+      "sha256": "0113806d2aa795f8faac79de9c8522bae13cd8e29d3ab43e1e82deaaa7e28a02"
+    },
+    {
+      "name": "ELLIOT_v0.6.2_universal.apk",
+      "bytes": 141695859,
+      "sha256": "36af3dd7d0455cc814b3283135c700c8ce0094964d0875b54ffb282065cd86a1"
+    },
+    {
+      "name": "ELLIOT_original_package_v0.6.2_unsigned.apk",
+      "bytes": 141683543,
+      "sha256": "dc3416928b7d61f9a0af8840cd187313055f63459f98d1e001c829de4a41ff1b"
+    }
+  ],
+  "android_instrumentation_tests": {
+    "compiled": 2,
+    "executed": false,
+    "reason": "No connected ADB device; /dev/kvm absent"
+  },
+  "native_host": {
+    "old_config_exit": 255,
+    "corrected_config_passed": true
+  }
+}

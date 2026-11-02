@@ -1,0 +1,1356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.10.1">
+
+    <issue
+        id="ApplySharedPref"
+        severity="Warning"
+        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
+        category="Correctness"
+        priority="6"
+        summary="Use `apply()` on `SharedPreferences`"
+        explanation="Consider using `apply()` instead of `commit` on shared preferences. Whereas `commit` blocks and writes its data to persistent storage immediately, `apply` will handle it in the background."
+        errorLine1="    fun fail() {prefs.edit().putString(&quot;blocked&quot;,key).remove(&quot;pending&quot;).commit()}"
+        errorLine2="                                                                        ~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/voice/remote/NativeSpeechClient.kt"
+            line="15"
+            column="73"/>
+    </issue>
+
+    <issue
+        id="ApplySharedPref"
+        severity="Warning"
+        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
+        category="Correctness"
+        priority="6"
+        summary="Use `apply()` on `SharedPreferences`"
+        explanation="Consider using `apply()` instead of `commit` on shared preferences. Whereas `commit` blocks and writes its data to persistent storage immediately, `apply` will handle it in the background."
+        errorLine1="    fun finish() {prefs.edit().remove(&quot;pending&quot;).commit()}"
+        errorLine2="                                                 ~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/voice/remote/NativeSpeechClient.kt"
+            line="16"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="ApplySharedPref"
+        severity="Warning"
+        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
+        category="Correctness"
+        priority="6"
+        summary="Use `apply()` on `SharedPreferences`"
+        explanation="Consider using `apply()` instead of `commit` on shared preferences. Whereas `commit` blocks and writes its data to persistent storage immediately, `apply` will handle it in the background."
+        errorLine1="    fun retry() {prefs.edit().remove(&quot;pending&quot;).remove(&quot;blocked&quot;).commit()}"
+        errorLine2="                                                                  ~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/voice/remote/NativeSpeechClient.kt"
+            line="17"
+            column="67"/>
+    </issue>
+
+    <issue
+        id="ApplySharedPref"
+        severity="Warning"
+        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
+        category="Correctness"
+        priority="6"
+        summary="Use `apply()` on `SharedPreferences`"
+        explanation="Consider using `apply()` instead of `commit` on shared preferences. Whereas `commit` blocks and writes its data to persistent storage immediately, `apply` will handle it in the background."
+        errorLine1="    init { if(!prefs.contains(&quot;notification_awareness&quot;))prefs.edit().putBoolean(&quot;notification_awareness&quot;,proactiveEnabled).commit() }"
+        errorLine2="                                                                                                                           ~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="32"
+            column="124"/>
+    </issue>
+
+    <issue
+        id="ApplySharedPref"
+        severity="Warning"
+        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
+        category="Correctness"
+        priority="6"
+        summary="Use `apply()` on `SharedPreferences`"
+        explanation="Consider using `apply()` instead of `commit` on shared preferences. Whereas `commit` blocks and writes its data to persistent storage immediately, `apply` will handle it in the background."
+        errorLine1="    private fun put(k: String, v: Boolean) { prefs.edit().putBoolean(k, v).commit() }"
+        errorLine2="                                                                           ~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="36"
+            column="76"/>
+    </issue>
+
+    <issue
+        id="ApplySharedPref"
+        severity="Warning"
+        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
+        category="Correctness"
+        priority="6"
+        summary="Use `apply()` on `SharedPreferences`"
+        explanation="Consider using `apply()` instead of `commit` on shared preferences. Whereas `commit` blocks and writes its data to persistent storage immediately, `apply` will handle it in the background."
+        errorLine1="    var checkInInterval: Int get() = prefs.getInt(&quot;checkin_interval&quot;, 60).coerceIn(5, 1440); set(v) { prefs.edit().putInt(&quot;checkin_interval&quot;, v.coerceIn(5,1440)).commit() }"
+        errorLine2="                                                                                                                                                                  ~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="49"
+            column="163"/>
+    </issue>
+
+    <issue
+        id="ApplySharedPref"
+        severity="Warning"
+        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
+        category="Correctness"
+        priority="6"
+        summary="Use `apply()` on `SharedPreferences`"
+        explanation="Consider using `apply()` instead of `commit` on shared preferences. Whereas `commit` blocks and writes its data to persistent storage immediately, `apply` will handle it in the background."
+        errorLine1="    var checkInStart: Int get() = prefs.getInt(&quot;checkin_start&quot;, 480).coerceIn(0,1439); set(v) { prefs.edit().putInt(&quot;checkin_start&quot;, v.coerceIn(0,1439)).commit() }"
+        errorLine2="                                                                                                                                                         ~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="50"
+            column="154"/>
+    </issue>
+
+    <issue
+        id="ApplySharedPref"
+        severity="Warning"
+        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
+        category="Correctness"
+        priority="6"
+        summary="Use `apply()` on `SharedPreferences`"
+        explanation="Consider using `apply()` instead of `commit` on shared preferences. Whereas `commit` blocks and writes its data to persistent storage immediately, `apply` will handle it in the background."
+        errorLine1="    var checkInEnd: Int get() = prefs.getInt(&quot;checkin_end&quot;, 1320).coerceIn(0,1439); set(v) { prefs.edit().putInt(&quot;checkin_end&quot;, v.coerceIn(0,1439)).commit() }"
+        errorLine2="                                                                                                                                                    ~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="51"
+            column="149"/>
+    </issue>
+
+    <issue
+        id="ApplySharedPref"
+        severity="Warning"
+        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
+        category="Correctness"
+        priority="6"
+        summary="Use `apply()` on `SharedPreferences`"
+        explanation="Consider using `apply()` instead of `commit` on shared preferences. Whereas `commit` blocks and writes its data to persistent storage immediately, `apply` will handle it in the background."
+        errorLine1="    var checkInSnooze: Long get() = prefs.getLong(&quot;checkin_snooze&quot;, 0); set(v) { prefs.edit().putLong(&quot;checkin_snooze&quot;, v).commit() }"
+        errorLine2="                                                                                                                           ~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="52"
+            column="124"/>
+    </issue>
+
+    <issue
+        id="ApplySharedPref"
+        severity="Warning"
+        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
+        category="Correctness"
+        priority="6"
+        summary="Use `apply()` on `SharedPreferences`"
+        explanation="Consider using `apply()` instead of `commit` on shared preferences. Whereas `commit` blocks and writes its data to persistent storage immediately, `apply` will handle it in the background."
+        errorLine1="    var lastCheckIn: Long get() = prefs.getLong(&quot;last_checkin&quot;, 0); set(v) { prefs.edit().putLong(&quot;last_checkin&quot;, v).commit() }"
+        errorLine2="                                                                                                                     ~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="53"
+            column="118"/>
+    </issue>
+
+    <issue
+        id="ImplicitSamInstance"
+        severity="Warning"
+        message="This argument is a new instance so `stopService` will not remove anything"
+        category="Correctness"
+        priority="6"
+        summary="Implicit SAM Instances"
+        explanation="Kotlin&apos;s support for SAM (single abstract method) interfaces lets you pass a lambda to the interface. This will create a new instance on the fly even though there is no explicit constructor call. If you pass one of these lambdas or method references into a method which (for example) stores or compares the object identity, unexpected results may happen.&#xA;&#xA;In particular, passing a lambda variable in as a listener, and then later attempting to remove the listener will not work because a different instance is passed in."
+        url="https://kotlinlang.org/docs/fun-interfaces.html#sam-conversions"
+        urls="https://kotlinlang.org/docs/fun-interfaces.html#sam-conversions"
+        errorLine1="        context.stopService(Intent(context, SentinelCoreService::class.java))"
+        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/core/SentinelRuntime.kt"
+            line="70"
+            column="29"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        severity="Warning"
+        message="Attribute `isAccessibilityTool` is only used in API level 31 and higher (current min is 26)"
+        category="Correctness"
+        priority="6"
+        summary="Attribute unused on older versions"
+        explanation="This check finds attributes set in XML files that were introduced in a version newer than the oldest version targeted by your application (with the `minSdkVersion` attribute).&#xA;&#xA;This is not an error; the application will simply ignore the attribute. However, if the attribute is important to the appearance or functionality of your application, you should consider finding an alternative way to achieve the same result with only available attributes, and then you can optionally create a copy of the layout in a layout-vNN folder which will be used on API NN or higher where you can take advantage of the newer attribute.&#xA;&#xA;Note: This check does not only apply to attributes. For example, some tags can be unused too, such as the new `&lt;tag>` element in layouts introduced in API 21."
+        errorLine1="    android:isAccessibilityTool=&quot;false&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/res/xml/accessibility_config.xml"
+            line="8"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        severity="Warning"
+        message="Use of this function is discouraged because resource reflection makes it harder to perform build optimizations and compile-time verification of code. It is much more efficient to retrieve resources by identifier (e.g. `R.foo.bar`) than by name (e.g. `getIdentifier(&quot;bar&quot;, &quot;foo&quot;, null)`)."
+        category="Correctness"
+        priority="2"
+        summary="Using discouraged APIs"
+        explanation="Discouraged APIs are allowed and are not deprecated, but they may be unfit for common use (e.g. due to slow performance or subtle behavior)."
+        errorLine1="                    val id = context.resources.getIdentifier(name, &quot;dimen&quot;, &quot;android&quot;)"
+        errorLine2="                                               ~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayWindowController.kt"
+            line="90"
+            column="48"/>
+    </issue>
+
+    <issue
+        id="Recycle"
+        severity="Warning"
+        message="This `Cursor` should be freed up after use with `#close()`"
+        category="Performance"
+        priority="7"
+        summary="Missing `recycle()` calls"
+        explanation="Many resources, such as TypedArrays, VelocityTrackers, etc., should be recycled (with a `recycle()` call) after use. This lint check looks for missing `recycle()` calls."
+        errorLine1="        readableDatabase.rawQuery(&quot;SELECT id,role,body,created,source,status FROM messages ORDER BY id DESC LIMIT 300&quot;, null).use { c ->"
+        errorLine2="                         ~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/MemoryStore.kt"
+            line="44"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="Recycle"
+        severity="Warning"
+        message="This `Cursor` should be freed up after use with `#close()`"
+        category="Performance"
+        priority="7"
+        summary="Missing `recycle()` calls"
+        explanation="Many resources, such as TypedArrays, VelocityTrackers, etc., should be recycled (with a `recycle()` call) after use. This lint check looks for missing `recycle()` calls."
+        errorLine1="        readableDatabase.rawQuery(&quot;SELECT id,body,url,created,kind FROM notes ORDER BY id DESC LIMIT 500&quot;, null).use { c ->"
+        errorLine2="                         ~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/MemoryStore.kt"
+            line="48"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        severity="Warning"
+        message="This folder configuration (`v26`) is unnecessary; `minSdkVersion` is 26. Merge all the resources in this folder into `mipmap-anydpi`."
+        category="Performance"
+        priority="6"
+        summary="Obsolete SDK_INT Version Check"
+        explanation="This check flags version checks that are not necessary, because the `minSdkVersion` (or surrounding known API level) is already at least as high as the version checked for.&#xA;&#xA;Similarly, it also looks for resources in `-vNN` folders, such as `values-v14` where the version qualifier is less than or equal to the `minSdkVersion`, where the contents should be merged into the best folder.">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/res/mipmap-anydpi-v26"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        severity="Warning"
+        message="Do not place Android context classes in static fields (static reference to `NativeSpeechClient` which has field `context` pointing to `Context`); this is a memory leak"
+        category="Performance"
+        priority="6"
+        summary="Static Field Leaks"
+        explanation="A static field will leak contexts.&#xA;&#xA;Non-static inner classes have an implicit reference to their outer class. If that outer class is for example a `Fragment` or `Activity`, then this reference means that the long-running handler/loader/task will hold a reference to the activity which prevents it from getting garbage collected.&#xA;&#xA;Similarly, direct field references to activities and fragments from these longer running instances can cause leaks.&#xA;&#xA;ViewModel classes should never point to Views or non-application Contexts."
+        errorLine1="object NativeSpeechClient {"
+        errorLine2="^">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/voice/remote/NativeSpeechClient.kt"
+            line="19"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        severity="Warning"
+        message="Do not place Android context classes in static fields; this is a memory leak"
+        category="Performance"
+        priority="6"
+        summary="Static Field Leaks"
+        explanation="A static field will leak contexts.&#xA;&#xA;Non-static inner classes have an implicit reference to their outer class. If that outer class is for example a `Fragment` or `Activity`, then this reference means that the long-running handler/loader/task will hold a reference to the activity which prevents it from getting garbage collected.&#xA;&#xA;Similarly, direct field references to activities and fragments from these longer running instances can cause leaks.&#xA;&#xA;ViewModel classes should never point to Views or non-application Contexts."
+        errorLine1="    private var context:Context?=null"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/voice/remote/NativeSpeechClient.kt"
+            line="26"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        severity="Warning"
+        message="Do not place Android context classes in static fields (static reference to `NeuralSpeechPlayer` which has field `context` pointing to `Context`); this is a memory leak"
+        category="Performance"
+        priority="6"
+        summary="Static Field Leaks"
+        explanation="A static field will leak contexts.&#xA;&#xA;Non-static inner classes have an implicit reference to their outer class. If that outer class is for example a `Fragment` or `Activity`, then this reference means that the long-running handler/loader/task will hold a reference to the activity which prevents it from getting garbage collected.&#xA;&#xA;Similarly, direct field references to activities and fragments from these longer running instances can cause leaks.&#xA;&#xA;ViewModel classes should never point to Views or non-application Contexts."
+        errorLine1="/** Bundled Piper male voice. Synthesis runs off-main; audio buffers can be flushed on interruption. */"
+        errorLine2="^">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/voice/NeuralSpeechPlayer.kt"
+            line="12"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        severity="Warning"
+        message="Do not place Android context classes in static fields; this is a memory leak"
+        category="Performance"
+        priority="6"
+        summary="Static Field Leaks"
+        explanation="A static field will leak contexts.&#xA;&#xA;Non-static inner classes have an implicit reference to their outer class. If that outer class is for example a `Fragment` or `Activity`, then this reference means that the long-running handler/loader/task will hold a reference to the activity which prevents it from getting garbage collected.&#xA;&#xA;Similarly, direct field references to activities and fragments from these longer running instances can cause leaks.&#xA;&#xA;ViewModel classes should never point to Views or non-application Contexts."
+        errorLine1="    private var context:Context?=null"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/voice/NeuralSpeechPlayer.kt"
+            line="18"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        severity="Warning"
+        message="Do not place Android context classes in static fields (static reference to `OverlayManager` which has field `ctx` pointing to `Context`); this is a memory leak"
+        category="Performance"
+        priority="6"
+        summary="Static Field Leaks"
+        explanation="A static field will leak contexts.&#xA;&#xA;Non-static inner classes have an implicit reference to their outer class. If that outer class is for example a `Fragment` or `Activity`, then this reference means that the long-running handler/loader/task will hold a reference to the activity which prevents it from getting garbage collected.&#xA;&#xA;Similarly, direct field references to activities and fragments from these longer running instances can cause leaks.&#xA;&#xA;ViewModel classes should never point to Views or non-application Contexts."
+        errorLine1="/** Small, separately focusable windows. All placement uses measured safe bounds. */"
+        errorLine2="^">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayManager.kt"
+            line="26"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        severity="Warning"
+        message="Do not place Android context classes in static fields; this is a memory leak"
+        category="Performance"
+        priority="6"
+        summary="Static Field Leaks"
+        explanation="A static field will leak contexts.&#xA;&#xA;Non-static inner classes have an implicit reference to their outer class. If that outer class is for example a `Fragment` or `Activity`, then this reference means that the long-running handler/loader/task will hold a reference to the activity which prevents it from getting garbage collected.&#xA;&#xA;Similarly, direct field references to activities and fragments from these longer running instances can cause leaks.&#xA;&#xA;ViewModel classes should never point to Views or non-application Contexts."
+        errorLine1="    private var ctx:Context?=null"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayManager.kt"
+            line="30"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        severity="Warning"
+        message="Do not place Android context classes in static fields (static reference to `OverlayWindowController` which has field `context` pointing to `Context`); this is a memory leak"
+        category="Performance"
+        priority="6"
+        summary="Static Field Leaks"
+        explanation="A static field will leak contexts.&#xA;&#xA;Non-static inner classes have an implicit reference to their outer class. If that outer class is for example a `Fragment` or `Activity`, then this reference means that the long-running handler/loader/task will hold a reference to the activity which prevents it from getting garbage collected.&#xA;&#xA;Similarly, direct field references to activities and fragments from these longer running instances can cause leaks.&#xA;&#xA;ViewModel classes should never point to Views or non-application Contexts."
+        errorLine1="    private var controller:OverlayWindowController?=null"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayManager.kt"
+            line="34"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        severity="Warning"
+        message="Do not place Android context classes in static fields (static reference to `OverlayTranscriptView` which has field `status` pointing to `TextView`); this is a memory leak"
+        category="Performance"
+        priority="6"
+        summary="Static Field Leaks"
+        explanation="A static field will leak contexts.&#xA;&#xA;Non-static inner classes have an implicit reference to their outer class. If that outer class is for example a `Fragment` or `Activity`, then this reference means that the long-running handler/loader/task will hold a reference to the activity which prevents it from getting garbage collected.&#xA;&#xA;Similarly, direct field references to activities and fragments from these longer running instances can cause leaks.&#xA;&#xA;ViewModel classes should never point to Views or non-application Contexts."
+        errorLine1="    private var panel:OverlayTranscriptView?=null"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayManager.kt"
+            line="37"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        severity="Warning"
+        message="Do not place Android context classes in static fields; this is a memory leak"
+        category="Performance"
+        priority="6"
+        summary="Static Field Leaks"
+        explanation="A static field will leak contexts.&#xA;&#xA;Non-static inner classes have an implicit reference to their outer class. If that outer class is for example a `Fragment` or `Activity`, then this reference means that the long-running handler/loader/task will hold a reference to the activity which prevents it from getting garbage collected.&#xA;&#xA;Similarly, direct field references to activities and fragments from these longer running instances can cause leaks.&#xA;&#xA;ViewModel classes should never point to Views or non-application Contexts."
+        errorLine1="    private var caption:LinearLayout?=null"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayManager.kt"
+            line="39"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        severity="Warning"
+        message="Do not place Android context classes in static fields; this is a memory leak"
+        category="Performance"
+        priority="6"
+        summary="Static Field Leaks"
+        explanation="A static field will leak contexts.&#xA;&#xA;Non-static inner classes have an implicit reference to their outer class. If that outer class is for example a `Fragment` or `Activity`, then this reference means that the long-running handler/loader/task will hold a reference to the activity which prevents it from getting garbage collected.&#xA;&#xA;Similarly, direct field references to activities and fragments from these longer running instances can cause leaks.&#xA;&#xA;ViewModel classes should never point to Views or non-application Contexts."
+        errorLine1="    private var captionText:TextView?=null"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayManager.kt"
+            line="40"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        severity="Warning"
+        message="Do not place Android context classes in static fields; this is a memory leak"
+        category="Performance"
+        priority="6"
+        summary="Static Field Leaks"
+        explanation="A static field will leak contexts.&#xA;&#xA;Non-static inner classes have an implicit reference to their outer class. If that outer class is for example a `Fragment` or `Activity`, then this reference means that the long-running handler/loader/task will hold a reference to the activity which prevents it from getting garbage collected.&#xA;&#xA;Similarly, direct field references to activities and fragments from these longer running instances can cause leaks.&#xA;&#xA;ViewModel classes should never point to Views or non-application Contexts."
+        errorLine1="    private var captionStatus:TextView?=null"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayManager.kt"
+            line="41"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        severity="Warning"
+        message="Do not place Android context classes in static fields (static reference to `SentinelRuntime` which has field `context` pointing to `Context`); this is a memory leak"
+        category="Performance"
+        priority="6"
+        summary="Static Field Leaks"
+        explanation="A static field will leak contexts.&#xA;&#xA;Non-static inner classes have an implicit reference to their outer class. If that outer class is for example a `Fragment` or `Activity`, then this reference means that the long-running handler/loader/task will hold a reference to the activity which prevents it from getting garbage collected.&#xA;&#xA;Similarly, direct field references to activities and fragments from these longer running instances can cause leaks.&#xA;&#xA;ViewModel classes should never point to Views or non-application Contexts."
+        errorLine1="/** One cancellation and permission boundary shared by UI, services, jobs and the overlay. */"
+        errorLine2="^">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/core/SentinelRuntime.kt"
+            line="14"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        severity="Warning"
+        message="Do not place Android context classes in static fields; this is a memory leak"
+        category="Performance"
+        priority="6"
+        summary="Static Field Leaks"
+        explanation="A static field will leak contexts.&#xA;&#xA;Non-static inner classes have an implicit reference to their outer class. If that outer class is for example a `Fragment` or `Activity`, then this reference means that the long-running handler/loader/task will hold a reference to the activity which prevents it from getting garbage collected.&#xA;&#xA;Similarly, direct field references to activities and fragments from these longer running instances can cause leaks.&#xA;&#xA;ViewModel classes should never point to Views or non-application Contexts."
+        errorLine1="    lateinit var context: Context; private set"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/core/SentinelRuntime.kt"
+            line="16"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        severity="Warning"
+        message="Do not place Android context classes in static fields (static reference to `VoiceIo` which has field `ctx` pointing to `Context`); this is a memory leak"
+        category="Performance"
+        priority="6"
+        summary="Static Field Leaks"
+        explanation="A static field will leak contexts.&#xA;&#xA;Non-static inner classes have an implicit reference to their outer class. If that outer class is for example a `Fragment` or `Activity`, then this reference means that the long-running handler/loader/task will hold a reference to the activity which prevents it from getting garbage collected.&#xA;&#xA;Similarly, direct field references to activities and fragments from these longer running instances can cause leaks.&#xA;&#xA;ViewModel classes should never point to Views or non-application Contexts."
+        errorLine1="object VoiceIo {"
+        errorLine2="^">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/voice/VoiceIo.kt"
+            line="25"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        severity="Warning"
+        message="Do not place Android context classes in static fields; this is a memory leak"
+        category="Performance"
+        priority="6"
+        summary="Static Field Leaks"
+        explanation="A static field will leak contexts.&#xA;&#xA;Non-static inner classes have an implicit reference to their outer class. If that outer class is for example a `Fragment` or `Activity`, then this reference means that the long-running handler/loader/task will hold a reference to the activity which prevents it from getting garbage collected.&#xA;&#xA;Similarly, direct field references to activities and fragments from these longer running instances can cause leaks.&#xA;&#xA;ViewModel classes should never point to Views or non-application Contexts."
+        errorLine1="    private var ctx: Context? = null"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/voice/VoiceIo.kt"
+            line="27"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="FrequentlyChangedStateReadInComposition"
+        severity="Warning"
+        message="Frequently changing state should not be directly read in composable function"
+        category="Performance"
+        priority="3"
+        summary="Frequently changing state should not  be directly read in composable function"
+        explanation="This property is observable and is updated after every scroll or remeasure. If you use it in the composable function directly, it will be recomposed on every change, causing potential performance issues including infinity recomposition loops. Prefer wrapping it with derivedStateOf to use calculation based on this property in composition or collect changes inside LaunchedEffect instead."
+        errorLine1="    LaunchedEffect(messages.lastOrNull()?.id,state.reply.length,state.busy,state.audioPending,follow,scroll.layoutInfo.viewportEndOffset) {"
+        errorLine2="                                                                                                     ~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/ui/HomeScreen.kt"
+            line="74"
+            column="102"/>
+    </issue>
+
+    <issue
+        id="MonochromeLauncherIcon"
+        severity="Warning"
+        message="The application adaptive icon is missing a monochrome tag"
+        category="Usability:Icons"
+        priority="6"
+        summary="Monochrome icon is not defined"
+        explanation="If `android:roundIcon` and `android:icon` are both in your manifest, you must either remove the reference to `android:roundIcon` if it is not needed; or, supply the monochrome icon in the drawable defined by the `android:roundIcon` and `android:icon` attribute.&#xA;&#xA;For example, if `android:roundIcon` and `android:icon` are both in the manifest, a launcher might choose to use `android:roundIcon` over `android:icon` to display the adaptive app icon. Therefore, your themed application iconwill not show if your monochrome attribute is not also specified in `android:roundIcon`."
+        errorLine1="&lt;adaptive-icon xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>&lt;background android:drawable=&quot;@color/icon_background&quot;/>&lt;foreground android:drawable=&quot;@drawable/ic_eiliot_foreground&quot;/>&lt;/adaptive-icon>"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="ViewConstructor"
+        severity="Warning"
+        message="Custom view `OverlayTranscriptView` is missing constructor used by tools: `(Context)` or `(Context,AttributeSet)` or `(Context,AttributeSet,int)`"
+        category="Usability"
+        priority="3"
+        summary="Missing View constructors for XML inflation"
+        explanation="Some layout tools (such as the Android layout editor) need to find a constructor with one of the following signatures:&#xA;* `View(Context context)`&#xA;* `View(Context context, AttributeSet attrs)`&#xA;* `View(Context context, AttributeSet attrs, int defStyle)`&#xA;&#xA;If your custom view needs to perform initialization which does not apply when used in a layout editor, you can surround the given code with a check to see if `View#isInEditMode()` is false, since that method will return `false` at runtime but true within a user interface editor."
+        errorLine1="class OverlayTranscriptView(context: Context, val mode: OverlayPanelMode, private val appearance: OverlayAppearance,"
+        errorLine2="      ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayTranscriptView.kt"
+            line="29"
+            column="7"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="    fun begin() {check(!blocked()) {&quot;Offline speech needs a manual retry&quot;};check(prefs.edit().putString(&quot;pending&quot;,key).commit())}"
+        errorLine2="                                                                                 ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/voice/remote/NativeSpeechClient.kt"
+            line="14"
+            column="82"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="    fun fail() {prefs.edit().putString(&quot;blocked&quot;,key).remove(&quot;pending&quot;).commit()}"
+        errorLine2="                ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/voice/remote/NativeSpeechClient.kt"
+            line="15"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="    fun finish() {prefs.edit().remove(&quot;pending&quot;).commit()}"
+        errorLine2="                  ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/voice/remote/NativeSpeechClient.kt"
+            line="16"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="    fun retry() {prefs.edit().remove(&quot;pending&quot;).remove(&quot;blocked&quot;).commit()}"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/voice/remote/NativeSpeechClient.kt"
+            line="17"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `String.toColorInt` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="        baseColor = Color.parseColor(&quot;#00E5FF&quot;),"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OrbState.kt"
+            line="27"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `String.toColorInt` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="        hotColor = Color.parseColor(&quot;#FFFFFF&quot;),"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OrbState.kt"
+            line="28"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `String.toColorInt` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="        baseColor = Color.parseColor(&quot;#8EF6FF&quot;),"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OrbState.kt"
+            line="31"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `String.toColorInt` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="        hotColor = Color.parseColor(&quot;#FFFFFF&quot;),"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OrbState.kt"
+            line="32"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `String.toColorInt` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="        baseColor = Color.parseColor(&quot;#7C8CFF&quot;),"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OrbState.kt"
+            line="35"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `String.toColorInt` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="        hotColor = Color.parseColor(&quot;#E8ECFF&quot;),"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OrbState.kt"
+            line="36"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `String.toColorInt` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="        baseColor = Color.parseColor(&quot;#3EF2D8&quot;),"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OrbState.kt"
+            line="39"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `String.toColorInt` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="        hotColor = Color.parseColor(&quot;#FFFFFF&quot;),"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OrbState.kt"
+            line="40"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `String.toColorInt` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="        baseColor = Color.parseColor(&quot;#FF5A2A&quot;),"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OrbState.kt"
+            line="43"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `String.toColorInt` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="        hotColor = Color.parseColor(&quot;#FFD54F&quot;),"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OrbState.kt"
+            line="44"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `String.toColorInt` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="        baseColor = Color.parseColor(&quot;#A78BFF&quot;),"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OrbState.kt"
+            line="47"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `String.toColorInt` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="        hotColor = Color.parseColor(&quot;#E6DEFF&quot;),"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OrbState.kt"
+            line="48"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="        prefs.edit().putInt(&quot;schema&quot;, 1).putInt(&quot;size&quot;, value.sizeDp.coerceIn(56, 112))"
+        errorLine2="        ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayLayoutStore.kt"
+            line="32"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="            prefs.edit().putBoolean(&quot;legacy_imported&quot;, true).putInt(&quot;schema&quot;,1).apply()"
+        errorLine2="            ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayLayoutStore.kt"
+            line="46"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="        prefs.edit().putString(&quot;anchor_${profile}_edge&quot;, a.edge.name).putFloat(&quot;anchor_${profile}_fraction&quot;, a.fraction).apply()"
+        errorLine2="        ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayLayoutStore.kt"
+            line="53"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="    fun reset() { prefs.edit().clear().putBoolean(&quot;legacy_imported&quot;, true).putInt(&quot;schema&quot;, 1).apply() }"
+        errorLine2="                  ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayLayoutStore.kt"
+            line="55"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `String.toUri` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="    fun requestPermission(context:Context) { suspendForSettings();context.startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,Uri.parse(&quot;package:${context.packageName}&quot;)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }"
+        errorLine2="                                                                                                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayManager.kt"
+            line="438"
+            column="138"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `String.toUri` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="                    if (args.getString(&quot;page&quot;) == &quot;app&quot;) intent.data = Uri.parse(&quot;package:${context.packageName}&quot;)"
+        errorLine2="                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/tools/PhoneTools.kt"
+            line="138"
+            column="72"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `String.toUri` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="                    if (args.getString(&quot;page&quot;) == &quot;app&quot;) intent.data = Uri.parse(&quot;package:${context.packageName}&quot;)"
+        errorLine2="                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/tools/PhoneTools.kt"
+            line="138"
+            column="72"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `String.toUri` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(WebPolicy.url(args.getString(&quot;url&quot;)).toString())).addCategory(Intent.CATEGORY_BROWSABLE).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))"
+        errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/tools/PhoneTools.kt"
+            line="157"
+            column="70"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="                    prefs.edit().putBoolean(&quot;migration_done&quot;, true).apply()"
+        errorLine2="                    ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="27"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="                }.onFailure { prefs.edit().putBoolean(&quot;migration_problem&quot;, true).apply() }"
+        errorLine2="                              ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="28"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="            } else prefs.edit().putBoolean(&quot;migration_done&quot;, true).apply()"
+        errorLine2="                   ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="29"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="    init { if(!prefs.contains(&quot;notification_awareness&quot;))prefs.edit().putBoolean(&quot;notification_awareness&quot;,proactiveEnabled).commit() }"
+        errorLine2="                                                        ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="32"
+            column="57"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="    private fun put(k: String, v: String) { prefs.edit().putString(k, v).apply() }"
+        errorLine2="                                            ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="34"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="    private fun put(k: String, v: Boolean) { prefs.edit().putBoolean(k, v).commit() }"
+        errorLine2="                                             ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="36"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="    var checkInInterval: Int get() = prefs.getInt(&quot;checkin_interval&quot;, 60).coerceIn(5, 1440); set(v) { prefs.edit().putInt(&quot;checkin_interval&quot;, v.coerceIn(5,1440)).commit() }"
+        errorLine2="                                                                                                      ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="49"
+            column="103"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="    var checkInStart: Int get() = prefs.getInt(&quot;checkin_start&quot;, 480).coerceIn(0,1439); set(v) { prefs.edit().putInt(&quot;checkin_start&quot;, v.coerceIn(0,1439)).commit() }"
+        errorLine2="                                                                                                ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="50"
+            column="97"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="    var checkInEnd: Int get() = prefs.getInt(&quot;checkin_end&quot;, 1320).coerceIn(0,1439); set(v) { prefs.edit().putInt(&quot;checkin_end&quot;, v.coerceIn(0,1439)).commit() }"
+        errorLine2="                                                                                             ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="51"
+            column="94"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="    var checkInSnooze: Long get() = prefs.getLong(&quot;checkin_snooze&quot;, 0); set(v) { prefs.edit().putLong(&quot;checkin_snooze&quot;, v).commit() }"
+        errorLine2="                                                                                 ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="52"
+            column="82"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="    var lastCheckIn: Long get() = prefs.getLong(&quot;last_checkin&quot;, 0); set(v) { prefs.edit().putLong(&quot;last_checkin&quot;, v).commit() }"
+        errorLine2="                                                                             ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="53"
+            column="78"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="        set(v) { prefs.edit().putStringSet(&quot;male_voices&quot;, v.toSet()).apply() }"
+        errorLine2="                 ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="71"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="    var ttsPitch: Float get() = prefs.getFloat(&quot;tts_pitch&quot;, 1f); set(v) { prefs.edit().putFloat(&quot;tts_pitch&quot;, v).apply() }"
+        errorLine2="                                                                          ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="72"
+            column="75"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="    var ttsRate: Float get() = prefs.getFloat(&quot;tts_rate&quot;, 1f); set(v) { prefs.edit().putFloat(&quot;tts_rate&quot;, v).apply() }"
+        errorLine2="                                                                        ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="73"
+            column="73"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `SharedPreferences.edit` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="    var lastProactiveAt: Long get() = prefs.getLong(&quot;last_proactive&quot;, 0); set(v) { prefs.edit().putLong(&quot;last_proactive&quot;, v).apply() }"
+        errorLine2="                                                                                   ~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/data/SecureStore.kt"
+            line="74"
+            column="84"/>
+    </issue>
+
+    <issue
+        id="UseKtx"
+        severity="Warning"
+        message="Use the KTX extension function `String.toUri` instead?"
+        category="Productivity"
+        priority="6"
+        summary="Use KTX extension function"
+        explanation="The Android KTX libraries decorates the Android platform SDK as well as various libraries with more convenient extension functions available from Kotlin, allowing you to use default parameters, named parameters, and more."
+        errorLine1="                        TextButton(onClick={runCatching {context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse(note.url)))}}) {Text(&quot;Source&quot;,maxLines=1)}"
+        errorLine2="                                                                                                         ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/ui/VaultScreen.kt"
+            line="74"
+            column="106"/>
+    </issue>
+
+    <issue
+        id="ClickableViewAccessibility"
+        severity="Warning"
+        message="Custom view ``ScrollView`` has `setOnTouchListener` called on it but does not override `performClick`"
+        category="Accessibility"
+        priority="6"
+        summary="Accessibility in Custom Views"
+        explanation="If a `View` that overrides `onTouchEvent` or uses an `OnTouchListener` does not also implement `performClick` and call it when clicks are detected, the `View` may not handle accessibility actions properly. Logic handling the click actions should ideally be placed in `View#performClick` as some accessibility services invoke `performClick` when a click action should occur."
+        errorLine1="        root.scroll.setOnTouchListener { _,e->if(e.actionMasked==MotionEvent.ACTION_DOWN)follow=false;false }"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayManager.kt"
+            line="255"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ClickableViewAccessibility"
+        severity="Warning"
+        message="`onTouch` lambda should call `View#performClick` when a click is detected"
+        category="Accessibility"
+        priority="6"
+        summary="Accessibility in Custom Views"
+        explanation="If a `View` that overrides `onTouchEvent` or uses an `OnTouchListener` does not also implement `performClick` and call it when clicks are detected, the `View` may not handle accessibility actions properly. Logic handling the click actions should ideally be placed in `View#performClick` as some accessibility services invoke `performClick` when a click action should occur."
+        errorLine1="        root.scroll.setOnTouchListener { _,e->if(e.actionMasked==MotionEvent.ACTION_DOWN)follow=false;false }"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayManager.kt"
+            line="255"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="ClickableViewAccessibility"
+        severity="Warning"
+        message="Custom view ``EditText`` has `setOnTouchListener` called on it but does not override `performClick`"
+        category="Accessibility"
+        priority="6"
+        summary="Accessibility in Custom Views"
+        explanation="If a `View` that overrides `onTouchEvent` or uses an `OnTouchListener` does not also implement `performClick` and call it when clicks are detected, the `View` may not handle accessibility actions properly. Logic handling the click actions should ideally be placed in `View#performClick` as some accessibility services invoke `performClick` when a click action should occur."
+        errorLine1="        input.setOnTouchListener { _,event -> if(event.actionMasked==android.view.MotionEvent.ACTION_DOWN) actions.focus(); false }"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayTranscriptView.kt"
+            line="86"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ClickableViewAccessibility"
+        severity="Warning"
+        message="`onTouch` lambda should call `View#performClick` when a click is detected"
+        category="Accessibility"
+        priority="6"
+        summary="Accessibility in Custom Views"
+        explanation="If a `View` that overrides `onTouchEvent` or uses an `OnTouchListener` does not also implement `performClick` and call it when clicks are detected, the `View` may not handle accessibility actions properly. Logic handling the click actions should ideally be placed in `View#performClick` as some accessibility services invoke `performClick` when a click action should occur."
+        errorLine1="        input.setOnTouchListener { _,event -> if(event.actionMasked==android.view.MotionEvent.ACTION_DOWN) actions.focus(); false }"
+        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayTranscriptView.kt"
+            line="86"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="            root.openButton.text=&quot;${if(s.error!=null) &quot;Needs attention&quot; else presence.phase.label} ↗&quot;"
+        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayManager.kt"
+            line="335"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="        captionStatus?.text=&quot;ELLIOT · ${CapabilityRegistry.currentSession().phase.label}&quot;"
+        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayManager.kt"
+            line="368"
+            column="29"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="        captionStatus?.text=&quot;ELLIOT · ${CapabilityRegistry.currentSession().phase.label}&quot;"
+        errorLine2="                             ~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayManager.kt"
+            line="368"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="        else status.text=&quot;Open ELLIOT to type or read more&quot;"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayTranscriptView.kt"
+            line="95"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        severity="Warning"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        category="Internationalization"
+        priority="6"
+        summary="TextView Internationalization"
+        explanation="When calling `TextView#setText`&#xA;* Never call `Number#toString()` to format numbers; it will not handle fraction separators and locale-specific digits properly. Consider using `String#format` with proper format specifications (`%d` or `%f`) instead.&#xA;* Do not pass a string literal (e.g. &quot;Hello&quot;) to display text. Hardcoded text can not be properly translated to other languages. Consider using Android resource strings instead.&#xA;* Do not build messages by concatenating text chunks. Such messages can not be properly translated."
+        url="https://developer.android.com/guide/topics/resources/localization.html"
+        urls="https://developer.android.com/guide/topics/resources/localization.html"
+        errorLine1="        if(mode!=OverlayPanelMode.FULL) { if(title!=null) { openButton.text=&quot;Review ↗&quot;;openButton.contentDescription=&quot;Open ELLIOT. Review: $title. More has Allow or Decline.&quot; };return }"
+        errorLine2="                                                                             ~~~~~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayTranscriptView.kt"
+            line="125"
+            column="78"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        severity="Warning"
+        message="Use &quot;`Gravity.START`&quot; instead of &quot;`Gravity.LEFT`&quot; to ensure correct behavior in right-to-left locales"
+        category="Internationalization:Bidirectional Text"
+        priority="5"
+        summary="Using left/right instead of start/end attributes"
+        explanation="Using `Gravity#LEFT` and `Gravity#RIGHT` can lead to problems when a layout is rendered in locales where text flows from right to left. Use `Gravity#START` and `Gravity#END` instead. Similarly, in XML `gravity` and `layout_gravity` attributes, use `start` rather than `left`.&#xA;&#xA;For XML attributes such as paddingLeft and `layout_marginLeft`, use `paddingStart` and `layout_marginStart`. **NOTE**: If your `minSdkVersion` is less than 17, you should add **both** the older left/right attributes **as well as** the new start/end attributes. On older platforms, where RTL is not supported and the start/end attributes are unknown and therefore ignored, you need the older left/right attributes. There is a separate lint check which catches that type of error.&#xA;&#xA;(Note: For `Gravity#LEFT` and `Gravity#START`, you can use these constants even when targeting older platforms, because the `start` bitmask is a superset of the `left` bitmask. Therefore, you can use `gravity=&quot;start&quot;` rather than `gravity=&quot;left|start&quot;`.)"
+        errorLine1="        gravity=Gravity.TOP or Gravity.LEFT"
+        errorLine2="                                       ~~~~">
+        <location
+            file="/workspace/scratch/25411cb79860/elliot-v062/elliot-android/app/src/main/java/com/eiliot/app/overlay/OverlayManager.kt"
+            line="96"
+            column="40"/>
+    </issue>
+
+</issues>

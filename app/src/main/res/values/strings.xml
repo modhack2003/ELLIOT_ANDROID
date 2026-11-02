@@ -1,0 +1,3 @@
+<resources>
+    <string name="accessibility_description">ELLIOT can read visible non-sensitive screen text when you approve it, and perform separately enabled and approved taps, scrolling and non-password text entry. Screen text may be shared with your chosen model for that task. It cannot unlock the phone, silently grant permissions or access other apps’ private storage.</string>
+</resources>

@@ -1,0 +1,13 @@
+{
+  "runtime": "sherpa-onnx 1.13.8 Linux CPU (not Android audio)",
+  "tts_samples": 47616,
+  "tts_sample_rate": 22050,
+  "asr_synthesized_command": "T VOLUME TO THIRTY PER CENT",
+  "keyword_hits": [
+    "hey_elliot"
+  ],
+  "vad_speech_frames": 76,
+  "silence_frames_checked": 40,
+  "elapsed_seconds": 3.98,
+  "limits": "Synthetic near-field model smoke only. Not phone echo, false-wake rate, distance, end-to-end latency or Android JNI/audio certification."
+}

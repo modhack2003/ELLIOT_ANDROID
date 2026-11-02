@@ -1,0 +1,48 @@
+{
+  "release": "0.6.1",
+  "version_code": 9,
+  "tests": {
+    "tests": 144,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lint": {
+    "release": {
+      "Error": 0,
+      "Fatal": 0,
+      "Warning": 76
+    },
+    "preview": {
+      "Error": 0,
+      "Fatal": 0,
+      "Warning": 74
+    }
+  },
+  "physical_device_available": false,
+  "model_smoke": {
+    "runtime": "sherpa-onnx 1.13.8 Linux CPU (not Android audio)",
+    "tts_samples": 46080,
+    "tts_sample_rate": 22050,
+    "asr_synthesized_command": "T VOLUME TO THIRTY PER CENT",
+    "keyword_hits": [
+      "hey_elliot"
+    ],
+    "vad_speech_frames": 74,
+    "silence_frames_checked": 40,
+    "elapsed_seconds": 2.68,
+    "limits": "Synthetic near-field model smoke only. Not phone echo, false-wake rate, distance, end-to-end latency or Android JNI/audio certification."
+  },
+  "artifacts": [
+    {
+      "name": "ELLIOT_v0.6.1.apk",
+      "bytes": 258908993,
+      "sha256": "797b012ee81c92bdf523c8b6957fe57162073ef4a41532b341f798fc33b51364"
+    },
+    {
+      "name": "ELLIOT_original_package_v0.6.1_unsigned.apk",
+      "bytes": 258896693,
+      "sha256": "8355c5745aeabd003f11e741cc8a3ddaa485b54e80317ee0027858f85c1c05c1"
+    }
+  ]
+}

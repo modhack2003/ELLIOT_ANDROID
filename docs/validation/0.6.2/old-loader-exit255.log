@@ -1,0 +1,1 @@
+/project/sherpa-onnx/csrc/online-zipformer-transducer-model.cc:InitEncoder:118 'attention_dims' does not exist in the metadata

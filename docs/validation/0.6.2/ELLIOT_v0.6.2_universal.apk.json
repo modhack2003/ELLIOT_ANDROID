@@ -1,0 +1,123 @@
+{
+  "file": "ELLIOT_v0.6.2_universal.apk",
+  "bytes": 141695859,
+  "sha256": "36af3dd7d0455cc814b3283135c700c8ce0094964d0875b54ffb282065cd86a1",
+  "model_files_verified": 373,
+  "model_bytes_verified": 88298303,
+  "aligned_64_bit_libraries": [
+    {
+      "library": "lib/arm64-v8a/libandroidx.graphics.path.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/arm64-v8a/libjnidispatch.so",
+      "load_alignments": [
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/arm64-v8a/libonnxruntime.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/arm64-v8a/libsherpa-onnx-c-api.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/arm64-v8a/libsherpa-onnx-cxx-api.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/arm64-v8a/libsherpa-onnx-jni.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/arm64-v8a/libvosk.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/x86_64/libandroidx.graphics.path.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/x86_64/libjnidispatch.so",
+      "load_alignments": [
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/x86_64/libonnxruntime.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/x86_64/libsherpa-onnx-c-api.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/x86_64/libsherpa-onnx-cxx-api.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/x86_64/libsherpa-onnx-jni.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/x86_64/libvosk.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ]
+    }
+  ]
+}

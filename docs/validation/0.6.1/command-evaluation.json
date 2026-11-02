@@ -1,0 +1,18 @@
+[
+  {
+    "input": "Set volume to thirty percent.",
+    "recognized": "T VOLUME TO THIRTY PER CENT"
+  },
+  {
+    "input": "Start a timer for five minutes.",
+    "recognized": "ER FOR FIVE MINUTES"
+  },
+  {
+    "input": "Open YouTube.",
+    "recognized": "'N YOU TOO"
+  },
+  {
+    "input": "I would like some help with my work.",
+    "recognized": "OUD LIKE SOME HELP WITH MY WORK"
+  }
+]

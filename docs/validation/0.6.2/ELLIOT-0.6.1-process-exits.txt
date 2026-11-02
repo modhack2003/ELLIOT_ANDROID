@@ -1,0 +1,24 @@
+ACTIVITY MANAGER PROCESS EXIT INFO (dumpsys activity exit-info)
+Last Timestamp of Persistence Into Persistent Storage: 2026-10-30 18:22:55.250
+  package: com.eiliot.app.preview
+    Historical Process Exit for uid=10564
+        ApplicationExitInfo #0:
+          timestamp=2026-10-30 19:13:38.868 pid=7304 realUid=10564 packageUid=10564 definingUid=10564 user=0
+          process=com.eiliot.app.preview reason=1 (EXIT_SELF) subreason=0 (UNKNOWN) status=255
+          importance=100 pss=0.00 rss=120MB description=null state=empty trace=null
+        ApplicationExitInfo #1:
+          timestamp=2026-10-30 18:26:57.866 pid=619 realUid=10564 packageUid=10564 definingUid=10564 user=0
+          process=com.eiliot.app.preview reason=1 (EXIT_SELF) subreason=0 (UNKNOWN) status=255
+          importance=100 pss=0.00 rss=0.00 description=null state=empty trace=null
+        ApplicationExitInfo #2:
+          timestamp=2026-10-30 18:26:51.250 pid=6857 realUid=10564 packageUid=10564 definingUid=10564 user=0
+          process=com.eiliot.app.preview reason=1 (EXIT_SELF) subreason=0 (UNKNOWN) status=255
+          importance=100 pss=0.00 rss=185MB description=null state=empty trace=null
+        ApplicationExitInfo #3:
+          timestamp=2026-10-30 18:25:51.258 pid=6151 realUid=10564 packageUid=10564 definingUid=10564 user=0
+          process=com.eiliot.app.preview reason=1 (EXIT_SELF) subreason=0 (UNKNOWN) status=255
+          importance=100 pss=0.00 rss=213MB description=null state=empty trace=null
+        ApplicationExitInfo #4:
+          timestamp=2026-10-30 18:25:18.570 pid=26202 realUid=10564 packageUid=10564 definingUid=10564 user=0
+          process=com.eiliot.app.preview reason=1 (EXIT_SELF) subreason=0 (UNKNOWN) status=255
+          importance=100 pss=0.00 rss=242MB description=null state=empty trace=null

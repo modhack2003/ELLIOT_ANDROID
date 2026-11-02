@@ -1,0 +1,66 @@
+{
+  "file": "ELLIOT_v0.6.2.apk",
+  "bytes": 93268860,
+  "sha256": "0113806d2aa795f8faac79de9c8522bae13cd8e29d3ab43e1e82deaaa7e28a02",
+  "model_files_verified": 373,
+  "model_bytes_verified": 88298303,
+  "aligned_64_bit_libraries": [
+    {
+      "library": "lib/arm64-v8a/libandroidx.graphics.path.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/arm64-v8a/libjnidispatch.so",
+      "load_alignments": [
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/arm64-v8a/libonnxruntime.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/arm64-v8a/libsherpa-onnx-c-api.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/arm64-v8a/libsherpa-onnx-cxx-api.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/arm64-v8a/libsherpa-onnx-jni.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "library": "lib/arm64-v8a/libvosk.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ]
+    }
+  ]
+}
