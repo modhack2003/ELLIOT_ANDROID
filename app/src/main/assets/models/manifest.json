@@ -1,5 +1,5 @@
 {
-  "version": 9,
+  "version": 10,
   "files": [
     {
       "path": "NOTICES.md",
@@ -35,6 +35,16 @@
       "path": "asr/tokens.txt",
       "bytes": 5048,
       "sha256": "49e3c2646595fd907228b3c6787069658f67b17377c60aeb8619c4551b2316fb"
+    },
+    {
+      "path": "denoise/LICENSE.txt",
+      "bytes": 1069,
+      "sha256": "c467165e5860b4a7494ef4a6e2788e4115d95b5b8989bb5f86287089adddf794"
+    },
+    {
+      "path": "denoise/gtcrn.onnx",
+      "bytes": 535638,
+      "sha256": "e77603ac0c23dac3227dd2d7135b3a585cbee2679048aecfa886657d3ae1b534"
     },
     {
       "path": "kws/bpe.model",

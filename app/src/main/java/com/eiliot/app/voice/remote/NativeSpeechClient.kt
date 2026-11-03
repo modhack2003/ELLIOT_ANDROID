@@ -119,16 +119,18 @@ class RemoteStream(key:SpeechHandle):RemoteObject(key) {
 }
 data class RemoteResult(val text:String) {val keyword get()=text}
 open class RemoteDecoder(kind:String,options:Bundle=Bundle()):RemoteObject(newHandle(kind,options)) {
-    fun createStream(hotwords:String="")=RemoteStream(SpeechHandle(rpc("stream",args().apply {putString("hotwords",hotwords)}).getLong("id"),session))
+    open fun createStream(hotwords:String="")=RemoteStream(SpeechHandle(rpc("stream",args().apply {putString("hotwords",hotwords)}).getLong("id"),session))
     fun isReady(stream:RemoteStream)=rpc("ready",args(stream)).getBoolean("value")
     fun decode(stream:RemoteStream) {rpc("decode",args(stream))}
     fun getResult(stream:RemoteStream)=RemoteResult(rpc("result",args(stream)).getString("text").orEmpty())
     fun reset(stream:RemoteStream) {rpc("reset",args(stream))}
 }
-class RemoteKeywordSpotter(score:Float?=null,threshold:Float?=null):RemoteDecoder("kws",Bundle().apply {
+class RemoteKeywordSpotter(score:Float?=null,threshold:Float?=null,private val alternateNames:Boolean=false):RemoteDecoder("kws",Bundle().apply {
     // Reset must pass defaults explicitly: worker SharedPreferences may cache an old profile.
     putFloat("score",score?:2f);putFloat("threshold",threshold?:.15f)
-})
+}) {
+    override fun createStream(hotwords:String)=super.createStream(if(alternateNames)com.eiliot.app.voice.WakePronunciations.extras else "")
+}
 class RemoteRecognizer:RemoteDecoder("asr") {
     fun isEndpoint(stream:RemoteStream)=rpc("endpoint",args(stream)).getBoolean("value")
 }
@@ -141,6 +143,23 @@ class RemoteWhisper(language:String="en",model:String=com.eiliot.app.voice.Multi
             for(offset in audio.indices step 4096)stream.acceptWaveform(audio.copyOfRange(offset,minOf(offset+4096,audio.size)),16000)
             decode(stream);return getResult(stream).text.trim()
         }finally {runCatching{stream.release()}}
+    }
+}
+class RemoteDenoiser:RemoteObject(newHandle("denoiser")) {
+    /** Diagnostic clips only. Each Binder transaction stays well below its size limit. */
+    suspend fun clean(audio:FloatArray):FloatArray {
+        require(audio.size in 1..128000 && audio.all(Float::isFinite))
+        rpc("denoise_reset")
+        val parts=mutableListOf<FloatArray>()
+        try {
+            for(at in audio.indices step 4096) {
+                kotlinx.coroutines.currentCoroutineContext().ensureActive()
+                parts.add(checkNotNull(rpc("denoise",args().apply {putFloatArray("pcm",audio.copyOfRange(at,minOf(at+4096,audio.size)))}).getFloatArray("pcm")))
+            }
+            parts.add(checkNotNull(rpc("denoise_flush").getFloatArray("pcm")))
+            check(parts.sumOf {it.size}==audio.size){"Noise filter changed recording length"}
+            return FloatArray(audio.size).also {out->var at=0;parts.forEach {it.copyInto(out,at);at+=it.size}}
+        }finally {parts.forEach {it.fill(0f)}}
     }
 }
 class RemoteVad:RemoteObject(newHandle("vad")) {

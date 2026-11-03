@@ -87,7 +87,7 @@ object WakeListener {
                 val root=ModelAssets.await(SentinelRuntime.context)
                 NativeSpeechClient.connect(SentinelRuntime.context)
                 val calibration=VoiceCalibrationStore.load(SentinelRuntime.context)
-                val spotter=RemoteKeywordSpotter(calibration?.score,calibration?.threshold)
+                val spotter=RemoteKeywordSpotter(calibration?.score,calibration?.threshold,calibration?.alternateNames?:false)
                 kws=spotter;val keywordStream=spotter.createStream();kwsStream=keywordStream
                 val asr=RemoteRecognizer()
                 recognizer=asr
@@ -97,10 +97,13 @@ object WakeListener {
                 val apps=withContext(Dispatchers.Main) { PhoneTools.apps().take(80).map { it.name } }
                 val hotwords=(listOf("ELLIOT","BATTERY","VOLUME","TIMER","SCROLL","CLICK","YOUTUBE","WHATSAPP")+apps.map { it.uppercase().replace(Regex("[^A-Z0-9 ]")," ") }).filter(String::isNotBlank).distinct().joinToString("\n")
                 ensureActive();check(gen==generation && SentinelRuntime.alive(epoch))
-                audio=VoiceAudioInput(SentinelRuntime.context,calibration?.referenceCapture?:com.eiliot.app.BuildConfig.VOICE_REFERENCE_CAPTURE) { }
+                val direct=calibration?.referenceCapture?:
+                    (WakeCapturePreference.reference(SentinelRuntime.context) || com.eiliot.app.BuildConfig.VOICE_REFERENCE_CAPTURE)
+                val reduceNoise=calibration?.noiseReduction?:WakeCapturePreference.noiseReduction(SentinelRuntime.context)
+                audio=VoiceAudioInput(SentinelRuntime.context,direct,reduceNoise) { }
                 ensureActive();check(gen==generation && SentinelRuntime.alive(epoch))
                 input=audio;ready=true
-                if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "capture ready; live=${liveCall.value}; wake=${SentinelRuntime.store.wakeEnabled}; echo=${audio.echoEnabled}")
+                if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "capture ready; direct=$direct; live=${liveCall.value}; wake=${SentinelRuntime.store.wakeEnabled}; echo=${audio.echoEnabled}; noise=${audio.noiseEnabled}; gain=${audio.gainEnabled}")
                 var diagnosticAt=android.os.SystemClock.elapsedRealtime()
                 var diagnosticFrames=0
                 var diagnosticPeak=0f

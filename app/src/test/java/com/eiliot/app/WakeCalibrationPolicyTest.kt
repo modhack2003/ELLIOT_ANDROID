@@ -5,6 +5,12 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class WakeCalibrationPolicyTest {
+    @Test fun alternateNameDoesNotBecomeACommandOrMatchLongerWords() {
+        assertEquals("",WakeWords.command("Hey Eliot"))
+        assertEquals("what is my battery level",WakeWords.command("Hey Eliot, what is my battery level?"))
+        assertEquals("Tell me about Eliot",WakeWords.command("Tell me about Eliot"))
+        assertFalse(WakeWords.contains("eliotson"))
+    }
     private fun result(setting:WakeSetting,hits:Int=4,falseHits:Int=0,phrases:Set<String> = setOf("hey","name"))=
         WakeAssessment(setting,hits,4,falseHits,2,phrases)
     @Test fun missesOnePhraseOrFalseTriggersCannotPass() {

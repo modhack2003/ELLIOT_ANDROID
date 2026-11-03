@@ -92,3 +92,16 @@ from the verified original token table. This works around per-token UTF-8 cleanu
 in Sherpa 1.13.8; the original downloads, token IDs and weights are unchanged.
 The complete native result is decoded back to UTF-8 in Kotlin. No native inverse
 text normalization or homophone rules may be enabled on this encoded text.
+
+## GTCRN local speech denoiser
+
+Diagnostic original/cleaned comparison, Sherpa-onnx 1.13.8 CPU implementation.
+- Upstream: https://github.com/Xiaobin-Rong/gtcrn (MIT, copyright 2024 Rong Xiaobin).
+- Export: https://github.com/k2-fsa/sherpa-onnx/releases/download/speech-enhancement-models/gtcrn_simple.onnx
+- GitHub asset ID: 236067657; 535638 bytes; upstream asset had no digest field.
+- Bundled path: app/src/main/assets/models/denoise/gtcrn.onnx.
+- SHA-256: e77603ac0c23dac3227dd2d7135b3a585cbee2679048aecfa886657d3ae1b534.
+- License included alongside the model as denoise/LICENSE.txt.
+
+All bundled files are verified by the updated model manifest before use.
+Processing occurs locally in the private speech worker. No voice upload occurs.

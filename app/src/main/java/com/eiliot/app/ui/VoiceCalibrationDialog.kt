@@ -29,22 +29,25 @@ import kotlinx.coroutines.*
     var validated by remember {mutableStateOf(false)}
     var transcript by remember {mutableStateOf("")}
     var lastClip by remember {mutableStateOf<FloatArray?>(null)}
-    var referenceStt by remember {mutableStateOf(false)}
+    var cleanedClip by remember {mutableStateOf<FloatArray?>(null)}
+    var referenceStt by remember {mutableStateOf(VoiceCalibrationStore.load(context)?.referenceCapture?:WakeCapturePreference.reference(context))}
     var multilingual by remember {mutableStateOf(MultilingualModelPack.available(context))}
     var selectedPack by remember {mutableStateOf(MultilingualModelPack.SMALL)}
     var language by remember {mutableStateOf("en")}
     var packReady by remember {mutableStateOf(MultilingualModelPack.available(context))}
     var clipNumber by remember {mutableIntStateOf(0)}
     var clipMicrophone by remember {mutableStateOf("")}
+    var clipEffects by remember {mutableStateOf("")}
     var job by remember {mutableStateOf<Job?>(null)}
     val exportFile=remember {context.getExternalFilesDir(null)?.let {java.io.File(it,"voice-evaluation/consented-sample.wav")}}
     var exported by remember {mutableStateOf(exportFile?.exists()==true)}
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) {onClose()}
     val priorLive=remember {WakeListener.liveCall.value}
     fun discard() {trials.forEach {it.audio.fill(0f)};trials.clear()}
+    fun discardCleaned() {cleanedClip?.fill(0f);cleanedClip=null}
     DisposableEffect(Unit) {
         onDispose {
-            job?.cancel();discard();lastClip?.fill(0f)
+            job?.cancel();discard();lastClip?.fill(0f);discardCleaned()
             WakeListener.calibrationActive=false
             if(SentinelRuntime.alive() && SentinelRuntime.foreground) {
                 if(priorLive)WakeListener.setLiveCall(context,true)else WakeListener.start(context)
@@ -58,6 +61,52 @@ import kotlinx.coroutines.*
         catch(e:CancellationException){throw e}
         catch(e:Exception){status="Offline voice could not start. Close this check and use Repair offline voice."}
     }
+    fun checkWake(recordNew:Boolean) {
+        busy=true
+        job=scope.launch {
+            var clip:FloatArray?=null
+            try {
+                val audio=if(recordNew)WakeCalibration.capture(context,referenceStt,4,onEffects={clipEffects=it},onReady={status="Speak now. Say Hey Elliot once. Capturing four seconds…"})else checkNotNull(lastClip).copyOf()
+                clip=audio
+                if(recordNew) {discardCleaned();lastClip?.fill(0f);lastClip=audio.copyOf();clipNumber++;clipMicrophone=if(referenceStt)"Direct"else "Processed";transcript=""}
+                check(WakeCalibration.usable(audio)){"Quiet or distorted recording"}
+                status="Checking the same recording with original and alternate name spellings…"
+                val rows=WakeCalibration.settings(referenceStt,WakeCapturePreference.noiseReduction(context)).map {setting->
+                    val hits=WakeCalibration.detectHits(setting,audio)
+                    "${if(setting.alternateNames)"Alternate names"else "Original"} · ${setting.score}/${setting.threshold}: ${hits.joinToString().ifEmpty {"missed"}}"
+                }
+                transcript="Wake replay · recording $clipNumber · $clipMicrophone · $clipEffects:\n"+rows.joinToString("\n")
+                status="Wake check complete. These results do not change your settings. Ordinary speech and fresh wake checks must pass before saving sensitivity."
+            }catch(e:CancellationException){throw e}
+            catch(e:Exception){status="Wake check failed. Listen back and retry or repair offline voice."}
+            finally {clip?.fill(0f);busy=false}
+        }
+    }
+    fun cleanWake() {
+        val original=checkNotNull(lastClip).copyOf();busy=true
+        job=scope.launch {
+            var cleaned:FloatArray?=null
+            try {
+                status="Cleaning the same recording locally…"
+                val audio=withContext(Dispatchers.IO) {
+                    val denoiser=com.eiliot.app.voice.remote.RemoteDenoiser()
+                    try {denoiser.clean(original)}finally{runCatching{denoiser.release()}}
+                }
+                cleaned=audio
+                status="Checking wake detection on the cleaned recording…"
+                val rows=WakeCalibration.settings(referenceStt).map {setting->
+                    val hits=WakeCalibration.detectHits(setting,audio)
+                    "${if(setting.alternateNames)"Alternate names"else "Original"} · ${setting.score}/${setting.threshold}: ${hits.joinToString().ifEmpty {"missed"}}"
+                }
+                discardCleaned();cleanedClip=audio;cleaned=null
+                val report="Cleaned wake replay · recording $clipNumber · GTCRN:\n"+rows.joinToString("\n")
+                transcript=(listOf(report)+transcript.split("\n\n")).take(3).joinToString("\n\n")
+                status="Compare Play last recording and Play cleaned recording. Cleaning stays in memory and is not enabled for normal listening."
+            }catch(e:CancellationException){throw e}
+            catch(e:Exception){status="Software noise check failed. Original recording is unchanged."}
+            finally {original.fill(0f);cleaned?.fill(0f);busy=false}
+        }
+    }
     fun record() {
         busy=true
         job=scope.launch {
@@ -65,15 +114,15 @@ import kotlinx.coroutines.*
             try {
                 status="Preparing the microphone. Wait for Speak now…"
                 val reference=if(step<12)step>=6 else checkNotNull(candidate).setting.referenceCapture
-                val clip=WakeCalibration.capture(context,reference,onReady={status="Speak now. Recording for four seconds…"});audio=clip
-                lastClip?.fill(0f);lastClip=clip.copyOf()
+                val clip=WakeCalibration.capture(context,reference,onEffects={clipEffects=it},onReady={status="Speak now. Recording for four seconds…"});audio=clip
+                discardCleaned();lastClip?.fill(0f);lastClip=clip.copyOf()
                 if(!WakeCalibration.usable(clip)){status="Too quiet or distorted. Adjust your distance and retry.";return@launch}
                 if(step<12) {
                     val i=step%6
                     trials+=WakeTrial(if(i%2==0)"hey" else "name",i<4,clip);audio=null
                     if(step==5 || step==11) {
                         status="Checking this microphone against your samples…"
-                        assessments+=WakeCalibration.assess(reference,trials)
+                        assessments+=WakeCalibration.assess(reference,trials,WakeCapturePreference.noiseReduction(context))
                         discard()
                     }
                     step++
@@ -104,11 +153,11 @@ import kotlinx.coroutines.*
             try {
                 val audio=if(recordNew) {
                     status="Preparing the microphone. Wait for Speak now…"
-                    WakeCalibration.capture(context,referenceStt,6,onReady={status="Speak now. Say one sentence. Capturing six seconds…"})
+                    WakeCalibration.capture(context,referenceStt,6,onEffects={clipEffects=it},onReady={status="Speak now. Say one sentence. Capturing six seconds…"})
                 }else checkNotNull(lastClip).copyOf()
                 clip=audio
                 if(recordNew) {
-                    lastClip?.fill(0f);lastClip=audio.copyOf();clipNumber++
+                    discardCleaned();lastClip?.fill(0f);lastClip=audio.copyOf();clipNumber++
                     clipMicrophone=if(referenceStt)"Direct"else "Processed"
                     transcript=""
                 }
@@ -121,7 +170,7 @@ import kotlinx.coroutines.*
                 }else WakeCalibration.transcribe(audio)
                 val seconds=(android.os.SystemClock.elapsedRealtime()-started)/1000.0
                 val label=if(useWhisper)"${model.label} · ${selectedLanguage.ifEmpty {"Auto"}}"else "English Zipformer"
-                val result="Recording $clipNumber · $clipMicrophone · $label (${String.format(java.util.Locale.US,"%.1f",seconds)} seconds):\n${text.ifBlank {"No words recognized"}}"
+                val result="Recording $clipNumber · $clipMicrophone · $clipEffects · $label (${String.format(java.util.Locale.US,"%.1f",seconds)} seconds):\n${text.ifBlank {"No words recognized"}}"
                 transcript=(listOf(result)+transcript.split("\n\n").filter{it.isNotBlank()}).take(6).joinToString("\n\n")
                 status="Result below. Change model or language, then tap Transcribe last recording to compare the same audio. No command ran. Saving audio requires the separate local-save button."
             }catch(e:CancellationException){throw e}
@@ -137,7 +186,7 @@ import kotlinx.coroutines.*
                     else "We compare two microphone paths using your normal accent. Audio stays in memory and is discarded when you close. This does not train the speech model.")
                 Text(status)
                 if(!transcriptionOnly && step>=12)assessments.forEachIndexed {i,result->
-                    Text("Microphone ${if(result.setting.referenceCapture)2 else 1}, sensitivity ${i%3+1}: Hey Elliot ${result.phraseHits["hey"]?:0}/2; Elliot ${result.phraseHits["name"]?:0}/2; unwanted wakes ${result.falseHits}/2.",style=MaterialTheme.typography.bodySmall)
+                        Text("Microphone ${if(result.setting.referenceCapture)2 else 1}, ${if(result.setting.alternateNames)"alternate names"else "original"}, sensitivity ${i%4+1}: Hey Elliot ${result.phraseHits["hey"]?:0}/2; Elliot ${result.phraseHits["name"]?:0}/2; unwanted wakes ${result.falseHits}/2.",style=MaterialTheme.typography.bodySmall)
                 }
                 if(!transcriptionOnly && (step<12 || (step<16 && candidate!=null))) {
                     val index=if(step<12)step%6 else step-12
@@ -191,6 +240,9 @@ import kotlinx.coroutines.*
                     }
                 }
                 if(transcriptionOnly && ready && !busy) {
+                    Button(onClick={checkWake(true)}){Text("Record wake check")}
+                    if(lastClip!=null)Button(onClick={checkWake(false)}){Text("Recheck wake on recording")}
+                    if(lastClip!=null)Button(onClick={cleanWake()}){Text("Clean and recheck wake")}
                     Button(onClick={checkSentence(true)},enabled=!multilingual || packReady){Text("Record sentence")}
                     if(lastClip!=null)Button(onClick={checkSentence(false)},enabled=!multilingual || packReady){Text("Transcribe last recording")}
                 }
@@ -221,6 +273,15 @@ import kotlinx.coroutines.*
                         finally {busy=false}
                     }
                 },enabled=!busy){Text("Play last recording")}
+                if(cleanedClip!=null)TextButton(onClick={
+                    busy=true
+                    job=scope.launch {
+                        try {WakeCalibration.play(checkNotNull(cleanedClip));status="Cleaned playback complete. Compare it with the original recording."}
+                        catch(e:CancellationException){throw e}
+                        catch(e:Exception){status="Cleaned playback could not finish."}
+                        finally{busy=false}
+                    }
+                },enabled=!busy){Text("Play cleaned recording")}
                 TextButton(onClick={onClose()}){Text(if(busy)"Cancel and close" else if(transcriptionOnly)"Close" else "Close without saving")}
             }
         }

@@ -1,6 +1,6 @@
 {
-  "release": "0.6.3-dev.8",
-  "version_code": 18,
+  "release": "0.6.3-dev.13",
+  "version_code": 23,
   "runtime": {
     "name": "sherpa-onnx",
     "version": "1.13.8",
@@ -118,5 +118,15 @@
     ],
     "validation": "Native generated-English smoke tests establish compatibility only. Real held-out accuracy and latency gates are still required for each requested speech mode.",
     "text_transport": "Whisper token bytes are rendered through native/JNI as ASCII hex and decoded after concatenation; original pinned token files and model predictions are unchanged."
+  },
+  "denoiser": {
+    "name": "GTCRN simple",
+    "scope": "Diagnostic same-recording comparison only",
+    "asset_id": 236067657,
+    "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speech-enhancement-models/gtcrn_simple.onnx",
+    "bytes": 535638,
+    "sha256": "e77603ac0c23dac3227dd2d7135b3a585cbee2679048aecfa886657d3ae1b534",
+    "license": "MIT",
+    "upstream": "https://github.com/Xiaobin-Rong/gtcrn"
   }
 }

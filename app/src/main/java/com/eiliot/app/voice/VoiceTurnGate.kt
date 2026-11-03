@@ -26,7 +26,7 @@ class VoiceTurnGate {
 object VoiceSession { val gate = VoiceTurnGate(); val state get() = gate.state }
 
 object WakeWords {
-    private val word = Regex("\\b(?:(?:hey|hi|okay|wake\\s+up)\\s+)?(?:elliot|elliott|eiliot)\\b", RegexOption.IGNORE_CASE)
+    private val word = Regex("\\b(?:(?:hey|hi|okay|wake\\s+up)\\s+)?(?:elliot|elliott|eliot|eiliot)\\b", RegexOption.IGNORE_CASE)
     fun contains(text: String) = word.containsMatchIn(text)
     fun afterWake(text: String): String? = word.find(text)?.let { text.substring(it.range.last + 1).trim(' ', ',', '.', ':', '!', '?') }
     fun command(text: String) = if(word.find(text.trim())?.range?.first==0)afterWake(text.trim()).orEmpty()else text.trim()

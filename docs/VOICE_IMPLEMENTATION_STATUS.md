@@ -1,7 +1,70 @@
 # Voice implementation status — 3 November 2026
 
-Current working milestone: 0.6.3-dev.8 / versionCode 18.
+Current working milestone: 0.6.3-dev.13 / versionCode 23.
 Baseline source commit: 0d508c5fbc747010b16c0d51d8151aa3ef48748e.
+
+## Noise investigation (dev.12–dev.13)
+
+The user identified excessive fan/AC/traffic noise. Direct capture now offers a
+hardware noise-suppression request and explicitly disables app-controlled AGC.
+The diagnostic labels show actual effect enabled states; changing a filter clears
+sensitivity calibrated on another capture configuration (fingerprint v3).
+The Vivo reported NS on and AGC off, but the user still heard excessive noise.
+One dev.12 alternate-name setting (2.5/.1) matched; the other seven missed. This
+isolated match is not an accepted calibration or reliable wake result.
+
+Dev.13 bundles the 535638-byte MIT GTCRN model and adds local, bounded, chunked
+noise processing in the existing speech worker. Clean and recheck wake retains
+both versions only in RAM for original/cleaned playback and eight-profile replay.
+Sample length is preserved and buffers clear on replacement/close. Cleaning does
+not replace the original export or enable software filtering in normal listening.
+Six focused tests and one actual Vivo denoiser chunk/reset test passed. Signing,
+375 bundled-model and native alignment checks passed. Desktop smoke runs also
+preserved exact lengths for aligned and unaligned chunks.
+
+The user confirmed lower fan/AC noise and a clear, complete voice in the cleaned
+version. All eight original and cleaned wake replays on that clip still missed.
+Noise playback improved in diagnostics; wake recognition remains unresolved.
+
+## Alternate-name wake comparison (dev.11)
+
+The user's dev.10 four-second Direct recording missed at all four sensitivities.
+No sensitivity was selected from it. Dev.11 adds optional Eliot/Elliott name
+spellings, generated from the bundled BPE model, through the native KWS per-stream
+keywords API. This supplements the original grammar. Main listening uses these
+only when an accepted calibration profile explicitly enables them; default wake
+behavior is unchanged. Fingerprint v2 invalidates incompatible old profiles.
+
+Wake replay compares original and alternate grammars at all four sensitivities
+using identical RAM audio. Full calibration checks both sets against the same
+positive/negative samples and requires fresh validation before saving. A saved
+profile carries its grammar choice into the normal listener. Leading Hey Eliot
+is removed from command text like the other supported name spellings.
+
+Six focused tests passed. One Vivo JNI replay/profile round-trip test passed,
+including generated speech through the alternate grammar and persistence of
+its selection. Signing, bundled-model and alignment checks passed. These tests
+establish compatibility; real wake accuracy remains under investigation.
+
+## Wake investigation (dev.9–dev.10)
+
+Direct microphone is now a persistent normal-listening option under Voice options.
+Changing capture clears sensitivity calibration from the previous path. Valid
+calibration takes precedence; the default remains Processed unless selected.
+The Vivo is configured Direct. The user confirmed one wake, then reported a
+missed repeat. Wake reliability remains unresolved; this is not a passing fix.
+Current microphone frames continue while idle and the startup log confirms the
+Direct path. Wake keywords still match the packaged BPE encoding.
+
+Record wake check captures four seconds in RAM and displays actual KWS labels
+at four sensitivity settings. Recheck wake on recording uses identical PCM.
+Neither changes settings or runs commands. Full calibration adds score 3.5 /
+threshold .05 to the earlier three candidates, preserving all positive/negative
+and fresh-validation gates. Diagnostics now default to the selected capture path.
+Five focused tests passed; build, signing, bundled-model and alignment checks
+passed. New real-voice replay and acceptance trials remain pending.
+The comparison APK uses voiceDiagnostics=true (frame counts/levels and keyword
+events only; no saved microphone audio or command-transcript logging).
 
 ## Byte-preserving Whisper text correction (dev.8)
 

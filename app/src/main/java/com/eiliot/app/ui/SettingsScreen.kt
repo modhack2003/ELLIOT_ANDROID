@@ -140,6 +140,15 @@ import kotlinx.coroutines.*
             }) {Text("Reset wake calibration")}
             TextButton(onClick={voiceOptions=!voiceOptions}) {Text(if(voiceOptions)"Hide voice options" else "Voice options",maxLines=1)}
             if(voiceOptions) {
+                ControlSwitch("Direct microphone","Use the microphone without call processing for wake listening. Changing this clears sensitivity calibration.",
+                    VoiceCalibrationStore.load(context)?.referenceCapture?:WakeCapturePreference.reference(context)) {
+                    WakeCapturePreference.setReference(context,it)
+                    WakeListener.stop();WakeListener.start(context);changed()
+                }
+                ControlSwitch("Reduce background noise","Request a noise filter on the Direct microphone. Changing this clears sensitivity calibration.",WakeCapturePreference.noiseReduction(context)) {
+                    WakeCapturePreference.setNoiseReduction(context,it)
+                    WakeListener.stop();WakeListener.start(context);changed()
+                }
                 Text("ELLIOT · Ryan · offline male voice",color=EiliotColors.TextSecondary,maxLines=1,overflow=TextOverflow.Ellipsis)
                 Text("Speed",color=EiliotColors.TextSecondary);Slider(rate,{rate=it;store.ttsRate=it},valueRange=.7f..1.4f)
                 Text("Pitch",color=EiliotColors.TextSecondary);Slider(pitch,{pitch=it;store.ttsPitch=it},valueRange=.7f..1.3f)

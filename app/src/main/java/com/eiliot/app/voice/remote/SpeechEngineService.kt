@@ -65,7 +65,19 @@ class SpeechEngineService:Service() {
                     tokens=WhisperTokenTransport.prepare(File(pack,spec.tokens),File(cacheDir,"whisper-text/${spec.id}")).path,numThreads=4,provider="cpu")))))
             }
             "vad"->out.putLong("id",hold(Vad(config=VadModelConfig(sileroVadModelConfig=SileroVadModelConfig(model="${root.path}/silero_vad.onnx",threshold=.65f,minSilenceDuration=.5f,minSpeechDuration=.192f,windowSize=512),sampleRate=16000,numThreads=1))))
-            "stream"->out.putLong("id",hold(when(val owner=objects[id]) {is KeywordSpotter->owner.createStream();is OnlineRecognizer->owner.createStream(a.getString("hotwords").orEmpty());is OfflineRecognizer->owner.createStream();else->error("Invalid stream owner")}))
+            "denoiser"->out.putLong("id",hold(OnlineSpeechDenoiser(config=OnlineSpeechDenoiserConfig(model=OfflineSpeechDenoiserModelConfig(
+                gtcrn=OfflineSpeechDenoiserGtcrnModelConfig(model="${root.path}/denoise/gtcrn.onnx"),numThreads=1,provider="cpu")))))
+            "denoise_reset"->obj<OnlineSpeechDenoiser>(id).reset()
+            "denoise","denoise_flush"->{
+                val denoiser=obj<OnlineSpeechDenoiser>(id)
+                val cleaned=if(op=="denoise_flush")denoiser.flush()else {
+                    val pcm=checkNotNull(a.getFloatArray("pcm"));require(pcm.size in 1..4096 && pcm.all(Float::isFinite))
+                    denoiser.run(pcm,16000)
+                }
+                check(cleaned.sampleRate==16000 && cleaned.samples.size<=8192 && cleaned.samples.all(Float::isFinite))
+                out.putFloatArray("pcm",cleaned.samples)
+            }
+            "stream"->out.putLong("id",hold(when(val owner=objects[id]) {is KeywordSpotter->owner.createStream(a.getString("hotwords").orEmpty());is OnlineRecognizer->owner.createStream(a.getString("hotwords").orEmpty());is OfflineRecognizer->owner.createStream();else->error("Invalid stream owner")}))
             "accept"->{val pcm=checkNotNull(a.getFloatArray("pcm"));require(pcm.size<=16000);when(val stream=objects[id]){is OnlineStream->stream.acceptWaveform(pcm,16000);is OfflineStream->stream.acceptWaveform(pcm,16000);else->error("Invalid speech stream")}}
             "ready"->out.putBoolean("value",when(val owner=objects[id]) {is KeywordSpotter->owner.isReady(obj(sid));is OnlineRecognizer->owner.isReady(obj(sid));else->false})
             "decode"->when(val owner=objects[id]) {is KeywordSpotter->owner.decode(obj(sid));is OnlineRecognizer->owner.decode(obj(sid));is OfflineRecognizer->owner.decode(obj(sid));else->error("Invalid decoder")}
@@ -73,7 +85,7 @@ class SpeechEngineService:Service() {
             "endpoint"->out.putBoolean("value",obj<OnlineRecognizer>(id).isEndpoint(obj(sid)))
             "reset"->when(val owner=objects[id]) {is KeywordSpotter->owner.reset(obj(sid));is OnlineRecognizer->owner.reset(obj(sid));is Vad->owner.reset();else->error("Invalid reset")}
             "compute"->{val pcm=checkNotNull(a.getFloatArray("pcm"));require(pcm.size==512);out.putFloat("value",obj<Vad>(id).compute(pcm))}
-            "release"->when(val item=objects.remove(id)) {is OnlineStream->item.release();is OfflineStream->item.release();is KeywordSpotter->item.release();is OnlineRecognizer->item.release();is OfflineRecognizer->item.release();is Vad->item.release()}
+            "release"->when(val item=objects.remove(id)) {is OnlineStream->item.release();is OfflineStream->item.release();is KeywordSpotter->item.release();is OnlineRecognizer->item.release();is OfflineRecognizer->item.release();is OnlineSpeechDenoiser->item.release();is Vad->item.release()}
             "tts"->synchronized(ttsLock) {
                 if(tts==null)tts=OfflineTts(config=OfflineTtsConfig(model=OfflineTtsModelConfig(vits=OfflineTtsVitsModelConfig(model="${root.path}/tts/model.onnx",tokens="${root.path}/tts/tokens.txt",dataDir="${root.path}/tts/espeak-ng-data"),numThreads=contract.threads,provider="cpu"),maxNumSentences=1))
                 out.putInt("rate",tts!!.sampleRate());out.putInt("speakers",tts!!.numSpeakers())

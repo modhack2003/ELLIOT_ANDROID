@@ -15,6 +15,21 @@ import org.junit.runner.RunWith
 /** Actual Android JNI/process checks; these do not certify microphone/acoustic quality. */
 @RunWith(AndroidJUnit4::class)
 class NativeSpeechDeviceTest {
+    @Test fun softwareDenoiserPreservesSamplesAcrossChunksAndResets()=runBlocking {
+        withContext(Dispatchers.IO) {
+            NativeSpeechClient.connect(app)
+            val denoiser=RemoteDenoiser()
+            try {
+                for(n in listOf(64000,12345)) {
+                    val audio=FloatArray(n){(.03*kotlin.math.sin(it*.021)).toFloat()}
+                    val cleaned=denoiser.clean(audio)
+                    assertEquals(n,cleaned.size);assertTrue(cleaned.all(Float::isFinite))
+                    audio.fill(0f);cleaned.fill(0f)
+                }
+                assertTrue(runCatching {denoiser.clean(floatArrayOf(Float.NaN))}.isFailure)
+            }finally{denoiser.release()}
+        }
+    }
     @Test fun calibrationPlaybackCanFinishAndCancel()=runBlocking {
         WakeCalibration.play(FloatArray(1600))
         val playback=launch {WakeCalibration.play(FloatArray(32000))}
@@ -34,7 +49,8 @@ class NativeSpeechDeviceTest {
                 assertTrue(WakeCalibration.detect(WakeSetting(false),audio))
                 assertTrue(WakeCalibration.detect(WakeSetting(true,2.5f,.1f),audio))
                 assertTrue(WakeCalibration.transcribe(audio).contains("battery",ignoreCase=true))
-                val setting=WakeSetting(true,2.5f,.1f)
+                val setting=WakeSetting(true,2.5f,.1f,true)
+                assertTrue(WakeCalibration.detect(setting,audio))
                 VoiceCalibrationStore.save(app,setting);assertEquals(setting,VoiceCalibrationStore.load(app))
                 VoiceCalibrationStore.clear(app);assertNull(VoiceCalibrationStore.load(app))
                 assertTrue(runCatching{RemoteKeywordSpotter(4f,.1f)}.isFailure)
