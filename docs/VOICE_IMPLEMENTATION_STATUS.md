@@ -1,7 +1,25 @@
 # Voice implementation status — 3 November 2026
 
-Current working milestone: 0.6.3-dev.13 / versionCode 23.
+Current working milestone: 0.6.3-dev.14 / versionCode 24.
 Baseline source commit: 0d508c5fbc747010b16c0d51d8151aa3ef48748e.
+
+## Normal-listening noise filtering (dev.14)
+
+Enhanced noise reduction now applies GTCRN continuously before wake detection,
+VAD and command STT. It is an explicit persistent Voice options setting, enabled
+on this Vivo after the user confirmed quieter fan/AC noise with voice intact.
+Variable native output is assembled into complete 512-sample frames for VAD;
+buffers clear at shutdown. Capture/calibration use the same configured software
+filter and saved profiles retain its choice (fingerprint v4). Changing filters
+clears prior calibration. Diagnostics label enhanced filtering and avoid offering
+another software-clean pass on already enhanced wake captures.
+
+Eight focused tests passed, including frame ordering/boundaries and preference
+invalidation. The native 512-sample streaming test processed four seconds in
+508 ms, preserving 64000 samples across 125 frames. Phone startup confirms
+Direct=true, hardware NS=true, AGC=false, enhanced=true; frame statistics continue
+at normal rate. This proves integration and timing on this run, not battery-life
+acceptance or wake accuracy. Wake misses remain unresolved.
 
 ## Noise investigation (dev.12–dev.13)
 

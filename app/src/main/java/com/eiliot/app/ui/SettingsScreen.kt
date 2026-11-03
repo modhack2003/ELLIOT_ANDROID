@@ -149,6 +149,10 @@ import kotlinx.coroutines.*
                     WakeCapturePreference.setNoiseReduction(context,it)
                     WakeListener.stop();WakeListener.start(context);changed()
                 }
+                ControlSwitch("Enhanced noise reduction","Locally reduce fan and AC noise. Changing this clears sensitivity calibration.",WakeCapturePreference.softwareNoiseReduction(context)) {
+                    WakeCapturePreference.setSoftwareNoiseReduction(context,it)
+                    WakeListener.stop();WakeListener.start(context);changed()
+                }
                 Text("ELLIOT · Ryan · offline male voice",color=EiliotColors.TextSecondary,maxLines=1,overflow=TextOverflow.Ellipsis)
                 Text("Speed",color=EiliotColors.TextSecondary);Slider(rate,{rate=it;store.ttsRate=it},valueRange=.7f..1.4f)
                 Text("Pitch",color=EiliotColors.TextSecondary);Slider(pitch,{pitch=it;store.ttsPitch=it},valueRange=.7f..1.3f)

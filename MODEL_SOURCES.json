@@ -1,6 +1,6 @@
 {
-  "release": "0.6.3-dev.13",
-  "version_code": 23,
+  "release": "0.6.3-dev.14",
+  "version_code": 24,
   "runtime": {
     "name": "sherpa-onnx",
     "version": "1.13.8",
@@ -121,7 +121,7 @@
   },
   "denoiser": {
     "name": "GTCRN simple",
-    "scope": "Diagnostic same-recording comparison only",
+    "scope": "Optional normal-listening filter and diagnostic same-recording comparison",
     "asset_id": 236067657,
     "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speech-enhancement-models/gtcrn_simple.onnx",
     "bytes": 535638,

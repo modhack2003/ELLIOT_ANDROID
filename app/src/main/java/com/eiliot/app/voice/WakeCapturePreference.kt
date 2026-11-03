@@ -6,6 +6,11 @@ import android.content.Context
 object WakeCapturePreference {
     fun reference(c:Context)=c.getSharedPreferences("wake_capture",0).getBoolean("direct",false)
     fun noiseReduction(c:Context)=c.getSharedPreferences("wake_capture",0).getBoolean("reduce_noise",false)
+    fun softwareNoiseReduction(c:Context)=c.getSharedPreferences("wake_capture",0).getBoolean("software_noise",false)
+    fun setSoftwareNoiseReduction(c:Context,value:Boolean) {
+        check(c.getSharedPreferences("wake_capture",0).edit().putBoolean("software_noise",value).commit())
+        VoiceCalibrationStore.clear(c)
+    }
     fun setNoiseReduction(c:Context,value:Boolean) {
         check(c.getSharedPreferences("wake_capture",0).edit().putBoolean("reduce_noise",value).commit())
         VoiceCalibrationStore.clear(c)

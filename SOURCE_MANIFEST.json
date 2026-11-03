@@ -1,6 +1,6 @@
 {
-  "release": "0.6.3-dev.13",
-  "version_code": 23,
+  "release": "0.6.3-dev.14",
+  "version_code": 24,
   "files": [
     {
       "path": ".gitignore",
@@ -34,8 +34,8 @@
     },
     {
       "path": "MODEL_SOURCES.json",
-      "bytes": 5566,
-      "sha256": "fc80288e78321dd3c7df5e239d417168b45f26d224e65c6230b58aa8a6d6c668"
+      "bytes": 5598,
+      "sha256": "27d072172ae0021a52ae6d276e7d620b0cf5671563b2c5004fb5cfb372f3613d"
     },
     {
       "path": "NEXT_BUILD_PLAN.md",
@@ -64,8 +64,8 @@
     },
     {
       "path": "THIRD_PARTY_MODELS.md",
-      "bytes": 6165,
-      "sha256": "08cf956f2d864497755d5241f54aba26dbb7d29a1c8baace3a67b28e1c52bfd5"
+      "bytes": 6266,
+      "sha256": "d5312f6537f39b558119fa5df5e2cb53a29ef8b2b5cac8cd916dfc3da68736c1"
     },
     {
       "path": "VALIDATION.md",
@@ -75,7 +75,7 @@
     {
       "path": "app/build.gradle.kts",
       "bytes": 5221,
-      "sha256": "144112ba4276d499b21ef1c20806f516ae852073f1ff2243672503eeb21afcab"
+      "sha256": "8082e13d0cd45ec94b7b060d5f21193938e3c9980b1997cfb71aadf2aec15002"
     },
     {
       "path": "app/libs/sherpa-onnx-1.13.8.aar",
@@ -84,8 +84,8 @@
     },
     {
       "path": "app/src/androidTest/java/com/eiliot/app/NativeSpeechDeviceTest.kt",
-      "bytes": 7562,
-      "sha256": "e435d195030cf982b8e821e70ded8892391e95637e8c412071269d0897ae950f"
+      "bytes": 8812,
+      "sha256": "1135e56527c0972999de9b7a86c0a7d3157af89e34463983b9456678e7b2a379"
     },
     {
       "path": "app/src/androidTest/java/com/eiliot/app/SavedSpeechComparisonTest.kt",
@@ -2084,8 +2084,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/core/WakeListener.kt",
-      "bytes": 14337,
-      "sha256": "9a934e3d7474d4dfd5ccfabe5aeb8f8469515c8e07ebeedd722b76e22fd91f78"
+      "bytes": 14996,
+      "sha256": "bcb47bb492a2da7a4d8a29f03d1fa0586194d8bd6869ee5447fa08ef254d3234"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/data/CryptoVault.kt",
@@ -2319,8 +2319,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/SettingsScreen.kt",
-      "bytes": 18182,
-      "sha256": "3d78f58457c0af1ffaf94dcaaeafe6e1661ec910e1c46b22defd9c9cdba6b891"
+      "bytes": 18553,
+      "sha256": "e798c52e2dc81f7e77a18b32e5f97956bcfa5940385471cb1d1314dce7724dd6"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/VaultScreen.kt",
@@ -2329,8 +2329,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/VoiceCalibrationDialog.kt",
-      "bytes": 20421,
-      "sha256": "3cf6f8e75cf60a1dba5451512ffac70e19d4d6cf33488cf8725be6e89ebfbe0f"
+      "bytes": 20745,
+      "sha256": "1f40a35ef372a577011ed847a077a30faa60704af890ff8c6b6dd6234812e721"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/DiagnosticWav.kt",
@@ -2356,6 +2356,11 @@
       "path": "app/src/main/java/com/eiliot/app/voice/NeuralSpeechPlayer.kt",
       "bytes": 8840,
       "sha256": "8d86d46c6268e54a2e613be4bc0e286180759d44eca4e6af078c2fe44ad5859b"
+    },
+    {
+      "path": "app/src/main/java/com/eiliot/app/voice/PcmFrameBuffer.kt",
+      "bytes": 448,
+      "sha256": "5efd95fda96902cc2a13df432413b440fff4273462ba6cd5743f94bbcdad253c"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/SpeechPolicies.kt",
@@ -2389,13 +2394,13 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/WakeCalibration.kt",
-      "bytes": 7241,
-      "sha256": "496832f932ab1cd78f0976d1b72067564e0c3e7b43c1d18f7f5622d77550203d"
+      "bytes": 7723,
+      "sha256": "06718f2bcca064868c46c1726d3d5752d5c08397910e21953f1e6c44063db825"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/WakeCapturePreference.kt",
-      "bytes": 854,
-      "sha256": "1ce60f7817e298d3e18f773c31e339057cf2d19a20c44703613a465360c7d174"
+      "bytes": 1185,
+      "sha256": "1949899fe5da5738a62ee447167ed4bb5c9eaf696e5a602683e9e3b3b59c1a84"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/WakePronunciations.kt",
@@ -2409,8 +2414,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/NativeSpeechClient.kt",
-      "bytes": 11153,
-      "sha256": "0de517f295e57497c7675796cb5ffad222cd9a2e028dc2cd7e1495667c00a749"
+      "bytes": 11363,
+      "sha256": "e07ea3d11d9b346d07b71a376664a10276c2f4c4c1103e279f5ff1a6c3793239"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/NativeTtsCallback.java",
@@ -2548,6 +2553,11 @@
       "sha256": "51677ca66621678715010ce044ba9bfc85e47486c9b4ef5812472bbdc7201a2f"
     },
     {
+      "path": "app/src/test/java/com/eiliot/app/PcmFrameBufferTest.kt",
+      "bytes": 1010,
+      "sha256": "0064186092118cb1bff0234773f090f055396fcd464c9b21c4ce4db0dc9383cd"
+    },
+    {
       "path": "app/src/test/java/com/eiliot/app/PhoneToolsAndroidTest.kt",
       "bytes": 9751,
       "sha256": "a05f21edcaae437da3d5682b0a2fb2fb555c6a2c3ddf3e23b9739fab5ac0aefc"
@@ -2589,8 +2599,8 @@
     },
     {
       "path": "app/src/test/java/com/eiliot/app/WakeCapturePreferenceTest.kt",
-      "bytes": 1391,
-      "sha256": "99a062e89b5e26d68dbd90a1c894086cb4c16070d399982999a9193829dc6b53"
+      "bytes": 1632,
+      "sha256": "64c192a70982b20264c6655ab9fbe2c97c42b63fe4f80203dbadcba8bd6731fb"
     },
     {
       "path": "app/src/test/java/com/eiliot/app/WhisperTokenTransportTest.kt",
@@ -2609,8 +2619,8 @@
     },
     {
       "path": "docs/VOICE_IMPLEMENTATION_STATUS.md",
-      "bytes": 18103,
-      "sha256": "9b620cbfb5fe8003d4820808211b9ce8e36ee5220a5be088aeb157d7bcc8b5ce"
+      "bytes": 19243,
+      "sha256": "78bfc9734fbeec4de2349a95cd2bf3eb313c0cc3677c892056d9994092807273"
     },
     {
       "path": "docs/archive/0.6.0/FEATURE_REVIEW.md",

@@ -146,17 +146,23 @@ class RemoteWhisper(language:String="en",model:String=com.eiliot.app.voice.Multi
     }
 }
 class RemoteDenoiser:RemoteObject(newHandle("denoiser")) {
+    fun reset() {rpc("denoise_reset")}
+    fun filterChunk(audio:FloatArray):FloatArray {
+        require(audio.size in 1..4096 && audio.all(Float::isFinite))
+        return checkNotNull(rpc("denoise",args().apply {putFloatArray("pcm",audio)}).getFloatArray("pcm"))
+    }
+    fun flush()=checkNotNull(rpc("denoise_flush").getFloatArray("pcm"))
     /** Diagnostic clips only. Each Binder transaction stays well below its size limit. */
     suspend fun clean(audio:FloatArray):FloatArray {
         require(audio.size in 1..128000 && audio.all(Float::isFinite))
-        rpc("denoise_reset")
+        reset()
         val parts=mutableListOf<FloatArray>()
         try {
             for(at in audio.indices step 4096) {
                 kotlinx.coroutines.currentCoroutineContext().ensureActive()
-                parts.add(checkNotNull(rpc("denoise",args().apply {putFloatArray("pcm",audio.copyOfRange(at,minOf(at+4096,audio.size)))}).getFloatArray("pcm")))
+                parts.add(filterChunk(audio.copyOfRange(at,minOf(at+4096,audio.size))))
             }
-            parts.add(checkNotNull(rpc("denoise_flush").getFloatArray("pcm")))
+            parts.add(flush())
             check(parts.sumOf {it.size}==audio.size){"Noise filter changed recording length"}
             return FloatArray(audio.size).also {out->var at=0;parts.forEach {it.copyInto(out,at);at+=it.size}}
         }finally {parts.forEach {it.fill(0f)}}

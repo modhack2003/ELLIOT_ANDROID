@@ -95,7 +95,7 @@ text normalization or homophone rules may be enabled on this encoded text.
 
 ## GTCRN local speech denoiser
 
-Diagnostic original/cleaned comparison, Sherpa-onnx 1.13.8 CPU implementation.
+Optional streaming filter and diagnostic original/cleaned comparison through Sherpa-onnx 1.13.8 CPU.
 - Upstream: https://github.com/Xiaobin-Rong/gtcrn (MIT, copyright 2024 Rong Xiaobin).
 - Export: https://github.com/k2-fsa/sherpa-onnx/releases/download/speech-enhancement-models/gtcrn_simple.onnx
 - GitHub asset ID: 236067657; 535638 bytes; upstream asset had no digest field.

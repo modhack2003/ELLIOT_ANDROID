@@ -26,7 +26,24 @@ class NativeSpeechDeviceTest {
                     assertEquals(n,cleaned.size);assertTrue(cleaned.all(Float::isFinite))
                     audio.fill(0f);cleaned.fill(0f)
                 }
+                denoiser.reset()
+                val streaming=FloatArray(64000){(.03*kotlin.math.sin(it*.021)).toFloat()}
+                val frames=PcmFrameBuffer();var outputSamples=0;var frameCount=0
+                val started=android.os.SystemClock.elapsedRealtime()
+                val consume:(FloatArray)->Unit={assertEquals(512,it.size);assertTrue(it.all(Float::isFinite));frameCount++}
+                for(at in streaming.indices step 512) {
+                    val output=denoiser.filterChunk(streaming.copyOfRange(at,at+512));outputSamples+=output.size
+                    frames.push(output,consume);output.fill(0f)
+                }
+                val tail=denoiser.flush();outputSamples+=tail.size;frames.push(tail,consume)
+                val elapsed=android.os.SystemClock.elapsedRealtime()-started
+                assertEquals(streaming.size,outputSamples);assertEquals(125,frameCount)
+                InstrumentationRegistry.getInstrumentation().sendStatus(0,android.os.Bundle().apply {
+                    putLong("denoiser_stream_4_seconds_ms",elapsed)
+                })
+                tail.fill(0f);streaming.fill(0f);frames.clear()
                 assertTrue(runCatching {denoiser.clean(floatArrayOf(Float.NaN))}.isFailure)
+                assertTrue(runCatching {denoiser.filterChunk(FloatArray(4097))}.isFailure)
             }finally{denoiser.release()}
         }
     }

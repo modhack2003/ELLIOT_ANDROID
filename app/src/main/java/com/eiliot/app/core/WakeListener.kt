@@ -82,6 +82,8 @@ object WakeListener {
             var kws:RemoteKeywordSpotter?=null;var kwsStream:RemoteStream?=null
             var recognizer:RemoteRecognizer?=null;var stream:RemoteStream?=null;var vad:RemoteVad?=null
             var audio:VoiceAudioInput?=null
+            var noiseReducer:RemoteDenoiser?=null
+            var enhancedFrames:PcmFrameBuffer?=null
             try {
                 status.value="Getting your offline voice ready"
                 val root=ModelAssets.await(SentinelRuntime.context)
@@ -100,16 +102,19 @@ object WakeListener {
                 val direct=calibration?.referenceCapture?:
                     (WakeCapturePreference.reference(SentinelRuntime.context) || com.eiliot.app.BuildConfig.VOICE_REFERENCE_CAPTURE)
                 val reduceNoise=calibration?.noiseReduction?:WakeCapturePreference.noiseReduction(SentinelRuntime.context)
+                val enhanced=calibration?.softwareNoiseReduction?:WakeCapturePreference.softwareNoiseReduction(SentinelRuntime.context)
+                val reducer=if(enhanced)RemoteDenoiser()else null;noiseReducer=reducer
+                val assembled=PcmFrameBuffer();enhancedFrames=assembled
                 audio=VoiceAudioInput(SentinelRuntime.context,direct,reduceNoise) { }
                 ensureActive();check(gen==generation && SentinelRuntime.alive(epoch))
                 input=audio;ready=true
-                if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "capture ready; direct=$direct; live=${liveCall.value}; wake=${SentinelRuntime.store.wakeEnabled}; echo=${audio.echoEnabled}; noise=${audio.noiseEnabled}; gain=${audio.gainEnabled}")
+                if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "capture ready; direct=$direct; live=${liveCall.value}; wake=${SentinelRuntime.store.wakeEnabled}; echo=${audio.echoEnabled}; noise=${audio.noiseEnabled}; gain=${audio.gainEnabled}; enhanced=$enhanced")
                 var diagnosticAt=android.os.SystemClock.elapsedRealtime()
                 var diagnosticFrames=0
                 var diagnosticPeak=0f
                 var diagnosticEnergy=0.0
                 echoStatus.value=if(audio.echoEnabled)"Device echo cancellation is on" else "Headphones can help avoid speaker echo"
-                audio.onFrame={ frame ->
+                val processFrame:(FloatArray)->Unit={ frame ->
                     if(gen!=generation || !SentinelRuntime.alive(epoch))throw CancellationException()
                     if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS) {
                         diagnosticFrames++
@@ -186,6 +191,7 @@ object WakeListener {
                         }
                     }
                 }
+                audio.onFrame={frame->if(reducer==null)processFrame(frame)else assembled.push(reducer.filterChunk(frame),processFrame)}
                 status.value=if(liveCall.value)"Live call · speak naturally" else "Say Hey Elliot"
                 val bytes=ByteArray(1024)
                 while(isActive && gen==generation && SentinelRuntime.alive(epoch)) { if(audio.read(bytes,0,bytes.size)<0)break }
@@ -199,6 +205,7 @@ object WakeListener {
                 }
             } finally {
                 audio?.onFrame=null;runCatching { audio?.close() }
+                enhancedFrames?.clear();runCatching{noiseReducer?.release()}
                 runCatching { stream?.release() };runCatching { kwsStream?.release() };runCatching { recognizer?.release() };runCatching { kws?.release() };runCatching { vad?.release() }
                 if(gen==generation) { input=null;ready=false }
             }
