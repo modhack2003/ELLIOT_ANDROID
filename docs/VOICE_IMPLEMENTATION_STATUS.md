@@ -1,7 +1,38 @@
 # Voice implementation status — 3 November 2026
 
-Current working milestone: 0.6.3-dev.6 / versionCode 16.
+Current working milestone: 0.6.3-dev.7 / versionCode 17.
 Baseline source commit: 0d508c5fbc747010b16c0d51d8151aa3ef48748e.
+
+## Consented local reference test (dev.7)
+
+On November 3 the user authorized retaining one Bengali-English test recording
+locally, with no cloud upload. The diagnostic screen now offers an explicit
+Save one local test recording action. It writes a bounded 16 kHz mono PCM16 WAV
+to app-scoped external `voice-evaluation/consented-sample.wav`. Existing files
+are not overwritten. Recording and transcription do not automatically save.
+The folder is excluded from Android cloud backup and device transfer. Once
+saved, the file persists until deleted; closing the dialog still clears RAM.
+
+Two WAV tests passed, including exact PCM16 round-trip and invalid/overlong input
+rejection. The app built and installed on the Vivo; signing and bundled model
+checks passed. One six-second WAV was explicitly saved and pulled locally for
+reference inference. The user confirmed that this exact saved file is clear,
+complete and at normal speed. It is not included in source archives or Git.
+
+Reference runner: official whisper.cpp v1.9.2 Windows x64 CPU binary with a
+SHA-256-verified multilingual Small F16 model. Initial Auto/Bengali runs also
+failed to transcribe the clip; Auto detected Bengali. This does not isolate a
+Sherpa bug: runtime, export and quantization differ. Additional decoding/model
+comparisons and their exact results are recorded in the exported progress report.
+
+Completed same-file comparison: phone Turbo int8 returned empty with Bengali;
+reference Turbo F16 produced Bengali text with name/spelling errors. Reference
+Auto identified Hindi. Neither passes the speech-quality gate. A saved-recording
+device probe requires the explicit `consentedSpeechComparison=true` argument and
+otherwise skips; it does not capture or save new microphone audio. Its pass means
+execution only. Small ONNX also failed on Windows with both 1000 and 2400 tail
+padding frames. Precision/export and language handling need controlled follow-up;
+these results do not isolate a runtime-only defect.
 
 ## Multilingual diagnostics (dev.5–dev.6)
 

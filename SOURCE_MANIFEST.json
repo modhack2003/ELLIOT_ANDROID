@@ -1,6 +1,6 @@
 {
-  "release": "0.6.3-dev.6",
-  "version_code": 16,
+  "release": "0.6.3-dev.7",
+  "version_code": 17,
   "files": [
     {
       "path": ".gitignore",
@@ -35,7 +35,7 @@
     {
       "path": "MODEL_SOURCES.json",
       "bytes": 4103,
-      "sha256": "3ef6fac6ba77bb7bfd0e9b90f588d2a7785da7065047ab368ffb45d2b3b8b88b"
+      "sha256": "ebdda93ed7917e5932062c95d330e33f2ef17db3ab73f10a4cf96d2086f1b737"
     },
     {
       "path": "NEXT_BUILD_PLAN.md",
@@ -75,7 +75,7 @@
     {
       "path": "app/build.gradle.kts",
       "bytes": 5220,
-      "sha256": "0d3977ab5b986f3a96461f8e80c0f652564da519fe43b94a0e234a74c383189d"
+      "sha256": "40620fe309e2f9a0e41c823348e2f2c158448b539d3f38d0e3eae39ef44615c0"
     },
     {
       "path": "app/libs/sherpa-onnx-1.13.8.aar",
@@ -86,6 +86,11 @@
       "path": "app/src/androidTest/java/com/eiliot/app/NativeSpeechDeviceTest.kt",
       "bytes": 6768,
       "sha256": "07eca19bd961e40f0e1f5c94764086fd2d13736b2f03f2d22cf32881019b223e"
+    },
+    {
+      "path": "app/src/androidTest/java/com/eiliot/app/SavedSpeechComparisonTest.kt",
+      "bytes": 2966,
+      "sha256": "535324fcedd31412685138d7e3d21532716372ec7eb7aaeb7b6fde1a05cde4a6"
     },
     {
       "path": "app/src/androidTest/java/com/eiliot/app/WhisperDeviceTest.kt",
@@ -2314,8 +2319,13 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/VoiceCalibrationDialog.kt",
-      "bytes": 14228,
-      "sha256": "6517feca7f6de7138d5560926aa6ac3b5cbfde69d72ccb84eb229caeeb9b27cc"
+      "bytes": 15818,
+      "sha256": "466fc5ae29f02d42c72adec4e8df13fcd8f068ee7d6f83c96f352b5dca680db3"
+    },
+    {
+      "path": "app/src/main/java/com/eiliot/app/voice/DiagnosticWav.kt",
+      "bytes": 849,
+      "sha256": "7d8cec1a5e41a71f3da5efecea2a0e744377387d9ed7eee7c7e4ace4a55d108d"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/ListeningPolicy.kt",
@@ -2424,13 +2434,13 @@
     },
     {
       "path": "app/src/main/res/xml/backup_rules.xml",
-      "bytes": 186,
-      "sha256": "5f7356dc276622a5841ea581bd7cbb9724b057e2c33d1f9bd0d14b9d10d31c28"
+      "bytes": 239,
+      "sha256": "00a180178e192e7e4c463ef87a5fdcc8b8ff6e6aeb1eee79e0629f2652a38904"
     },
     {
       "path": "app/src/main/res/xml/data_extraction_rules.xml",
-      "bytes": 396,
-      "sha256": "792be4fe66aeb751c21b685008a31e2c85662bb2c8af59971e93d30356853331"
+      "bytes": 502,
+      "sha256": "45ccf436dc2d914c864ccb158cb9f83f0f6a024c8baed14902e556026c1eef27"
     },
     {
       "path": "app/src/preview/AndroidManifest.xml",
@@ -2461,6 +2471,11 @@
       "path": "app/src/test/java/com/eiliot/app/CorePolicyTest.kt",
       "bytes": 6336,
       "sha256": "4840e269b1b554329afd07fa093f7e2d07298e2e99893e65eef50d4bd77689dc"
+    },
+    {
+      "path": "app/src/test/java/com/eiliot/app/DiagnosticWavTest.kt",
+      "bytes": 960,
+      "sha256": "51681fab28ae21648b4dcb8c2d4c6a0f1ca8fd6cb4e470fcd5b81f5435fb0b05"
     },
     {
       "path": "app/src/test/java/com/eiliot/app/FeedParserTest.kt",
@@ -2559,8 +2574,8 @@
     },
     {
       "path": "docs/VOICE_IMPLEMENTATION_STATUS.md",
-      "bytes": 9774,
-      "sha256": "aa3e740a60646f08591ef15a90de9a1f9a37b77adf5459cfb3cb85224a8302c4"
+      "bytes": 11761,
+      "sha256": "f7f9b9c38fc949b49b820bbedcb5f3b541f6c109e8c166f334184e9fd322939b"
     },
     {
       "path": "docs/archive/0.6.0/FEATURE_REVIEW.md",
@@ -2934,8 +2949,8 @@
     },
     {
       "path": "evaluation/voice/README.md",
-      "bytes": 4261,
-      "sha256": "9436dfa98a81c988d71675fcae38b11b3d3a9f6b76dbff6d1488e850992f29a2"
+      "bytes": 4661,
+      "sha256": "64a478bb08d71c1aba106349bbdc22ccb7c6e5c6273ce077b4a39bc22bd215ea"
     },
     {
       "path": "evaluation/voice/model-candidates.json",
@@ -2976,6 +2991,11 @@
       "path": "settings.gradle.kts",
       "bytes": 325,
       "sha256": "f19faf0e885034538868a9d04c09390691d96747c9a33d4e8c402dc28cff79b5"
+    },
+    {
+      "path": "tools/benchmark_whisper_reference.py",
+      "bytes": 2516,
+      "sha256": "de604d41c0a4e62689eab5c37390630aab8791be3181d9340af697f687e0abb8"
     },
     {
       "path": "tools/check_release.py",

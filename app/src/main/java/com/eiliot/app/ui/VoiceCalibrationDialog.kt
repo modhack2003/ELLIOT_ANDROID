@@ -37,6 +37,8 @@ import kotlinx.coroutines.*
     var clipNumber by remember {mutableIntStateOf(0)}
     var clipMicrophone by remember {mutableStateOf("")}
     var job by remember {mutableStateOf<Job?>(null)}
+    val exportFile=remember {context.getExternalFilesDir(null)?.let {java.io.File(it,"voice-evaluation/consented-sample.wav")}}
+    var exported by remember {mutableStateOf(exportFile?.exists()==true)}
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) {onClose()}
     val priorLive=remember {WakeListener.liveCall.value}
     fun discard() {trials.forEach {it.audio.fill(0f)};trials.clear()}
@@ -121,7 +123,7 @@ import kotlinx.coroutines.*
                 val label=if(useWhisper)"${model.label} · ${selectedLanguage.ifEmpty {"Auto"}}"else "English Zipformer"
                 val result="Recording $clipNumber · $clipMicrophone · $label (${String.format(java.util.Locale.US,"%.1f",seconds)} seconds):\n${text.ifBlank {"No words recognized"}}"
                 transcript=(listOf(result)+transcript.split("\n\n").filter{it.isNotBlank()}).take(6).joinToString("\n\n")
-                status="Result below. Change model or language, then tap Transcribe last recording to compare the same audio. Nothing was executed or saved."
+                status="Result below. Change model or language, then tap Transcribe last recording to compare the same audio. No command ran. Saving audio requires the separate local-save button."
             }catch(e:CancellationException){throw e}
             catch(e:Exception){status="Transcription check failed. Verify or repair the selected model, then retry."}
             finally{clip?.fill(0f);busy=false}
@@ -131,7 +133,7 @@ import kotlinx.coroutines.*
         Surface(shape=MaterialTheme.shapes.large) {
             Column(Modifier.padding(20.dp).heightIn(max=650.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(12.dp)) {
                 Text(if(transcriptionOnly)"Check speech recognition" else "Calibrate my wake phrase",style=MaterialTheme.typography.titleLarge)
-                Text(if(transcriptionOnly)"Record a sentence, compare the recognized words, and listen back. Audio stays in memory until you record again or close. No command will run."
+                Text(if(transcriptionOnly)"Record a sentence, compare the recognized words, and listen back. Audio stays in memory unless you tap Save one local test recording. No command will run."
                     else "We compare two microphone paths using your normal accent. Audio stays in memory and is discarded when you close. This does not train the speech model.")
                 Text(status)
                 if(!transcriptionOnly && step>=12)assessments.forEachIndexed {i,result->
@@ -193,6 +195,23 @@ import kotlinx.coroutines.*
                     if(lastClip!=null)Button(onClick={checkSentence(false)},enabled=!multilingual || packReady){Text("Transcribe last recording")}
                 }
                 if(transcript.isNotBlank())Text(transcript)
+                if(transcriptionOnly && lastClip!=null && !exported && exportFile!=null)TextButton(onClick={
+                    val clip=checkNotNull(lastClip).copyOf();busy=true
+                    job=scope.launch {
+                        try {
+                            withContext(Dispatchers.IO) {
+                                val bytes=DiagnosticWav.encode(clip)
+                                check(exportFile.parentFile!!.isDirectory || exportFile.parentFile!!.mkdirs())
+                                check(exportFile.createNewFile()) {"A local test recording already exists"}
+                                try {exportFile.writeBytes(bytes)}catch(e:Exception){exportFile.delete();throw e}
+                            }
+                            exported=true;status="Saved one local WAV for computer comparison. It stays on this phone until deleted; no upload was made."
+                        }catch(e:CancellationException){throw e}
+                        catch(e:Exception){status="Could not save the local test recording."}
+                        finally{clip.fill(0f);busy=false}
+                    }
+                },enabled=!busy){Text("Save one local test recording")}
+                if(transcriptionOnly && exported)Text("One test recording is saved locally. New recordings will not overwrite it.")
                 if(lastClip!=null)TextButton(onClick={
                     val clip=checkNotNull(lastClip);busy=true
                     job=scope.launch {

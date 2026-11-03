@@ -1,5 +1,11 @@
 # Real-speech evaluation
 
+Dev.7 exception to RAM-only diagnostics: Save one local test recording explicitly
+exports the current clip as a 16 kHz mono PCM16 WAV. It never overwrites an
+existing export. The user authorized one local recording for reference testing;
+no cloud upload is authorized. The export survives dialog close and is excluded
+from backup/device transfer. Keep it outside source control and source archives.
+
 This harness scores supplied, user-approved reference/transcript pairs. It does
 not record, upload, train or run an ASR model. Never present fixture scores as
 device accuracy. Enrollment/calibration utterances must not be reused as held-out
