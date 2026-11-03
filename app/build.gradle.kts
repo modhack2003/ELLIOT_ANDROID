@@ -15,8 +15,8 @@ android {
         minSdk = 26
         targetSdk = 36
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        versionCode = 12
-        versionName = "0.6.3-dev.2"
+        versionCode = 16
+        versionName = "0.6.3-dev.6"
         buildConfigField("boolean", "VOICE_REFERENCE_CAPTURE", "false")
         buildConfigField("boolean", "VOICE_DIAGNOSTICS", "false")
     }
@@ -43,7 +43,8 @@ android {
     }
     // All weights are streamed into verified internal files, so APK compression is safe.
     packaging { jniLibs.useLegacyPackaging = true }
-    splits { abi { isEnable = true; reset(); include("arm64-v8a", "armeabi-v7a", "x86", "x86_64"); isUniversalApk = true } }
+    val voiceArm64Only=providers.gradleProperty("voiceArm64Only").orElse("false").get().toBooleanStrict()
+    splits { abi { isEnable = true; reset(); if(voiceArm64Only)include("arm64-v8a")else include("arm64-v8a", "armeabi-v7a", "x86", "x86_64"); isUniversalApk = !voiceArm64Only } }
     testOptions {
         unitTests.isIncludeAndroidResources = true
         unitTests.all { test ->

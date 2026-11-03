@@ -1,6 +1,9 @@
 package com.eiliot.app.voice
 
 import android.content.Context
+import android.media.AudioAttributes
+import android.media.AudioFormat
+import android.media.AudioTrack
 import com.eiliot.app.voice.remote.*
 import kotlinx.coroutines.*
 import java.security.MessageDigest
@@ -9,7 +12,7 @@ data class WakeSetting(val referenceCapture:Boolean,val score:Float=2f,val thres
     init {require(score.isFinite() && score in 1f..3.5f);require(threshold.isFinite() && threshold in .05f.. .3f)}
 }
 data class WakeTrial(val phrase:String,val positive:Boolean,val audio:FloatArray)
-data class WakeAssessment(val setting:WakeSetting,val hits:Int,val positives:Int,val falseHits:Int,val negatives:Int,val phrases:Set<String>) {
+data class WakeAssessment(val setting:WakeSetting,val hits:Int,val positives:Int,val falseHits:Int,val negatives:Int,val phrases:Set<String>,val phraseHits:Map<String,Int> = emptyMap()) {
     val eligible get()=positives>=4 && negatives>=2 && hits>=3 && falseHits==0 && phrases.containsAll(listOf("hey","name"))
 }
 object WakeCalibrationPolicy {
@@ -38,11 +41,12 @@ object VoiceCalibrationStore {
 }
 object WakeCalibration {
     /** Bounded RAM-only capture. No files, network or automatic commands. */
-    suspend fun capture(c:Context,reference:Boolean,seconds:Int=4):FloatArray=withContext(Dispatchers.IO) {
+    suspend fun capture(c:Context,reference:Boolean,seconds:Int=4,onReady:()->Unit={}):FloatArray=withContext(Dispatchers.IO) {
         require(seconds in 1..8)
         val samples=ArrayList<Float>(16000*seconds)
         VoiceAudioInput(c,reference) {}.use {input->
             input.onFrame={frame->samples.addAll(frame.asList())}
+            withContext(Dispatchers.Main){onReady()}
             val bytes=ByteArray(1024)
             while(samples.size<16000*seconds) {ensureActive();check(input.read(bytes,0,bytes.size)>0){"Microphone stopped. Try again."}}
         }
@@ -68,11 +72,25 @@ object WakeCalibration {
     suspend fun assess(reference:Boolean,trials:List<WakeTrial>):List<WakeAssessment> {
         val results=mutableListOf<WakeAssessment>()
         for((score,threshold) in listOf(2f to .15f,2.5f to .1f,3f to .08f)) {
-            val setting=WakeSetting(reference,score,threshold);var hits=0;var falseHits=0;val phrases=mutableSetOf<String>()
-            for(t in trials) {val hit=detect(setting,t.audio);if(hit && t.positive){hits++;phrases+=t.phrase}else if(hit)falseHits++}
-            results+=WakeAssessment(setting,hits,trials.count{it.positive},falseHits,trials.count{!it.positive},phrases)
+            val setting=WakeSetting(reference,score,threshold);var hits=0;var falseHits=0;val phraseHits=mutableMapOf<String,Int>()
+            for(t in trials) {val hit=detect(setting,t.audio);if(hit && t.positive){hits++;phraseHits[t.phrase]=(phraseHits[t.phrase]?:0)+1}else if(hit)falseHits++}
+            results+=WakeAssessment(setting,hits,trials.count{it.positive},falseHits,trials.count{!it.positive},phraseHits.keys.toSet(),phraseHits.toMap())
         }
         return results
+    }
+    /** Play only the current in-memory check; never sends it through the command pipeline. */
+    suspend fun play(audio:FloatArray)=withContext(Dispatchers.IO) {
+        require(audio.isNotEmpty() && audio.size<=16000*8)
+        val player=AudioTrack.Builder()
+            .setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).build())
+            .setAudioFormat(AudioFormat.Builder().setSampleRate(16000).setChannelMask(AudioFormat.CHANNEL_OUT_MONO).setEncoding(AudioFormat.ENCODING_PCM_FLOAT).build())
+            .setTransferMode(AudioTrack.MODE_STATIC).setBufferSizeInBytes(audio.size*4).build()
+        try {
+            check(player.state!=AudioTrack.STATE_UNINITIALIZED)
+            ensureActive();check(player.write(audio,0,audio.size,AudioTrack.WRITE_BLOCKING)==audio.size)
+            player.play()
+            withTimeout(audio.size*1000L/16000+3000) {while(player.playbackHeadPosition<audio.size){ensureActive();delay(25)}}
+        }finally {runCatching{player.stop()};player.release()}
     }
     suspend fun transcribe(audio:FloatArray):String=withContext(Dispatchers.IO) {
         val asr=RemoteRecognizer();val stream=asr.createStream("ELLIOT\nBATTERY\nVOLUME")

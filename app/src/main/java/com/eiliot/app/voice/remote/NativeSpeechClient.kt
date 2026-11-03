@@ -126,10 +126,22 @@ open class RemoteDecoder(kind:String,options:Bundle=Bundle()):RemoteObject(newHa
     fun reset(stream:RemoteStream) {rpc("reset",args(stream))}
 }
 class RemoteKeywordSpotter(score:Float?=null,threshold:Float?=null):RemoteDecoder("kws",Bundle().apply {
-    score?.let {putFloat("score",it)};threshold?.let {putFloat("threshold",it)}
+    // Reset must pass defaults explicitly: worker SharedPreferences may cache an old profile.
+    putFloat("score",score?:2f);putFloat("threshold",threshold?:.15f)
 })
 class RemoteRecognizer:RemoteDecoder("asr") {
     fun isEndpoint(stream:RemoteStream)=rpc("endpoint",args(stream)).getBoolean("value")
+}
+class RemoteWhisper(language:String="en",model:String=com.eiliot.app.voice.MultilingualModelPack.SMALL.id):RemoteDecoder("whisper",Bundle().apply {putString("language",language);putString("model",model)}) {
+    /** The pinned backend truncates at 30 seconds; reject overlong clips explicitly. */
+    fun transcribe(audio:FloatArray):String {
+        require(audio.isNotEmpty() && audio.size<=28*16000){"Use speech segments of at most 28 seconds"}
+        val stream=createStream()
+        try {
+            for(offset in audio.indices step 4096)stream.acceptWaveform(audio.copyOfRange(offset,minOf(offset+4096,audio.size)),16000)
+            decode(stream);return getResult(stream).text.trim()
+        }finally {runCatching{stream.release()}}
+    }
 }
 class RemoteVad:RemoteObject(newHandle("vad")) {
     fun compute(frame:FloatArray)=rpc("compute",args().apply {putFloatArray("pcm",frame)}).getFloat("value")

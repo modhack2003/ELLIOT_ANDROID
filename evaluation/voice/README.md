@@ -41,3 +41,40 @@ Archive and hash the first APK before building the second: the output path is
 reused. Default capture remains VOICE_COMMUNICATION with effects. The reference
 profile requests MIC and creates no explicit AEC/NS/AGC effects. MIC is not a
 guarantee of unprocessed hardware audio. Runtime diagnostics default off.
+
+## Reusing one recording for model comparisons (dev.6)
+
+Settings > Check speech recognition is isolated from assistant actions. Optional
+Whisper Small (375 MB) and Large-v3 Turbo (1036 MB) are diagnostic candidates;
+normal wake/manual commands still use the bundled English recognizer.
+`model-candidates.json` records their exact revisions, files and hashes. Download
+the selected pack in the screen; Verify or repair detects same-size corruption.
+No model file is accepted solely because it has the expected filename or size.
+
+1. Choose Direct or Processed, a model and a language. Record one complete
+   sentence after Speak now. The current capture limit is six seconds.
+2. Play the last recording to check intelligibility and completeness.
+3. Change language or model and tap Transcribe last recording. This reuses the
+   same PCM without opening the microphone again. The original capture label
+   stays attached to the result; changing the microphone only affects the next
+   new recording.
+4. Compare Auto and forced English/Hindi/Bengali on the same clip. Keep the raw
+   results, including empty outputs, visible for inspection. The displayed time
+   includes loading, verification and decoding, not just model inference.
+5. Recording a new sentence clears previous results; closing or backgrounding
+   the dialog clears its RAM-only audio/results. No audio is retained or uploaded.
+
+The screen holds at most six result entries. These comparisons identify failures;
+they do not replace the separate held-out set described above. Clear playback
+does not prove a recognizer understands the words, and a generated English
+smoke test does not establish Bengali-English or Hindi-English support.
+
+Native compatibility checks, after installing the app and test APK:
+
+```powershell
+adb -s YOUR_DEVICE_SERIAL shell am instrument -w -r -e class com.eiliot.app.WhisperDeviceTest com.eiliot.app.preview.test/androidx.test.runner.AndroidJUnitRunner
+```
+
+This downloads missing candidate packs onto the phone and tests generated English
+through each model. Run it before a live recording session because instrumentation
+stops the assistant runtime. Record exact APK hashes and test metrics separately.

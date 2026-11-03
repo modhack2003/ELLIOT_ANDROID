@@ -20,9 +20,13 @@ if __name__=='__main__':
         models=apk.read('assets/models/manifest.json')
     result=dict(source_commit=git('rev-parse','HEAD'),source_dirty=bool(git('status','--porcelain')),
         apk_name=args.apk.name,apk_bytes=args.apk.stat().st_size,apk_sha256=sha(args.apk.read_bytes()),
-        capture_profile=args.capture_profile,profile_note='Caller-supplied build profile; archive build invocation alongside this manifest.',
+        capture_profile=args.capture_profile,profile_note='Caller-supplied build default; saved wake calibration and diagnostic microphone selection can override it. Archive each trial selection separately.',
         packaged_voice_contract=json.loads(contract),packaged_voice_contract_sha256=sha(contract),
         packaged_model_manifest_sha256=sha(models),models=json.loads(models),
         runtime_aar_sha256=sha((root/'app/libs/sherpa-onnx-1.13.8.aar').read_bytes()))
+    optional=root/'evaluation/voice/model-candidates.json'
+    if optional.exists():
+        result['optional_model_catalog']=json.loads(optional.read_text(encoding='utf-8'))
+        result['optional_models_note']='Catalog identifies downloadable diagnostic candidates; it does not prove installation or real-voice accuracy.'
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')

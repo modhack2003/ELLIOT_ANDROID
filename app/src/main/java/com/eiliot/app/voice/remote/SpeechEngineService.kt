@@ -52,21 +52,28 @@ class SpeechEngineService:Service() {
         check(initialized)
         when(op) {
             "kws"->{
-                val saved=VoiceCalibrationStore.load(applicationContext)?:WakeSetting(false)
-                val setting=WakeSetting(saved.referenceCapture,a.getFloat("score",saved.score),a.getFloat("threshold",saved.threshold))
+                val setting=WakeSetting(false,a.getFloat("score",2f),a.getFloat("threshold",.15f))
                 out.putLong("id",hold(KeywordSpotter(config=KeywordSpotterConfig(modelConfig=model("kws"),keywordsFile="${root.path}/kws/keywords.txt",keywordsScore=setting.score,keywordsThreshold=setting.threshold,numTrailingBlanks=1))))
             }
             "asr"->out.putLong("id",hold(OnlineRecognizer(config=OnlineRecognizerConfig(modelConfig=model("asr"),decodingMethod="modified_beam_search",maxActivePaths=4,hotwordsScore=1.5f,enableEndpoint=true,endpointConfig=EndpointConfig(EndpointRule(false,2.4f,0f),EndpointRule(true,1.4f,0f),EndpointRule(false,0f,60f))))))
+            "whisper"->{
+                val language=a.getString("language").orEmpty();require(language in setOf("","en","hi","bn"))
+                val spec=MultilingualModelPack.spec(a.getString("model")?:MultilingualModelPack.SMALL.id)
+                val pack=MultilingualModelPack.verify(applicationContext,spec)
+                out.putLong("id",hold(OfflineRecognizer(config=OfflineRecognizerConfig(modelConfig=OfflineModelConfig(
+                    whisper=OfflineWhisperModelConfig(encoder=File(pack,spec.encoder).path,decoder=File(pack,spec.decoder).path,language=language,task="transcribe"),
+                    tokens=File(pack,spec.tokens).path,numThreads=4,provider="cpu")))))
+            }
             "vad"->out.putLong("id",hold(Vad(config=VadModelConfig(sileroVadModelConfig=SileroVadModelConfig(model="${root.path}/silero_vad.onnx",threshold=.65f,minSilenceDuration=.5f,minSpeechDuration=.192f,windowSize=512),sampleRate=16000,numThreads=1))))
-            "stream"->out.putLong("id",hold(when(val owner=objects[id]) {is KeywordSpotter->owner.createStream();is OnlineRecognizer->owner.createStream(a.getString("hotwords").orEmpty());else->error("Invalid stream owner")}))
-            "accept"->{val pcm=checkNotNull(a.getFloatArray("pcm"));require(pcm.size<=16000);obj<OnlineStream>(id).acceptWaveform(pcm,16000)}
+            "stream"->out.putLong("id",hold(when(val owner=objects[id]) {is KeywordSpotter->owner.createStream();is OnlineRecognizer->owner.createStream(a.getString("hotwords").orEmpty());is OfflineRecognizer->owner.createStream();else->error("Invalid stream owner")}))
+            "accept"->{val pcm=checkNotNull(a.getFloatArray("pcm"));require(pcm.size<=16000);when(val stream=objects[id]){is OnlineStream->stream.acceptWaveform(pcm,16000);is OfflineStream->stream.acceptWaveform(pcm,16000);else->error("Invalid speech stream")}}
             "ready"->out.putBoolean("value",when(val owner=objects[id]) {is KeywordSpotter->owner.isReady(obj(sid));is OnlineRecognizer->owner.isReady(obj(sid));else->false})
-            "decode"->when(val owner=objects[id]) {is KeywordSpotter->owner.decode(obj(sid));is OnlineRecognizer->owner.decode(obj(sid));else->error("Invalid decoder")}
-            "result"->out.putString("text",when(val owner=objects[id]) {is KeywordSpotter->owner.getResult(obj(sid)).keyword;is OnlineRecognizer->owner.getResult(obj(sid)).text;else->""})
+            "decode"->when(val owner=objects[id]) {is KeywordSpotter->owner.decode(obj(sid));is OnlineRecognizer->owner.decode(obj(sid));is OfflineRecognizer->owner.decode(obj(sid));else->error("Invalid decoder")}
+            "result"->out.putString("text",when(val owner=objects[id]) {is KeywordSpotter->owner.getResult(obj(sid)).keyword;is OnlineRecognizer->owner.getResult(obj(sid)).text;is OfflineRecognizer->owner.getResult(obj(sid)).text;else->""})
             "endpoint"->out.putBoolean("value",obj<OnlineRecognizer>(id).isEndpoint(obj(sid)))
             "reset"->when(val owner=objects[id]) {is KeywordSpotter->owner.reset(obj(sid));is OnlineRecognizer->owner.reset(obj(sid));is Vad->owner.reset();else->error("Invalid reset")}
             "compute"->{val pcm=checkNotNull(a.getFloatArray("pcm"));require(pcm.size==512);out.putFloat("value",obj<Vad>(id).compute(pcm))}
-            "release"->when(val item=objects.remove(id)) {is OnlineStream->item.release();is KeywordSpotter->item.release();is OnlineRecognizer->item.release();is Vad->item.release()}
+            "release"->when(val item=objects.remove(id)) {is OnlineStream->item.release();is OfflineStream->item.release();is KeywordSpotter->item.release();is OnlineRecognizer->item.release();is OfflineRecognizer->item.release();is Vad->item.release()}
             "tts"->synchronized(ttsLock) {
                 if(tts==null)tts=OfflineTts(config=OfflineTtsConfig(model=OfflineTtsModelConfig(vits=OfflineTtsVitsModelConfig(model="${root.path}/tts/model.onnx",tokens="${root.path}/tts/tokens.txt",dataDir="${root.path}/tts/espeak-ng-data"),numThreads=contract.threads,provider="cpu"),maxNumSentences=1))
                 out.putInt("rate",tts!!.sampleRate());out.putInt("speakers",tts!!.numSpeakers())

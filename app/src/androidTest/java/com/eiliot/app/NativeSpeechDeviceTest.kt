@@ -15,6 +15,12 @@ import org.junit.runner.RunWith
 /** Actual Android JNI/process checks; these do not certify microphone/acoustic quality. */
 @RunWith(AndroidJUnit4::class)
 class NativeSpeechDeviceTest {
+    @Test fun calibrationPlaybackCanFinishAndCancel()=runBlocking {
+        WakeCalibration.play(FloatArray(1600))
+        val playback=launch {WakeCalibration.play(FloatArray(32000))}
+        delay(100);playback.cancelAndJoin();assertTrue(playback.isCancelled)
+        WakeCalibration.play(FloatArray(1600))
+    }
     @Test fun calibrationReplayAndProfileRoundTrip()=runBlocking {
         val previous=VoiceCalibrationStore.load(app)
         try {
@@ -54,9 +60,8 @@ class NativeSpeechDeviceTest {
             try {
                 for(start in resampled.indices step 512) {
                     stream.acceptWaveform(resampled.copyOfRange(start,minOf(start+512,resampled.size)),16000)
-                    while(kws.isReady(stream))kws.decode(stream)
-                    val word=kws.getResult(stream).keyword
-                    if(word.isNotBlank()) {hits.add(word);kws.reset(stream)}
+                    drainWakeResults({kws.isReady(stream)},{kws.decode(stream)},
+                        {kws.getResult(stream).keyword},{kws.reset(stream)}) {hits.add(it)}
                 }
                 assertEquals("Wake detection for $phrase: $hits",expectWake,hits.isNotEmpty())
             }finally {stream.release();kws.release()}

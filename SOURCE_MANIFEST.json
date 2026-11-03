@@ -1,6 +1,6 @@
 {
-  "release": "0.6.3-dev.2",
-  "version_code": 12,
+  "release": "0.6.3-dev.6",
+  "version_code": 16,
   "files": [
     {
       "path": ".gitignore",
@@ -34,8 +34,8 @@
     },
     {
       "path": "MODEL_SOURCES.json",
-      "bytes": 1832,
-      "sha256": "669cf3a054d20a545e53cbede4d0cdf2455a57aea1269eba1f9656ae281a9a44"
+      "bytes": 4103,
+      "sha256": "3ef6fac6ba77bb7bfd0e9b90f588d2a7785da7065047ab368ffb45d2b3b8b88b"
     },
     {
       "path": "NEXT_BUILD_PLAN.md",
@@ -64,8 +64,8 @@
     },
     {
       "path": "THIRD_PARTY_MODELS.md",
-      "bytes": 2467,
-      "sha256": "39caba39fbd37932e4b0ec95a6ff271e6e0e09ded62bf4cf00f1c34e3c1fa21b"
+      "bytes": 4487,
+      "sha256": "8d5a506a48c5fec7cf78f332c17d9dd1271abda379c1acb94a4ee2f6dff39e8e"
     },
     {
       "path": "VALIDATION.md",
@@ -74,8 +74,8 @@
     },
     {
       "path": "app/build.gradle.kts",
-      "bytes": 5059,
-      "sha256": "62ac7f2840a12b1c5be1ad140bd2250187cd7ed9a2cad8d8656c6dfa46240389"
+      "bytes": 5220,
+      "sha256": "0d3977ab5b986f3a96461f8e80c0f652564da519fe43b94a0e234a74c383189d"
     },
     {
       "path": "app/libs/sherpa-onnx-1.13.8.aar",
@@ -84,8 +84,13 @@
     },
     {
       "path": "app/src/androidTest/java/com/eiliot/app/NativeSpeechDeviceTest.kt",
-      "bytes": 6481,
-      "sha256": "71b25ff4a67f3d91a6cb0681c68ba701117c8717af23d554a76a6e0291539f8f"
+      "bytes": 6768,
+      "sha256": "07eca19bd961e40f0e1f5c94764086fd2d13736b2f03f2d22cf32881019b223e"
+    },
+    {
+      "path": "app/src/androidTest/java/com/eiliot/app/WhisperDeviceTest.kt",
+      "bytes": 3154,
+      "sha256": "3f4e95674753002f0fa168a03b538d3b0fe5187a299584a32c86e86fb29d1faf"
     },
     {
       "path": "app/src/main/AndroidManifest.xml",
@@ -1968,6 +1973,11 @@
       "sha256": "6c12fa92b262717849abbdcf9e1fe1c6254449d930d549dd21ba8a78dca106e2"
     },
     {
+      "path": "app/src/main/assets/whisper-LICENSE.txt",
+      "bytes": 1063,
+      "sha256": "b5d65a59060e68c4ff940e1eddfa6f94b2d68fdf58ed7f4dd57721c997e35e9d"
+    },
+    {
       "path": "app/src/main/java/com/eiliot/app/EiliotApp.kt",
       "bytes": 2279,
       "sha256": "944c1ecec428424d9aea8a9679033a0e4fad318c20eb4c54f7dbf77c9ab36f54"
@@ -2294,8 +2304,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/SettingsScreen.kt",
-      "bytes": 17103,
-      "sha256": "8c801edfba1d472aab26003ed1e3514e731a4012cf55f71b2158199d205e8ad5"
+      "bytes": 17368,
+      "sha256": "511b73e7f02450ca80d29a3c6dc9cfe32a479f0dc4b2beae61e4fe6c65bfc45a"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/VaultScreen.kt",
@@ -2304,8 +2314,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/VoiceCalibrationDialog.kt",
-      "bytes": 7629,
-      "sha256": "1669d51c1910d0170a5da2ccec23543cd8ddd45cf05a6f6e011ed4050fc3fc1f"
+      "bytes": 14228,
+      "sha256": "6517feca7f6de7138d5560926aa6ac3b5cbfde69d72ccb84eb229caeeb9b27cc"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/ListeningPolicy.kt",
@@ -2316,6 +2326,11 @@
       "path": "app/src/main/java/com/eiliot/app/voice/ModelAssets.kt",
       "bytes": 3727,
       "sha256": "52b6b7b5922ab15f0d251edbbfad5b6aff7a7eefd090149750bdfdc9049d01ad"
+    },
+    {
+      "path": "app/src/main/java/com/eiliot/app/voice/MultilingualModelPack.kt",
+      "bytes": 6346,
+      "sha256": "9bc84be2bf64bb16af1b151cacd06a88034874465dbfe81947ca56d62dc36fae"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/NeuralSpeechPlayer.kt",
@@ -2354,13 +2369,13 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/WakeCalibration.kt",
-      "bytes": 5058,
-      "sha256": "a64e1b21348ca93fe929186eb63e16e86d1e03905e5b4ac0bbf10f0acb099700"
+      "bytes": 6440,
+      "sha256": "de46bf6b2602c76b04be8f2a10a4f5f6b81fa184aa9ece42797c93709cfabe3e"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/NativeSpeechClient.kt",
-      "bytes": 9125,
-      "sha256": "fbec0251ec662d8feae10d3b877f45eccccf16e08e8c05f87c29d922ce61d00c"
+      "bytes": 9961,
+      "sha256": "527da0ddb31f1fc2b475c50d858a173ebe3b5396493b1c3bbd9bb73b875531dd"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/NativeTtsCallback.java",
@@ -2369,8 +2384,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/SpeechEngineService.kt",
-      "bytes": 7097,
-      "sha256": "723061fd87869c6e874350ca4f6ff6727baf0b1d6ae448c4c76d51af060af7f9"
+      "bytes": 8011,
+      "sha256": "94835498cb92ae229ff147af20654dccdcc4f6d427228750b85bbae88b5cb30d"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/SpeechWire.kt",
@@ -2468,6 +2483,11 @@
       "sha256": "da333ab20529ee97b001401152430a38401f908da5faa98900a95c1a75fc50de"
     },
     {
+      "path": "app/src/test/java/com/eiliot/app/MultilingualModelPackTest.kt",
+      "bytes": 2984,
+      "sha256": "da025130cbb9a51d3c62bb4abea0137e769a48472145a689bb9f7ae711aa598a"
+    },
+    {
       "path": "app/src/test/java/com/eiliot/app/NativeTtsCallbackTest.kt",
       "bytes": 744,
       "sha256": "c26493c68a551c327869866ab7561513fd7c42afd00e254d6bd9d5df9b591683"
@@ -2539,8 +2559,8 @@
     },
     {
       "path": "docs/VOICE_IMPLEMENTATION_STATUS.md",
-      "bytes": 4693,
-      "sha256": "8b83c0c377cd4f07d1d1fdc551f0ea3a74d2fd7a3db0e11d3a2066ee40d55061"
+      "bytes": 9774,
+      "sha256": "aa3e740a60646f08591ef15a90de9a1f9a37b77adf5459cfb3cb85224a8302c4"
     },
     {
       "path": "docs/archive/0.6.0/FEATURE_REVIEW.md",
@@ -2914,8 +2934,13 @@
     },
     {
       "path": "evaluation/voice/README.md",
-      "bytes": 2065,
-      "sha256": "644b8606444da75e635b1dba27e5e40b39ec96f25c1fa87255e6ab80836657c9"
+      "bytes": 4261,
+      "sha256": "9436dfa98a81c988d71675fcae38b11b3d3a9f6b76dbff6d1488e850992f29a2"
+    },
+    {
+      "path": "evaluation/voice/model-candidates.json",
+      "bytes": 1811,
+      "sha256": "017d3902429d185013c181e47e8126338bd7d8a5d5621d4a2a407c37b8fcfb01"
     },
     {
       "path": "evaluation/voice/prompts.json",
@@ -2969,8 +2994,8 @@
     },
     {
       "path": "tools/voice_build_manifest.py",
-      "bytes": 1599,
-      "sha256": "352c2afdc7b43761969210537dae6255f647f63e8ff3fd7d424e8c6ac5566909"
+      "bytes": 1992,
+      "sha256": "ad2aaf561117e39b56be05c5d1299d2df1a82c339472a9169659abcf5e500efa"
     },
     {
       "path": "tools/voice_smoke.py",
