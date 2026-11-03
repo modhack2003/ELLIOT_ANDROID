@@ -29,7 +29,12 @@ object MultilingualModelPack {
         Entry("turbo-decoder.int8.onnx",361080764,"20accd02388482eb3a46bd615631adfdc85e1eb2c7db9ea3f02a40ffe6b81547"),
         Entry("turbo-tokens.txt",816730,"b34b360dbb493e781e479794586d661700670d65564001f23024971d1f2fa126")
     ))
-    val models=listOf(SMALL,TURBO)
+    val TURBO_FULL_DECODER=Spec("whisper-turbo-full-decoder","Turbo · unquantized decoder",TURBO.repository,TURBO.revision,listOf(
+        TURBO.files[0],
+        Entry("turbo-decoder.onnx",636209532,"b24db5d90fa230c5eaa6b823d74862ced9e0d1dc3e01ec46601968e8db0e09ec"),
+        TURBO.files[2]
+    ))
+    val models=listOf(SMALL,TURBO,TURBO_FULL_DECODER)
     fun spec(id:String)=models.singleOrNull {it.id==id}?:throw IllegalArgumentException("Unknown speech model")
     fun directory(c:Context,s:Spec=SMALL)=File(c.filesDir,"speech-packs/${s.id}-${s.revision}")
     fun available(c:Context,s:Spec=SMALL):Boolean=runCatching {
@@ -60,10 +65,11 @@ object MultilingualModelPack {
             try {
                 for((index,entry) in s.files.withIndex()) {
                     ensureActive();onProgress("Preparing ${s.label} ${index+1} of ${s.files.size}")
-                    val local=c.getExternalFilesDir(null)?.let{File(it,"speech-packs/${s.id}/${entry.name}")}
+                    val preload=c.getExternalFilesDir(null)?.let{File(it,"speech-packs/${s.id}/${entry.name}")}
+                    val local=(listOfNotNull(preload)+models.map{File(directory(c,it),entry.name)}).firstOrNull {verified(it,entry)}
                     val target=File(stage,entry.name)
                     if(verified(target,entry))continue
-                    if(local!=null && verified(local,entry))local.copyTo(target,overwrite=true)
+                    if(local!=null)local.copyTo(target,overwrite=true)
                     else {
                         val url="https://huggingface.co/${s.repository}/resolve/${s.revision}/${entry.name}"
                         val connection=URL(url).openConnection() as HttpURLConnection

@@ -77,3 +77,18 @@ runtime. It is evaluated in diagnostics before any normal-command integration.
 Total: 1036613791 bytes. The upstream Whisper license is retained in the APK.
 Both optional packs use `task=transcribe`. Their support for individual languages
 does not establish Bengali-English or Hindi-English accuracy on this phone.
+
+## Controlled Turbo decoder comparison (dev.8)
+
+Diagnostic pack `whisper-turbo-full-decoder` reuses the pinned Turbo int8 encoder
+and token table above, replacing only the decoder with `turbo-decoder.onnx` from
+the same repository/revision. Decoder: 636209532 bytes, SHA-256
+`b24db5d90fa230c5eaa6b823d74862ced9e0d1dc3e01ec46601968e8db0e09ec`.
+Total pack: 1311742559 bytes. This is an experimental comparison, not an accuracy
+recommendation. The installer reuses matching local files after hash verification.
+
+WhisperTokenTransport derives an ASCII-hex token rendering table in app cache
+from the verified original token table. This works around per-token UTF-8 cleanup
+in Sherpa 1.13.8; the original downloads, token IDs and weights are unchanged.
+The complete native result is decoded back to UTF-8 in Kotlin. No native inverse
+text normalization or homophone rules may be enabled on this encoded text.

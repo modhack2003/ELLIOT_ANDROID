@@ -1,7 +1,38 @@
 # Voice implementation status — 3 November 2026
 
-Current working milestone: 0.6.3-dev.7 / versionCode 17.
+Current working milestone: 0.6.3-dev.8 / versionCode 18.
 Baseline source commit: 0d508c5fbc747010b16c0d51d8151aa3ef48748e.
+
+## Byte-preserving Whisper text correction (dev.8)
+
+A controlled phone replay found a concrete text-rendering defect in Sherpa
+1.13.8: Whisper byte tokens are individually passed through UTF-8 cleanup before
+joining. Split Unicode characters lose bytes. `WhisperTokenTransport.kt` now
+renders token bytes as ASCII hex through native/JNI and decodes once after joining.
+It derives the temporary table from the verified pinned original table; weights,
+IDs and predictions are unchanged. Native ITN/homophone rules must remain disabled.
+The upstream `=` placeholder maps to space. Invalid trailing UTF-8 remains visible.
+
+The same saved WAV with Turbo int8 changed from empty Bengali to
+“ইলিয়ট আমার ফনের ব�” (20.687 s); Auto restored missing Devanagari characters but
+still used an unsuitable script. This fixes byte loss, not recognition accuracy.
+A second controlled probe appended six seconds of silence without recapturing or
+saving audio. Bengali then returned “ইলিয়ট আমার ফনের বাটরেয়েল কটু” (29.862 s).
+The native six-tokens-per-second budget is insufficient for this byte-tokenized
+sentence. Silence padding changes context and budget; it is a diagnostic probe,
+not an enabled default or a production fix. Spelling and word errors remain.
+
+The new unquantized-decoder comparison holds the Turbo encoder/token table,
+revision, runtime and audio fixed. Before the text fix it still returned empty
+Bengali. That precision change alone did not fix the problem. Hash-verified shared
+files can now be copied from another installed pack instead of downloaded again.
+
+Nine focused unit tests passed (3 text transport, 4 pack installation, 2 WAV).
+Both generated-English Vivo tests passed after the fix (Small and Turbo).
+Signature, 373 bundled model files and library alignment checks passed.
+Both same-file phone probes completed; passing probe status means execution only.
+Detailed raw transcripts/timings are exported in ELLIOT-dev8-speech-fix-report.md.
+Whisper remains diagnostics-only and wake reliability is still unresolved.
 
 ## Consented local reference test (dev.7)
 

@@ -54,4 +54,14 @@ class MultilingualModelPackTest {
         assertEquals(root,MultilingualModelPack.verify(app,first))
         assertThrows(IllegalArgumentException::class.java){MultilingualModelPack.spec("../unknown")}
     }
+    @Test fun reusesIdenticalVerifiedFileWithoutDownloadingItAgain():Unit=runBlocking {
+        val model=fixture("reuse-test")
+        val source=File(app.getExternalFilesDir(null),"speech-packs/${model.id}/${model.encoder}")
+        val installed=MultilingualModelPack.directory(app,MultilingualModelPack.SMALL).apply{mkdirs()}
+        source.copyTo(File(installed,model.encoder))
+        assertTrue(source.delete())
+        MultilingualModelPack.prepare(app,model)
+        assertTrue(MultilingualModelPack.available(app,model))
+        assertTrue(File(installed,model.encoder).exists())
+    }
 }
