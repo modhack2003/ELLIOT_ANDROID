@@ -94,7 +94,7 @@ class SpeechEngineService:Service() {
                 is KeywordSpotter->{
                     val keywords=a.getString("hotwords").orEmpty()
                     if(keywords.isNotBlank()) {
-                        require(keywords.length<=1024)
+                        require(keywords.length<=2048)
                         val tokens=File(owner.config.modelConfig.tokens).readLines()
                             .map {it.substringBeforeLast(' ')}.toSet()
                         require(keywords.lines().all {line->

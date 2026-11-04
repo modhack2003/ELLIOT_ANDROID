@@ -24,6 +24,7 @@ import kotlinx.coroutines.*
     val finalStep=initialSteps+4
     val currentReference=remember {WakeCapturePreference.reference(context)}
     val secondWake=if(requireHey)"Hey Elliot"else "Elliot"
+    val finalControl=if(requireHey)"Elliot"else "What is my battery level?"
     val prompts=listOf("Hey Elliot",secondWake,"Hey Elliot",secondWake,"Hello, how are you?","What is my battery level?")
     var step by remember {mutableIntStateOf(0)}
     var busy by remember {mutableStateOf(false)};var ready by remember {mutableStateOf(false)}
@@ -82,7 +83,7 @@ import kotlinx.coroutines.*
                 val learned=if(requireHey)WakeCalibration.learnedSetting(settings.first(),WakeCalibration.observePhones(audio))else null
                 val rows=(settings+listOfNotNull(learned)).map {setting->
                     val hits=WakeCalibration.detectHits(setting,audio)
-                    val label=if(setting.learnedPhones.isEmpty())setting.label else "Learned from this recording"
+                    val label=if(setting.learnedPronunciations.isEmpty())setting.label else "Learned from this recording"
                     "$label · ${setting.score}/${setting.threshold}: ${hits.joinToString().ifEmpty {"missed"}}"
                 }
                 transcript="Wake replay · recording $clipNumber · $clipMicrophone · $clipEffects:\n"+rows.joinToString("\n")
@@ -147,7 +148,7 @@ import kotlinx.coroutines.*
                     if(step==finalStep) {
                         validated=WakeCalibrationPolicy.validationPass(validation)
                         status=if(validated)"Both fresh wake attempts worked and both ordinary phrases were rejected. You can save this setting."
-                            else "The fresh checks did not pass. Your previous settings are unchanged."
+                            else "Fresh checks found ${validation.take(2).count {it}} of 2 wakes and ${validation.drop(2).count {it}} unwanted wakes."
                     }else status="Check complete. Continue with the next phrase."
                 }
             }catch(e:CancellationException){throw e}
@@ -202,14 +203,14 @@ import kotlinx.coroutines.*
                 }
                 if(!transcriptionOnly && (step<initialSteps || (step<finalStep && candidate!=null))) {
                     val index=if(step<initialSteps)step%6 else step-initialSteps
-                    val phrase=if(step<initialSteps)prompts[index]else listOf("Hey Elliot",secondWake,"Hello, how are you?","What is my battery level?")[index]
+                    val phrase=if(step<initialSteps)prompts[index]else listOf("Hey Elliot",secondWake,"Hello, how are you?",finalControl)[index]
                     Text(if(step<initialSteps)"Microphone check ${step/6+1} · sample ${step%6+1} of 6" else "Fresh validation ${step-initialSteps+1} of 4")
                     Text("Say: $phrase",style=MaterialTheme.typography.titleMedium)
                     Text("Tap Record, then speak once when “Speak now” appears. Stay quiet for the rest of the four seconds.")
                     Button(onClick={record()},enabled=ready && !busy){Text(if(busy)"Checking…" else "Record sample")}
                 }
-                if(!transcriptionOnly && validated && candidate?.setting?.learnedPhones?.isNotEmpty()==true)
-                    Text("Saving stores a short sequence of sound labels on this phone.")
+                if(!transcriptionOnly && validated && candidate?.setting?.learnedPronunciations?.isNotEmpty()==true)
+                    Text("Saving stores short pronunciation sequences on this phone.")
                 if(!transcriptionOnly && validated)Button(onClick={
                     try {VoiceCalibrationStore.save(context,checkNotNull(candidate).setting);onClose()}
                     catch(e:Exception){status="The setting could not be saved. Please retry or close this check."}

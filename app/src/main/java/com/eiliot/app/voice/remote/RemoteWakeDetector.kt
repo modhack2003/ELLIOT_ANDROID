@@ -7,7 +7,7 @@ import com.eiliot.app.voice.drainWakeResults
 class RemoteWakeDetector(setting:WakeSetting):AutoCloseable {
     private val spotter=RemoteKeywordSpotter(
         setting.score,setting.threshold,setting.alternateNames,setting.phonemeModel,setting.requireHey,
-        setting.learnedPhones
+        setting.learnedPronunciations
     )
     // The BPE model's search is sensitive to where speech lands in an encoder
     // chunk. A second stream shares its weights and starts 160 ms out of phase.

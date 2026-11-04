@@ -131,7 +131,7 @@ class RemoteKeywordSpotter(
     private val alternateNames:Boolean=false,
     private val phonemeModel:Boolean=false,
     private val requireHey:Boolean=false,
-    private val learnedPhones:List<String> = emptyList()
+    private val learnedPronunciations:List<List<String>> = emptyList()
 ):RemoteDecoder("kws",Bundle().apply {
     // Reset must pass defaults explicitly: worker SharedPreferences may cache an old profile.
     putFloat("score",score?:2f);putFloat("threshold",threshold?:.15f)
@@ -147,7 +147,9 @@ class RemoteKeywordSpotter(
         val selected=if(requireHey)keywords.lineSequence().filter {
             it.substringAfter('@').startsWith("hey_")
         }.joinToString("\n")else keywords
-        val learned=if(learnedPhones.isEmpty())""else learnedPhones.joinToString(" ")+" @hey_elliot_personal"
+        val learned=learnedPronunciations.joinToString("\n") {phones->
+            phones.joinToString(" ")+" @hey_elliot_personal"
+        }
         return super.createStream(listOf(selected,learned).filter(String::isNotBlank).joinToString("\n"))
     }
 }

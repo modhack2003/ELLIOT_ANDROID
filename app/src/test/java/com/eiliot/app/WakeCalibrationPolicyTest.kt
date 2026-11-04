@@ -8,7 +8,7 @@ class WakeCalibrationPolicyTest {
     @Test fun learnedWakeNeedsAnOnsetAndValidPhoneTokens() {
         val base=WakeSetting(false,requireHey=true)
         val phones=listOf("HH","EY1","y","ī","l","iè")
-        assertEquals(phones,WakeCalibration.learnedSetting(base,phones)?.learnedPhones)
+        assertEquals(listOf(phones),WakeCalibration.learnedSetting(base,phones)?.learnedPronunciations)
         assertNull(WakeCalibration.learnedSetting(base,listOf("y","ī","l","iè","T")))
         assertNull(WakeCalibration.learnedSetting(base,phones+ "@bad"))
         assertNull(WakeCalibration.learnedSetting(WakeSetting(false),phones))

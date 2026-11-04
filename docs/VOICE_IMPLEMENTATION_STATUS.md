@@ -1,7 +1,22 @@
 # Voice implementation status — 3 November 2026
 
-Current working milestone: 0.6.3-dev.18 / versionCode 28.
+Current working milestone: 0.6.3-dev.19 / versionCode 29.
 Baseline source commit: 0d508c5fbc747010b16c0d51d8151aa3ef48748e.
+
+## Pronunciation variants and replay speed (dev.19)
+
+The dev.18 learned candidate matched three of four initial wake samples and
+rejected both ordinary samples. It failed the fresh checks on the Vivo.
+Dev.19 considers up to four distinct pronunciations and a combined candidate.
+It loads each detector once per setting and resets its streams for each sample.
+It stops each replay after its first hit for calibration scoring. The fresh
+checks report wake hits and unwanted hits separately. Full phrase validation
+uses an ordinary phrase and standalone Elliot as its fresh negative controls.
+The profile format reads previously saved single pronunciation sequences.
+
+Twenty-nine focused unit tests and both native Vivo checks passed. The native
+grammar check now loads two learned variants. Signing, 383 model-file hashes and
+native alignment passed. User calibration is evaluated separately.
 
 ## Local pronunciation calibration (dev.18)
 

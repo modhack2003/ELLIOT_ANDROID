@@ -108,7 +108,7 @@ class NativeSpeechDeviceTest {
         withContext(Dispatchers.IO) {
             NativeSpeechClient.connect(app)
             val setting=WakeSetting(false,phonemeModel=true,requireHey=true,
-                learnedPhones=listOf("HH","EY1","y","ī","l","iè"))
+                learnedPronunciations=listOf(listOf("HH","EY1","y","ī","l","iè"),listOf("h","ēi","y","ī","l","iè")))
             assertFalse(WakeCalibration.detect(setting,FloatArray(16000)))
         }
     }
