@@ -42,6 +42,7 @@ import kotlinx.coroutines.*
     var cleanedClip by remember {mutableStateOf<FloatArray?>(null)}
     var referenceStt by remember {mutableStateOf(VoiceCalibrationStore.load(context)?.referenceCapture?:WakeCapturePreference.reference(context))}
     var liveSpeech by remember {mutableStateOf(CommandSpeech.load(context))}
+    val savedWake=remember {VoiceCalibrationStore.load(context)}
     var selectedPack by remember {mutableStateOf(liveSpeech?.model ?: MultilingualModelPack.SMALL)}
     var multilingual by remember {mutableStateOf(liveSpeech!=null || MultilingualModelPack.available(context,selectedPack))}
     var language by remember {mutableStateOf(liveSpeech?.language ?: "en")}
@@ -121,6 +122,47 @@ import kotlinx.coroutines.*
             }catch(e:CancellationException){throw e}
             catch(e:Exception){status="Software noise check failed. Original recording is unchanged."}
             finally {original.fill(0f);cleaned?.fill(0f);busy=false}
+        }
+    }
+    fun checkTableWake() {
+        val profile=checkNotNull(savedWake)
+        busy=true
+        job=scope.launch {
+            var original:FloatArray?=null
+            var cleaned:FloatArray?=null
+            try {
+                status="Keep the phone on the table. Wait for Speak now…"
+                val clip=WakeCalibration.capture(context,profile.referenceCapture,
+                    onEffects={clipEffects=it},
+                    onReady={status="Speak now. Say “Hey Elliot” or your control phrase once."},
+                    enhanced=false,noiseReduction=profile.noiseReduction)
+                original=clip
+                status="Comparing the same clip on your saved wake profile…"
+                val filtered=withContext(Dispatchers.IO) {
+                    val denoiser=com.eiliot.app.voice.remote.RemoteDenoiser()
+                    try {denoiser.clean(clip)}finally {runCatching {denoiser.release()}}
+                }
+                cleaned=filtered
+                val result=WakeCalibration.compareInputs(profile,clip,filtered)
+                fun resultText(hit:Boolean)=if(hit)"wake detected"else "missed"
+                fun level(audio:FloatArray)=WakeCalibration.peakWindowDb(audio)?.let {"$it dBFS"} ?: "silent"
+                val active=if(profile.softwareNoiseReduction)"Enhanced filter"else "Before enhanced filter"
+                val report="Table check ${++clipNumber} · ${profile.label}\n"+
+                    "Before enhanced filter · ${level(clip)} · ${resultText(result.beforeFilter)}\n"+
+                    "Enhanced filter · ${level(filtered)} · ${resultText(result.enhanced)}\n"+
+                    "Enhanced filter with 3× gain · ${resultText(result.boosted)}\n"+
+                    "Live wake uses $active."
+                transcript=(listOf(report)+transcript.split("\n\n").filter {it.startsWith("Table check ")}).take(4).joinToString("\n\n")
+                discardCleaned()
+                lastClip?.fill(0f)
+                lastClip=clip;original=null
+                cleanedClip=filtered;cleaned=null
+                clipEnhanced=false
+                clipMicrophone=if(profile.referenceCapture)"Direct"else "Processed"
+                status="Table check complete. The results stay in this dialog and your wake profile is unchanged."
+            }catch(e:CancellationException){throw e}
+            catch(e:Exception){status="Table check failed. Keep the phone still and retry."}
+            finally {original?.fill(0f);cleaned?.fill(0f);busy=false}
         }
     }
     fun record() {
@@ -217,6 +259,9 @@ import kotlinx.coroutines.*
                     else if(requireHey)"Use your usual voice and microphone. Speak each prompt after Speak now. Calibration compares pronunciation and sound patterns. The recordings stay in memory."
                     else "We compare two microphone paths using your normal accent. Audio stays in memory and is discarded when you close.")
                 Text(status)
+                if(transcriptionOnly && savedWake!=null && ready && !busy) {
+                    Button(onClick={checkTableWake()}){Text("Record table wake check")}
+                }
                 if(!transcriptionOnly && step>=initialSteps)assessments.forEach {result->
                         val sensitivity=if(result.setting.acousticProfile==null)", ${result.setting.score}/${result.setting.threshold}"else ""
                         Text("Microphone ${if(result.setting.referenceCapture)2 else 1}, ${result.setting.label}$sensitivity: Hey Elliot ${result.phraseHits["hey"]?:0}/${if(requireHey)4 else 2}. ${if(requireHey)""else "Elliot ${result.phraseHits["name"]?:0}/2. "}Unwanted wakes ${result.falseHits}/2.",style=MaterialTheme.typography.bodySmall)

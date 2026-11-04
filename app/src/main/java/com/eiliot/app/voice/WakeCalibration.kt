@@ -106,11 +106,15 @@ object VoiceCalibrationStore {
 }
 object WakeCalibration {
     /** Bounded RAM-only capture. No files, network or automatic commands. */
-    suspend fun capture(c:Context,reference:Boolean,seconds:Int=4,onEffects:(String)->Unit={},onReady:()->Unit={}):FloatArray=withContext(Dispatchers.IO) {
+    suspend fun capture(
+        c:Context,reference:Boolean,seconds:Int=4,onEffects:(String)->Unit={},onReady:()->Unit={},
+        enhanced:Boolean=WakeCapturePreference.softwareNoiseReduction(c),
+        noiseReduction:Boolean=WakeCapturePreference.noiseReduction(c)
+    ):FloatArray=withContext(Dispatchers.IO) {
         require(seconds in 1..8)
         val samples=ArrayList<Float>(16000*seconds)
-        val denoiser=if(WakeCapturePreference.softwareNoiseReduction(c))RemoteDenoiser()else null
-        try {VoiceAudioInput(c,reference,WakeCapturePreference.noiseReduction(c)) {}.use {input->
+        val denoiser=if(enhanced)RemoteDenoiser()else null
+        try {VoiceAudioInput(c,reference,noiseReduction) {}.use {input->
             input.onFrame={frame->samples.addAll((denoiser?.filterChunk(frame)?:frame).asList())}
             withContext(Dispatchers.Main){onEffects("Noise filter ${if(input.noiseEnabled)"on"else "off or unavailable"}; auto gain ${if(input.gainEnabled)"on"else "off"}; enhanced filter ${if(denoiser!=null)"on"else "off"}");onReady()}
             val bytes=ByteArray(1024)
@@ -155,6 +159,32 @@ object WakeCalibration {
     }
     suspend fun detectHits(setting:WakeSetting,audio:FloatArray):List<String> =withContext(Dispatchers.IO) {
         RemoteWakeDetector(setting).use {detector->replay(detector,audio,false)}
+    }
+    data class InputComparison(val beforeFilter:Boolean,val enhanced:Boolean,val boosted:Boolean)
+
+    /** Replay one recording through the saved profile without recalibrating or running actions. */
+    suspend fun compareInputs(setting:WakeSetting,original:FloatArray,cleaned:FloatArray):InputComparison=withContext(Dispatchers.IO) {
+        require(original.size==cleaned.size)
+        val boosted=FloatArray(cleaned.size) {i->(cleaned[i]*3f).coerceIn(-1f,1f)}
+        try {
+            RemoteWakeDetector(setting).use {detector->
+                val beforeFilter=replay(detector,original,true).isNotEmpty()
+                detector.reset()
+                val enhanced=replay(detector,cleaned,true).isNotEmpty()
+                detector.reset()
+                InputComparison(beforeFilter,enhanced,replay(detector,boosted,true).isNotEmpty())
+            }
+        }finally {boosted.fill(0f)}
+    }
+
+    fun peakWindowDb(audio:FloatArray):Int? {
+        val power=audio.indices.step(512).maxOfOrNull {start->
+            val end=minOf(start+512,audio.size)
+            var sum=0.0
+            for(i in start until end)sum+=audio[i].toDouble()*audio[i]
+            sum/(end-start)
+        } ?: return null
+        return if(power>0)(10*kotlin.math.log10(power)).toInt() else null
     }
     private suspend fun replay(detector:RemoteWakeDetector,audio:FloatArray,firstOnly:Boolean):List<String> {
         val found=mutableListOf<String>()

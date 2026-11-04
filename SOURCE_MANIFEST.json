@@ -1,6 +1,6 @@
 {
-  "release": "0.6.3-dev.22",
-  "version_code": 32,
+  "release": "0.6.3-dev.23",
+  "version_code": 33,
   "files": [
     {
       "path": ".gitignore",
@@ -35,7 +35,7 @@
     {
       "path": "MODEL_SOURCES.json",
       "bytes": 7393,
-      "sha256": "b8a15e9c39fc636aa293ff3d31f41cccbe187b5a097e53232241d87f99b0505b"
+      "sha256": "26f7abfcc5c98c6eb57f46f5906a77298d518318ea07aba540c2887f2e566100"
     },
     {
       "path": "NEXT_BUILD_PLAN.md",
@@ -75,7 +75,7 @@
     {
       "path": "app/build.gradle.kts",
       "bytes": 5221,
-      "sha256": "fb5153b7086651b4c5cc8d7ab7cce7f682153e2cad7627ffcb2c57fbbd964946"
+      "sha256": "ecdc4c019ad42b1782bfd21a884378409d29c02419c12be55dfc8742152bafd4"
     },
     {
       "path": "app/libs/sherpa-onnx-1.13.8.aar",
@@ -84,8 +84,8 @@
     },
     {
       "path": "app/src/androidTest/java/com/eiliot/app/NativeSpeechDeviceTest.kt",
-      "bytes": 13226,
-      "sha256": "15fecdd7124e876eec97fb684efef17ea4c7e5e9841555f4a3add6dedb068998"
+      "bytes": 13451,
+      "sha256": "3f3952b65eab48b30ba52d0eab2f2641159bd4513cb3b7f9fc1daed02e27be5e"
     },
     {
       "path": "app/src/androidTest/java/com/eiliot/app/SavedSpeechComparisonTest.kt",
@@ -2369,8 +2369,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/VoiceCalibrationDialog.kt",
-      "bytes": 25266,
-      "sha256": "86eecd0ee51b5c2a6dab97f3ea79ff852e4bb5bb85dce5b400e95adbf170684e"
+      "bytes": 28102,
+      "sha256": "ae7cf76fca5e056f0b520ad54b98d48e5e5e3a3cf4f4b9017ffd321c6c945d1c"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/AcousticWake.kt",
@@ -2449,8 +2449,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/WakeCalibration.kt",
-      "bytes": 16136,
-      "sha256": "6e23f865929c553219738373bb2d35f365b59ddbf9451b533ff07d959b99c08c"
+      "bytes": 17550,
+      "sha256": "6bbc30617187b1759db016a6c2918357e235eb9f6822a3357409aab78921eb6a"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/WakeCapturePreference.kt",

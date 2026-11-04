@@ -125,6 +125,10 @@ class NativeSpeechDeviceTest {
             val strict=WakeSetting(false,requireHey=true,phonemeBackup=PhonemeBackup.DICTIONARY)
             val candidate=WakeAssessment(strict,3,4,0,2,setOf("hey"))
             assertEquals(candidate to listOf(true,true,false,false),WakeCalibration.validate(listOf(candidate),trials))
+            val sameClip=trials.first().audio
+            val comparison=WakeCalibration.compareInputs(strict,sameClip,sameClip)
+            assertTrue(comparison.beforeFilter)
+            assertTrue(comparison.enhanced)
             val previous=VoiceCalibrationStore.load(app)
             try {
                 VoiceCalibrationStore.save(app,strict)
