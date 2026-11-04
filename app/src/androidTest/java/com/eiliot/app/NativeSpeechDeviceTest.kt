@@ -133,6 +133,9 @@ class NativeSpeechDeviceTest {
             try {
                 VoiceCalibrationStore.save(app,strict)
                 assertEquals(strict,VoiceCalibrationStore.load(app))
+                val separateWakeInput=strict.copy(softwareNoiseReduction=true,wakeBeforeEnhanced=true)
+                VoiceCalibrationStore.save(app,separateWakeInput)
+                assertEquals(separateWakeInput,VoiceCalibrationStore.load(app))
             }finally {
                 if(previous==null)VoiceCalibrationStore.clear(app)else VoiceCalibrationStore.save(app,previous)
             }

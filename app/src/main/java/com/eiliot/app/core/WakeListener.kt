@@ -120,17 +120,40 @@ object WakeListener {
                     (WakeCapturePreference.reference(SentinelRuntime.context) || com.eiliot.app.BuildConfig.VOICE_REFERENCE_CAPTURE)
                 val reduceNoise=calibration?.noiseReduction?:WakeCapturePreference.noiseReduction(SentinelRuntime.context)
                 val enhanced=calibration?.softwareNoiseReduction?:WakeCapturePreference.softwareNoiseReduction(SentinelRuntime.context)
+                val wakeBeforeEnhanced=wakeSetting.wakeBeforeEnhanced
                 val reducer=if(enhanced)RemoteDenoiser()else null;noiseReducer=reducer
                 val assembled=PcmFrameBuffer();enhancedFrames=assembled
                 audio=VoiceAudioInput(SentinelRuntime.context,direct,reduceNoise) { }
                 ensureActive();check(gen==generation && SentinelRuntime.alive(epoch))
                 input=audio;ready=true
-                if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "capture ready; direct=$direct; live=${liveCall.value}; wake=${SentinelRuntime.store.wakeEnabled}; echo=${audio.echoEnabled}; noise=${audio.noiseEnabled}; gain=${audio.gainEnabled}; enhanced=$enhanced; wakeProfile=${wakeSetting.label}; requireHey=${wakeSetting.requireHey}")
+                if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "capture ready; direct=$direct; live=${liveCall.value}; wake=${SentinelRuntime.store.wakeEnabled}; echo=${audio.echoEnabled}; noise=${audio.noiseEnabled}; gain=${audio.gainEnabled}; enhanced=$enhanced; wakeBeforeEnhanced=$wakeBeforeEnhanced; wakeProfile=${wakeSetting.label}; requireHey=${wakeSetting.requireHey}")
                 var diagnosticAt=android.os.SystemClock.elapsedRealtime()
                 var diagnosticFrames=0
                 var diagnosticPeak=0f
                 var diagnosticEnergy=0.0
                 echoStatus.value=if(audio.echoEnabled)"Device echo cancellation is on" else "Headphones can help avoid speaker echo"
+                fun processWake(frame:FloatArray,probability:Float?=null) {
+                    if(gen!=generation || !SentinelRuntime.alive(epoch))throw CancellationException()
+                    val idle=turn==null && !liveCall.value
+                    if(idle && !wakeWasIdle)spotter.reset()
+                    wakeWasIdle=idle
+                    if(!idle)return
+                    val wake=spotter.accept(frame,probability) ?: return
+                    if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "wake detected: $wake")
+                    if(!activationPending.compareAndSet(false,true))return
+                    main.post {
+                        try {
+                            val now=android.os.SystemClock.elapsedRealtime()
+                            if(gen==generation && SentinelRuntime.alive(epoch) && turn==null && !liveCall.value && now-lastTrigger>=900) {
+                                lastTrigger=now
+                                EiliotBrain.interruptForWake()
+                                val started=beginInput("wake",includePreRoll=wake!=ACOUSTIC_WAKE)
+                                if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "wake listening started=$started")
+                                if(started && !SentinelRuntime.foreground)OverlayManager.openPanel()
+                            }
+                        }finally {activationPending.set(false)}
+                    }
+                }
                 val processFrame:(FloatArray)->Unit=process@ { frame ->
                     if(gen!=generation || !SentinelRuntime.alive(epoch))throw CancellationException()
                     if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS) {
@@ -166,29 +189,8 @@ object WakeListener {
                             }finally { activationPending.set(false) }
                         }
                     }
-                    val wakeIdle=current==null && !liveCall.value
-                    if(wakeIdle && !wakeWasIdle)spotter.reset()
-                    wakeWasIdle=wakeIdle
-                    if(wakeIdle) {
-                        val wake=spotter.accept(frame,probability)
-                        if(wake!=null && com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS) {
-                            android.util.Log.i("ElliotWake", "wake detected: $wake")
-                        }
-                        if(wake!=null && !liveCall.value && activationPending.compareAndSet(false,true)) {
-                            main.post {
-                                try {
-                                    val now=android.os.SystemClock.elapsedRealtime()
-                                    if(gen==generation && SentinelRuntime.alive(epoch) && now-lastTrigger>=900) {
-                                        lastTrigger=now
-                                        EiliotBrain.interruptForWake()
-                                        val started=beginInput("wake",includePreRoll=wake!=ACOUSTIC_WAKE)
-                                        if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "wake listening started=$started")
-                                        if(!SentinelRuntime.foreground)OverlayManager.openPanel()
-                                    }
-                                }finally {activationPending.set(false)}
-                            }
-                        }
-                    } else if(current!=null && VoiceSession.gate.accepts(current.ticket,current.epoch)) {
+                    if(!wakeBeforeEnhanced)processWake(frame,probability)
+                    if(current!=null && VoiceSession.gate.accepts(current.ticket,current.epoch)) {
                         val needsReset=reset.getAndSet(false)
                         val commandSpeech=current.commandSpeech
                         if(commandSpeech!=null) {
@@ -265,7 +267,13 @@ object WakeListener {
                         }
                     }
                 }
-                audio.onFrame={frame->if(reducer==null)processFrame(frame)else assembled.push(reducer.filterChunk(frame),processFrame)}
+                audio.onFrame={frame->
+                    if(reducer==null)processFrame(frame)
+                    else {
+                        assembled.push(reducer.filterChunk(frame),processFrame)
+                        if(wakeBeforeEnhanced)processWake(frame)
+                    }
+                }
                 status.value=if(liveCall.value)"Live call · speak naturally" else "Say Hey Elliot"
                 val bytes=ByteArray(1024)
                 while(isActive && gen==generation && SentinelRuntime.alive(epoch)) { if(audio.read(bytes,0,bytes.size)<0)break }

@@ -21,8 +21,10 @@ data class WakeSetting(
     val requireHey:Boolean=false,
     val learnedPronunciations:List<List<String>> = emptyList(),
     val phonemeBackup:PhonemeBackup?=null,
-    val acousticProfile:AcousticWakeProfile?=null
+    val acousticProfile:AcousticWakeProfile?=null,
+    val wakeBeforeEnhanced:Boolean=false
 ) {
+    val canBypassWakeFilter get()=softwareNoiseReduction && requireHey && acousticProfile==null
     val label get()=when {
         acousticProfile!=null -> "Learned sound pattern"
         phonemeBackup!=null -> if(learnedPronunciations.isEmpty())"Two wake models" else "Two wake models with your pronunciation"
@@ -37,6 +39,7 @@ data class WakeSetting(
         require(threshold.isFinite() && threshold in .05f.. .3f)
         require(phonemeBackup==null || (requireHey && !phonemeModel))
         require(acousticProfile==null || (requireHey && !phonemeModel && phonemeBackup==null && learnedPronunciations.isEmpty()))
+        require(!wakeBeforeEnhanced || canBypassWakeFilter)
         require(learnedPronunciations.isEmpty() || (
             (phonemeModel || phonemeBackup!=null) && requireHey && learnedPronunciations.size<=4 &&
                 learnedPronunciations.all(WakePronunciations::canLearn)
@@ -90,7 +93,8 @@ object VoiceCalibrationStore {
             p.getString("acoustic_v1",null)?.let {
                 require(it.length<=50000)
                 AcousticWakeProfile.decode(android.util.Base64.decode(it,android.util.Base64.NO_WRAP))
-            }
+            },
+            p.getBoolean("wake_before_enhanced",false)
         )
     }.getOrNull()
     fun save(c:Context,s:WakeSetting) {check(c.getSharedPreferences("voice_calibration",0).edit()
@@ -101,6 +105,7 @@ object VoiceCalibrationStore {
         .putBoolean("require_hey",s.requireHey).putString("learned_phones",s.learnedPronunciations.joinToString("|"){it.joinToString(" ")})
         .putString("phoneme_backup",s.phonemeBackup?.name)
         .putString("acoustic_v1",s.acousticProfile?.let {android.util.Base64.encodeToString(it.encode(),android.util.Base64.NO_WRAP)})
+        .putBoolean("wake_before_enhanced",s.wakeBeforeEnhanced)
         .commit())}
     fun clear(c:Context) {check(c.getSharedPreferences("voice_calibration",0).edit().clear().commit())}
 }

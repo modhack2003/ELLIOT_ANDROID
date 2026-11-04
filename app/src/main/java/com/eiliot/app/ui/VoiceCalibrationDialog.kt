@@ -146,7 +146,7 @@ import kotlinx.coroutines.*
                 val result=WakeCalibration.compareInputs(profile,clip,filtered)
                 fun resultText(hit:Boolean)=if(hit)"wake detected"else "missed"
                 fun level(audio:FloatArray)=WakeCalibration.peakWindowDb(audio)?.let {"$it dBFS"} ?: "silent"
-                val active=if(profile.softwareNoiseReduction)"Enhanced filter"else "Before enhanced filter"
+                val active=if(profile.softwareNoiseReduction && !profile.wakeBeforeEnhanced)"Enhanced filter"else "Before enhanced filter"
                 val report="Table check ${++clipNumber} · ${profile.label}\n"+
                     "Before enhanced filter · ${level(clip)} · ${resultText(result.beforeFilter)}\n"+
                     "Enhanced filter · ${level(filtered)} · ${resultText(result.enhanced)}\n"+

@@ -140,12 +140,13 @@ import kotlinx.coroutines.*
             }) {Text("Reset wake calibration")}
             TextButton(onClick={voiceOptions=!voiceOptions}) {Text(if(voiceOptions)"Hide voice options" else "Voice options",maxLines=1)}
             if(voiceOptions) {
+                val calibrated=VoiceCalibrationStore.load(context)
                 ControlSwitch("Require Hey Elliot","Use the full wake phrase for hands-free listening.",WakeCapturePreference.requireHey(context)) {
                     WakeCapturePreference.setRequireHey(context,it)
                     WakeListener.stop();WakeListener.start(context);changed()
                 }
                 ControlSwitch("Direct microphone","Use the microphone without call processing for wake listening. Changing this clears sensitivity calibration.",
-                    VoiceCalibrationStore.load(context)?.referenceCapture?:WakeCapturePreference.reference(context)) {
+                    calibrated?.referenceCapture?:WakeCapturePreference.reference(context)) {
                     WakeCapturePreference.setReference(context,it)
                     WakeListener.stop();WakeListener.start(context);changed()
                 }
@@ -156,6 +157,12 @@ import kotlinx.coroutines.*
                 ControlSwitch("Enhanced noise reduction","Locally reduce fan and AC noise. Changing this clears sensitivity calibration.",WakeCapturePreference.softwareNoiseReduction(context)) {
                     WakeCapturePreference.setSoftwareNoiseReduction(context,it)
                     WakeListener.stop();WakeListener.start(context);changed()
+                }
+                if(calibrated?.canBypassWakeFilter==true) {
+                    ControlSwitch("Use enhanced filter for wake phrase","Requests keep enhanced noise reduction in either mode.",!calibrated.wakeBeforeEnhanced) {
+                        VoiceCalibrationStore.save(context,calibrated.copy(wakeBeforeEnhanced=!it))
+                        WakeListener.stop();WakeListener.start(context);changed()
+                    }
                 }
                 Text("ELLIOT · Ryan · offline male voice",color=EiliotColors.TextSecondary,maxLines=1,overflow=TextOverflow.Ellipsis)
                 Text("Speed",color=EiliotColors.TextSecondary);Slider(rate,{rate=it;store.ttsRate=it},valueRange=.7f..1.4f)
