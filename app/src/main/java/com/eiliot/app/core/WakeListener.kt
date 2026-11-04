@@ -23,7 +23,7 @@ object WakeListener {
     @Volatile private var running=false
     @Volatile private var generation=0L
     @Volatile private var ready=false
-    private data class Turn(val ticket:Long,val epoch:Long,val origin:String,val deadline:ListeningDeadline)
+    private data class Turn(val ticket:Long,val epoch:Long,val origin:String,val deadline:ListeningDeadline,val includePreRoll:Boolean)
     @Volatile private var turn:Turn?=null
     private var timeout:Runnable?=null
     private var lastTrigger=0L
@@ -46,12 +46,12 @@ object WakeListener {
         if(!SentinelRuntime.microphoneReady) { status.value="Open ELLIOT to allow voice";return }
         running=true;resumeWhenIdle()
     }
-    fun beginInput(origin:String,expectsWake:Boolean=false):Boolean {
+    fun beginInput(origin:String,includePreRoll:Boolean=true):Boolean {
         if(!available() || !SentinelRuntime.alive())return false
         cancelTurn()
         val ticket=VoiceIo.beginLocalListening(origin)
         val deadline=ListeningDeadline(android.os.SystemClock.elapsedRealtime(),if(origin=="live call")75000 else 18000)
-        turn=Turn(ticket,SentinelRuntime.epoch,origin,deadline);reset.set(true)
+        turn=Turn(ticket,SentinelRuntime.epoch,origin,deadline,includePreRoll);reset.set(true)
         val expiry=object:Runnable {
             override fun run() {
                 if(turn?.ticket!=ticket)return
@@ -150,7 +150,7 @@ object WakeListener {
                     if(wakeIdle && !wakeWasIdle)spotter.reset()
                     wakeWasIdle=wakeIdle
                     if(wakeIdle) {
-                        val wake=spotter.accept(frame)
+                        val wake=spotter.accept(frame,probability)
                         if(wake!=null && com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS) {
                             android.util.Log.i("ElliotWake", "wake detected: $wake")
                         }
@@ -161,7 +161,7 @@ object WakeListener {
                                     if(gen==generation && SentinelRuntime.alive(epoch) && now-lastTrigger>=900) {
                                         lastTrigger=now
                                         EiliotBrain.interruptForWake()
-                                        val started=beginInput("wake")
+                                        val started=beginInput("wake",includePreRoll=wake!=ACOUSTIC_WAKE)
                                         if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "wake listening started=$started")
                                         if(!SentinelRuntime.foreground)OverlayManager.openPanel()
                                     }
@@ -172,7 +172,7 @@ object WakeListener {
                         val needsReset=reset.getAndSet(false)
                         if(decodedTicket!=current.ticket || needsReset) {
                             stream?.release();stream=asr.createStream(hotwords);decodedTicket=current.ticket
-                            stream!!.acceptWaveform(preroll.snapshot(),16000)
+                            stream!!.acceptWaveform(if(current.includePreRoll)preroll.snapshot()else frame,16000)
                         }else stream!!.acceptWaveform(frame,16000)
                         val s=stream!!
                         while(asr.isReady(s))asr.decode(s)

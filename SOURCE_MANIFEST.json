@@ -1,6 +1,6 @@
 {
-  "release": "0.6.3-dev.20",
-  "version_code": 30,
+  "release": "0.6.3-dev.21",
+  "version_code": 31,
   "files": [
     {
       "path": ".gitignore",
@@ -35,7 +35,7 @@
     {
       "path": "MODEL_SOURCES.json",
       "bytes": 7280,
-      "sha256": "e5d9d35902bdef9f4304904884d1dee89037f150abb6fb08ee713d8f6ca7ed75"
+      "sha256": "c99dd4d4d1deb482a24a311d33a7502136e0dfe0f03d5c7f9f57cfdd9c15f88b"
     },
     {
       "path": "NEXT_BUILD_PLAN.md",
@@ -75,7 +75,7 @@
     {
       "path": "app/build.gradle.kts",
       "bytes": 5221,
-      "sha256": "3f44494581dd4de844ef8e00bfd5b2e95f7618e19dea303f071a53b1efa651fa"
+      "sha256": "ac26eb7f5689ed01c3982c75c918c0836182e0e408d1c67ff876e8730e77b2c3"
     },
     {
       "path": "app/libs/sherpa-onnx-1.13.8.aar",
@@ -84,8 +84,8 @@
     },
     {
       "path": "app/src/androidTest/java/com/eiliot/app/NativeSpeechDeviceTest.kt",
-      "bytes": 11346,
-      "sha256": "0cbb1726e323b5ae4a9a3ac8a3a8e6b25f68f3d7e76fe5d16da81b4c0efac57d"
+      "bytes": 13226,
+      "sha256": "15fecdd7124e876eec97fb684efef17ea4c7e5e9841555f4a3add6dedb068998"
     },
     {
       "path": "app/src/androidTest/java/com/eiliot/app/SavedSpeechComparisonTest.kt",
@@ -2124,8 +2124,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/core/WakeListener.kt",
-      "bytes": 15053,
-      "sha256": "845e72615561c5228ac2cf5073ee83091d98df06c55a96e605f115d050562faf"
+      "bytes": 15180,
+      "sha256": "2a459d981bb3d4c1643bf83c6ab990d93fb41ecda770a21246d007b512130aa4"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/data/CryptoVault.kt",
@@ -2369,8 +2369,13 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/VoiceCalibrationDialog.kt",
-      "bytes": 22926,
-      "sha256": "4ad1084fd9cbc27ace9c52d72175e4ec1a7ae75061a9e0656154201ed4936444"
+      "bytes": 23914,
+      "sha256": "22ee242208fbd1abefa1e2c9640dd03046fefaaffe6f0831d1c20bdeb51f5b6d"
+    },
+    {
+      "path": "app/src/main/java/com/eiliot/app/voice/AcousticWake.kt",
+      "bytes": 9494,
+      "sha256": "295819c8ce2eefa1ed4c8cd3b051ca260049e95ba2aa45f1c51c2e3fca83a755"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/DiagnosticWav.kt",
@@ -2434,8 +2439,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/WakeCalibration.kt",
-      "bytes": 13779,
-      "sha256": "6912ff6ae7adb4865f053c2d8afe230b59904658d4b35a7273037bd935cded58"
+      "bytes": 16136,
+      "sha256": "6e23f865929c553219738373bb2d35f365b59ddbf9451b533ff07d959b99c08c"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/WakeCapturePreference.kt",
@@ -2464,8 +2469,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/RemoteWakeDetector.kt",
-      "bytes": 2596,
-      "sha256": "25b83c672aab7af816ea778024ced5a61381415e645550d3cd6a290453b86adf"
+      "bytes": 3416,
+      "sha256": "0dbe2acdde5fed0cce7a1c321503afeba5a30d269a12cc38c6862cff371f9c1e"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/SpeechEngineService.kt",

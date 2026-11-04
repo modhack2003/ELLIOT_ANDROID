@@ -20,9 +20,11 @@ data class WakeSetting(
     val phonemeModel:Boolean=false,
     val requireHey:Boolean=false,
     val learnedPronunciations:List<List<String>> = emptyList(),
-    val phonemeBackup:PhonemeBackup?=null
+    val phonemeBackup:PhonemeBackup?=null,
+    val acousticProfile:AcousticWakeProfile?=null
 ) {
     val label get()=when {
+        acousticProfile!=null -> "Learned sound pattern"
         phonemeBackup!=null -> if(learnedPronunciations.isEmpty())"Two wake models" else "Two wake models with your pronunciation"
         learnedPronunciations.isNotEmpty() -> "Your pronunciation"
         phonemeModel && alternateNames -> "Phoneme accent"
@@ -34,6 +36,7 @@ data class WakeSetting(
         require(score.isFinite() && score in 1f..3.5f)
         require(threshold.isFinite() && threshold in .05f.. .3f)
         require(phonemeBackup==null || (requireHey && !phonemeModel))
+        require(acousticProfile==null || (requireHey && !phonemeModel && phonemeBackup==null && learnedPronunciations.isEmpty()))
         require(learnedPronunciations.isEmpty() || (
             (phonemeModel || phonemeBackup!=null) && requireHey && learnedPronunciations.size<=4 &&
                 learnedPronunciations.all(WakePronunciations::canLearn)
@@ -46,7 +49,8 @@ data class WakeAssessment(val setting:WakeSetting,val hits:Int,val positives:Int
 }
 object WakeCalibrationPolicy {
     fun ranked(results:List<WakeAssessment>)=results.filter {it.eligible}.sortedWith(
-        compareByDescending<WakeAssessment> {it.hits}.thenBy {it.setting.phonemeBackup!=null}
+        compareByDescending<WakeAssessment> {it.hits}.thenBy {it.setting.acousticProfile!=null}
+            .thenBy {it.setting.phonemeBackup!=null}
             .thenByDescending {it.setting.threshold}.thenBy {it.setting.score}
     )
     fun validationPass(hits:List<Boolean>)=hits==listOf(true,true,false,false)
@@ -82,7 +86,11 @@ object VoiceCalibrationStore {
             p.getBoolean("require_hey",false),
             p.getString("learned_phones",null).orEmpty().split('|').filter(String::isNotBlank)
                 .map {it.split(' ').filter(String::isNotBlank)},
-            p.getString("phoneme_backup",null)?.let(PhonemeBackup::valueOf)
+            p.getString("phoneme_backup",null)?.let(PhonemeBackup::valueOf),
+            p.getString("acoustic_v1",null)?.let {
+                require(it.length<=50000)
+                AcousticWakeProfile.decode(android.util.Base64.decode(it,android.util.Base64.NO_WRAP))
+            }
         )
     }.getOrNull()
     fun save(c:Context,s:WakeSetting) {check(c.getSharedPreferences("voice_calibration",0).edit()
@@ -91,7 +99,9 @@ object VoiceCalibrationStore {
         .putBoolean("alternate_names",s.alternateNames).putBoolean("reduce_noise",s.noiseReduction)
         .putBoolean("software_noise",s.softwareNoiseReduction).putBoolean("phoneme_model",s.phonemeModel)
         .putBoolean("require_hey",s.requireHey).putString("learned_phones",s.learnedPronunciations.joinToString("|"){it.joinToString(" ")})
-        .putString("phoneme_backup",s.phonemeBackup?.name).commit())}
+        .putString("phoneme_backup",s.phonemeBackup?.name)
+        .putString("acoustic_v1",s.acousticProfile?.let {android.util.Base64.encodeToString(it.encode(),android.util.Base64.NO_WRAP)})
+        .commit())}
     fun clear(c:Context) {check(c.getSharedPreferences("voice_calibration",0).edit().clear().commit())}
 }
 object WakeCalibration {
@@ -173,6 +183,39 @@ object WakeCalibration {
         return WakeAssessment(setting,phraseHits.values.sum(),positives,falseHits,trials.size-positives,phraseHits.keys,phraseHits)
     }
 
+    private suspend fun acousticAssessment(base:WakeSetting,trials:List<WakeTrial>):WakeAssessment? {
+        val segmenter=AcousticWakeSegmenter()
+        val vad=RemoteVad()
+        val features=try {
+            trials.map {trial->
+                vad.reset()
+                segmenter.reset()
+                buildList {
+                    for(offset in 0 until trial.audio.size+8192 step 512) {
+                        currentCoroutineContext().ensureActive()
+                        val frame=FloatArray(512){i->trial.audio.getOrElse(offset+i){0f}}
+                        segmenter.accept(frame,vad.compute(frame))?.let {add(it)}
+                    }
+                }
+            }
+        }finally {
+            segmenter.reset()
+            runCatching {vad.release()}
+        }
+        val wakes=trials.indices.filter {trials[it].positive && features[it].size==1}
+        val controls=trials.indices.filter {!trials[it].positive && features[it].size==1}
+        if(controls.none {trials[it].phrase=="similar"})return null
+        val profile=AcousticWakeProfile.enroll(wakes.map {features[it].single()},controls.map {features[it].single()})
+            ?:return null
+        // Enrollment clips count only if another sample recognizes them.
+        val hits=trials.indices.map {index->
+            val wake=wakes.indexOf(index)
+            if(trials[index].positive) wake>=0 && profile.matches(features[index].single(),wake)
+            else features[index].any {profile.matches(it)}
+        }
+        return assessment(base.copy(acousticProfile=profile),trials,hits)
+    }
+
     suspend fun validate(candidates:List<WakeAssessment>,trials:List<WakeTrial>):Pair<WakeAssessment?,List<Boolean>> =
         withContext(Dispatchers.IO) {
             WakeCalibrationPolicy.validate(candidates) {replayTrials(it.setting,trials)}
@@ -205,6 +248,7 @@ object WakeCalibration {
             }
             // Only the best pair advances. Each additional pair needs two loaded models.
             results+=WakeCalibrationPolicy.ranked(combined).take(1)
+            acousticAssessment(candidates.first(),trials)?.let {results+=it}
         }
         results
     }

@@ -116,18 +116,11 @@ class NativeSpeechDeviceTest {
         withContext(Dispatchers.IO) {
             NativeSpeechClient.connect(app)
             val tts=RemoteTts()
-            fun synthesize(phrase:String,speed:Float):FloatArray {
-                val chunks=mutableListOf<FloatArray>()
-                tts.generateWithCallback(phrase,0,speed){chunks.add(it.copyOf());1}
-                val samples=chunks.flatMap {it.asList()}.toFloatArray()
-                val rate=tts.sampleRate()
-                return FloatArray(samples.size*16000/rate){i->samples[(i.toLong()*rate/16000).toInt()]}
-            }
             val trials=listOf(
-                WakeTrial("hey",true,synthesize("Hey Elliot",1f)),
-                WakeTrial("hey",true,FloatArray(11264)+synthesize("Hey Elliot, what is my battery level?",1f)),
-                WakeTrial("name",false,synthesize("Elliot",1f)),
-                WakeTrial("ordinary",false,synthesize("Hey, what are you doing?",1f))
+                WakeTrial("hey",true,synthesize(tts,"Hey Elliot",1f)),
+                WakeTrial("hey",true,FloatArray(11264)+synthesize(tts,"Hey Elliot, what is my battery level?",1f)),
+                WakeTrial("name",false,synthesize(tts,"Elliot",1f)),
+                WakeTrial("ordinary",false,synthesize(tts,"Hey, what are you doing?",1f))
             )
             val strict=WakeSetting(false,requireHey=true,phonemeBackup=PhonemeBackup.DICTIONARY)
             val candidate=WakeAssessment(strict,3,4,0,2,setOf("hey"))
@@ -140,6 +133,47 @@ class NativeSpeechDeviceTest {
                 if(previous==null)VoiceCalibrationStore.clear(app)else VoiceCalibrationStore.save(app,previous)
             }
         }
+    }
+    @Test fun acousticWakeChecksFreshSpeechAndRejectsSimilarPhrases()=runBlocking {
+        withContext(Dispatchers.IO) {
+            NativeSpeechClient.connect(app)
+            val tts=RemoteTts()
+            fun sample(phrase:String,speed:Float)=FloatArray(8192)+synthesize(tts,phrase,speed)
+            val enrollment=listOf(.92f,.98f,1.03f,1.08f).map {WakeTrial("hey",true,sample("Hey Elliot",it))}+
+                WakeTrial("ordinary",false,sample("Hello, how are you?",1f))+
+                WakeTrial("similar",false,sample("Hey Ellie",1f))
+            val assessment=WakeCalibration.assess(false,enrollment,requireHey=true)
+                .singleOrNull {it.setting.acousticProfile!=null}
+            assertNotNull("No acoustic assessment",assessment)
+            val acoustic=checkNotNull(assessment)
+            assertTrue("Acoustic enrollment: ${acoustic.hits} hits, ${acoustic.falseHits} controls",acoustic.eligible)
+            val checks=listOf(
+                WakeTrial("hey",true,sample("Hey Elliot",.96f)),
+                WakeTrial("hey",true,sample("Hey Elliot",1.06f)),
+                WakeTrial("similar",false,sample("Hey Ellie",1.04f)),
+                WakeTrial("name",false,sample("Elliot",1f))
+            )
+            assertEquals(acoustic to listOf(true,true,false,false),WakeCalibration.validate(listOf(acoustic),checks))
+            val previous=VoiceCalibrationStore.load(app)
+            try {
+                VoiceCalibrationStore.save(app,acoustic.setting)
+                assertEquals(acoustic.setting,VoiceCalibrationStore.load(app))
+            }finally {
+                if(previous==null)VoiceCalibrationStore.clear(app)else VoiceCalibrationStore.save(app,previous)
+            }
+        }
+    }
+    private fun synthesize(tts:RemoteTts,phrase:String,speed:Float):FloatArray {
+        val chunks=mutableListOf<FloatArray>()
+        tts.generateWithCallback(phrase,0,speed){chunks.add(it.copyOf());1}
+        val samples=FloatArray(chunks.sumOf {it.size})
+        var offset=0
+        for(chunk in chunks) {
+            chunk.copyInto(samples,offset)
+            offset+=chunk.size
+        }
+        val rate=tts.sampleRate()
+        return FloatArray(samples.size*16000/rate){i->samples[(i.toLong()*rate/16000).toInt()]}
     }
     @Test fun packagedCallbackHasNativeSignature() {
         val callback=NativeTtsCallback { 0 }

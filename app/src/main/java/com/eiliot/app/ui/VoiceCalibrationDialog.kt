@@ -34,6 +34,7 @@ import kotlinx.coroutines.*
     var status by remember {mutableStateOf("Preparing microphone checks…")}
     val trials=remember {mutableListOf<WakeTrial>()};val assessments=remember {mutableListOf<WakeAssessment>()}
     var eligible by remember {mutableStateOf(emptyList<WakeAssessment>())}
+    val freshControl=if(eligible.any {it.setting.acousticProfile!=null})"Hey Ellie"else "Hello, how are you?"
     var candidate by remember {mutableStateOf<WakeAssessment?>(null)}
     var validated by remember {mutableStateOf(false)}
     var transcript by remember {mutableStateOf("")}
@@ -133,7 +134,13 @@ import kotlinx.coroutines.*
                 if(!WakeCalibration.usable(clip)){status="Too quiet or distorted. Adjust your distance and retry.";return@launch}
                 if(step<initialSteps) {
                     val i=step%6
-                    trials+=WakeTrial(if(requireHey || i%2==0)"hey" else "name",i<4,clip);audio=null
+                    val phrase=when {
+                        requireHey && i==5 -> "similar"
+                        i>=4 -> "ordinary"
+                        requireHey || i%2==0 -> "hey"
+                        else -> "name"
+                    }
+                    trials+=WakeTrial(phrase,i<4,clip);audio=null
                     if(step==5 || step==11) {
                         status="Checking this microphone against your samples…"
                         assessments+=WakeCalibration.assess(reference,trials,WakeCapturePreference.noiseReduction(context),WakeCapturePreference.softwareNoiseReduction(context),requireHey)
@@ -206,15 +213,18 @@ import kotlinx.coroutines.*
             Column(Modifier.padding(20.dp).heightIn(max=650.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(12.dp)) {
                 Text(if(transcriptionOnly)"Check speech recognition" else "Calibrate my wake phrase",style=MaterialTheme.typography.titleLarge)
                 Text(if(transcriptionOnly)"Record a sentence, compare the recognized words, and listen back. Audio stays in memory unless you tap Save one local test recording. No command will run."
-                    else if(requireHey)"Use your usual voice and microphone. Speak each prompt after Speak now. Calibration tests a pronunciation learned from your samples. The recordings stay in memory."
+                    else if(requireHey)"Use your usual voice and microphone. Speak each prompt after Speak now. Calibration compares pronunciation and sound patterns. The recordings stay in memory."
                     else "We compare two microphone paths using your normal accent. Audio stays in memory and is discarded when you close.")
                 Text(status)
                 if(!transcriptionOnly && step>=initialSteps)assessments.forEach {result->
-                        Text("Microphone ${if(result.setting.referenceCapture)2 else 1}, ${result.setting.label}, ${result.setting.score}/${result.setting.threshold}: Hey Elliot ${result.phraseHits["hey"]?:0}/${if(requireHey)4 else 2}. ${if(requireHey)""else "Elliot ${result.phraseHits["name"]?:0}/2. "}Unwanted wakes ${result.falseHits}/2.",style=MaterialTheme.typography.bodySmall)
+                        val sensitivity=if(result.setting.acousticProfile==null)", ${result.setting.score}/${result.setting.threshold}"else ""
+                        Text("Microphone ${if(result.setting.referenceCapture)2 else 1}, ${result.setting.label}$sensitivity: Hey Elliot ${result.phraseHits["hey"]?:0}/${if(requireHey)4 else 2}. ${if(requireHey)""else "Elliot ${result.phraseHits["name"]?:0}/2. "}Unwanted wakes ${result.falseHits}/2.",style=MaterialTheme.typography.bodySmall)
                 }
+                if(!transcriptionOnly && requireHey && step>=initialSteps && assessments.none {it.setting.acousticProfile!=null})
+                    Text("The recordings did not produce a usable sound pattern.",style=MaterialTheme.typography.bodySmall)
                 if(!transcriptionOnly && (step<initialSteps || (step<finalStep && eligible.isNotEmpty()))) {
                     val index=if(step<initialSteps)step%6 else step-initialSteps
-                    val phrase=if(step<initialSteps)prompts[index]else listOf("Hey Elliot",secondWake,"Hello, how are you?",finalControl)[index]
+                    val phrase=if(step<initialSteps)prompts[index]else listOf("Hey Elliot",secondWake,freshControl,finalControl)[index]
                     Text(if(step<initialSteps)"Microphone check ${step/6+1} · sample ${step%6+1} of 6" else "Fresh validation ${step-initialSteps+1} of 4")
                     Text("Say: $phrase",style=MaterialTheme.typography.titleMedium)
                     Text("Tap Record, then speak once when “Speak now” appears. Stay quiet for the rest of the four seconds.")
@@ -222,6 +232,8 @@ import kotlinx.coroutines.*
                 }
                 if(!transcriptionOnly && validated && candidate?.setting?.learnedPronunciations?.isNotEmpty()==true)
                     Text("Saving stores short pronunciation sequences on this phone.")
+                if(!transcriptionOnly && validated && candidate?.setting?.acousticProfile!=null)
+                    Text("Saving keeps derived sound patterns on this phone. Say “Hey Elliot” on its own, then wait for listening before speaking your request. Reset wake calibration removes the patterns.")
                 if(!transcriptionOnly && validated)Button(onClick={
                     try {VoiceCalibrationStore.save(context,checkNotNull(candidate).setting);onClose()}
                     catch(e:Exception){status="The setting could not be saved. Please retry or close this check."}
