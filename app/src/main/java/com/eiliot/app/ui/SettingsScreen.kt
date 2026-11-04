@@ -140,6 +140,10 @@ import kotlinx.coroutines.*
             }) {Text("Reset wake calibration")}
             TextButton(onClick={voiceOptions=!voiceOptions}) {Text(if(voiceOptions)"Hide voice options" else "Voice options",maxLines=1)}
             if(voiceOptions) {
+                ControlSwitch("Require Hey Elliot","Use the full wake phrase for hands-free listening.",WakeCapturePreference.requireHey(context)) {
+                    WakeCapturePreference.setRequireHey(context,it)
+                    WakeListener.stop();WakeListener.start(context);changed()
+                }
                 ControlSwitch("Direct microphone","Use the microphone without call processing for wake listening. Changing this clears sensitivity calibration.",
                     VoiceCalibrationStore.load(context)?.referenceCapture?:WakeCapturePreference.reference(context)) {
                     WakeCapturePreference.setReference(context,it)

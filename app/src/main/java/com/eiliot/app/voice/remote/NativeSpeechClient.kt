@@ -129,11 +129,14 @@ class RemoteKeywordSpotter(
     score:Float?=null,
     threshold:Float?=null,
     private val alternateNames:Boolean=false,
-    private val phonemeModel:Boolean=false
+    private val phonemeModel:Boolean=false,
+    private val requireHey:Boolean=false,
+    private val learnedPhones:List<String> = emptyList()
 ):RemoteDecoder("kws",Bundle().apply {
     // Reset must pass defaults explicitly: worker SharedPreferences may cache an old profile.
     putFloat("score",score?:2f);putFloat("threshold",threshold?:.15f)
     putBoolean("phoneme_model",phonemeModel)
+    putBoolean("require_hey",requireHey)
 }) {
     override fun createStream(hotwords:String):RemoteStream {
         val keywords=when {
@@ -141,11 +144,19 @@ class RemoteKeywordSpotter(
             phonemeModel -> WakePronunciations.phonemeExtras
             else -> WakePronunciations.extras
         }
-        return super.createStream(keywords)
+        val selected=if(requireHey)keywords.lineSequence().filter {
+            it.substringAfter('@').startsWith("hey_")
+        }.joinToString("\n")else keywords
+        val learned=if(learnedPhones.isEmpty())""else learnedPhones.joinToString(" ")+" @hey_elliot_personal"
+        return super.createStream(listOf(selected,learned).filter(String::isNotBlank).joinToString("\n"))
     }
 }
 class RemoteRecognizer:RemoteDecoder("asr") {
     fun isEndpoint(stream:RemoteStream)=rpc("endpoint",args(stream)).getBoolean("value")
+}
+class RemotePronunciationRecognizer:RemoteDecoder("wake_phones") {
+    fun tokens(stream:RemoteStream):List<String> =
+        rpc("phone_tokens",args(stream)).getStringArray("tokens")?.toList().orEmpty()
 }
 class RemoteWhisper(language:String="en",model:String=com.eiliot.app.voice.MultilingualModelPack.SMALL.id):RemoteDecoder("whisper",Bundle().apply {putString("language",language);putString("model",model)}) {
     /** The pinned backend truncates at 30 seconds; reject overlong clips explicitly. */

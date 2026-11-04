@@ -78,11 +78,11 @@ class NativeSpeechDeviceTest {
             }
         }finally{if(previous==null)VoiceCalibrationStore.clear(app)else VoiceCalibrationStore.save(app,previous)}
     }
-    @Test fun wakeDetectorRecognizesSpokenName()=runBlocking {
+    @Test fun wakeDetectorRequiresHeyInFullPhraseMode()=runBlocking {
         withContext(Dispatchers.IO) {
             NativeSpeechClient.connect(app)
             val tts=RemoteTts()
-            for((phrase,expectWake) in listOf("Hey Elliot" to true,"Elliot" to true,"What is my battery level?" to false,"Hello, how are you?" to false)) {
+            for((phrase,expectWake) in listOf("Hey Elliot" to true,"Elliot" to false,"What is my battery level?" to false,"Hello, how are you?" to false)) {
             val chunks=mutableListOf<FloatArray>()
             tts.generateWithCallback(phrase,0,1f) { chunks.add(it.copyOf());1 }
             val source=FloatArray(chunks.sumOf { it.size });var at=0
@@ -92,17 +92,24 @@ class NativeSpeechDeviceTest {
                 val pos=i.toDouble()*rate/16000;val index=pos.toInt()
                 if(index>=source.size-1)0f else (source[index]*(1-(pos-index))+source[index+1]*(pos-index)).toFloat()
             }
-            val kws=RemoteKeywordSpotter();val stream=kws.createStream()
+            val detector=RemoteWakeDetector(WakeSetting(false,requireHey=true))
             val hits=mutableListOf<String>()
             try {
                 for(start in resampled.indices step 512) {
-                    stream.acceptWaveform(resampled.copyOfRange(start,minOf(start+512,resampled.size)),16000)
-                    drainWakeResults({kws.isReady(stream)},{kws.decode(stream)},
-                        {kws.getResult(stream).keyword},{kws.reset(stream)}) {hits.add(it)}
+                    detector.accept(resampled.copyOfRange(start,minOf(start+512,resampled.size)))?.let(hits::add)
                 }
                 assertEquals("Wake detection for $phrase: $hits",expectWake,hits.isNotEmpty())
-            }finally {stream.release();kws.release()}
+                if(expectWake)assertTrue(WakeCalibration.observePhones(resampled).isNotEmpty())
+            }finally {detector.close()}
             }
+        }
+    }
+    @Test fun learnedWakeGrammarAcceptsValidPhonesAndRejectsSilence()=runBlocking {
+        withContext(Dispatchers.IO) {
+            NativeSpeechClient.connect(app)
+            val setting=WakeSetting(false,phonemeModel=true,requireHey=true,
+                learnedPhones=listOf("HH","EY1","y","ī","l","iè"))
+            assertFalse(WakeCalibration.detect(setting,FloatArray(16000)))
         }
     }
     @Test fun packagedCallbackHasNativeSignature() {

@@ -79,7 +79,7 @@ object WakeListener {
         val old=capture;val gen=++generation;val epoch=SentinelRuntime.epoch
         capture=SentinelRuntime.scope.launch(Dispatchers.IO) {
             old?.join()
-            var kws:RemoteKeywordSpotter?=null;var kwsStream:RemoteStream?=null
+            var kws:RemoteWakeDetector?=null
             var recognizer:RemoteRecognizer?=null;var stream:RemoteStream?=null;var vad:RemoteVad?=null
             var audio:VoiceAudioInput?=null
             var noiseReducer:RemoteDenoiser?=null
@@ -89,11 +89,10 @@ object WakeListener {
                 val root=ModelAssets.await(SentinelRuntime.context)
                 NativeSpeechClient.connect(SentinelRuntime.context)
                 val calibration=VoiceCalibrationStore.load(SentinelRuntime.context)
-                val spotter=RemoteKeywordSpotter(
-                    calibration?.score,calibration?.threshold,
-                    calibration?.alternateNames?:false,calibration?.phonemeModel?:false
-                )
-                kws=spotter;val keywordStream=spotter.createStream();kwsStream=keywordStream
+                val wakeSetting=calibration?:WakeSetting(false,requireHey=WakeCapturePreference.requireHey(SentinelRuntime.context))
+                val spotter=RemoteWakeDetector(wakeSetting)
+                kws=spotter
+                var wakeWasIdle=true
                 val asr=RemoteRecognizer()
                 recognizer=asr
                 val detector=RemoteVad()
@@ -111,7 +110,7 @@ object WakeListener {
                 audio=VoiceAudioInput(SentinelRuntime.context,direct,reduceNoise) { }
                 ensureActive();check(gen==generation && SentinelRuntime.alive(epoch))
                 input=audio;ready=true
-                if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "capture ready; direct=$direct; live=${liveCall.value}; wake=${SentinelRuntime.store.wakeEnabled}; echo=${audio.echoEnabled}; noise=${audio.noiseEnabled}; gain=${audio.gainEnabled}; enhanced=$enhanced; wakeProfile=${calibration?.label?:"Original"}")
+                if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "capture ready; direct=$direct; live=${liveCall.value}; wake=${SentinelRuntime.store.wakeEnabled}; echo=${audio.echoEnabled}; noise=${audio.noiseEnabled}; gain=${audio.gainEnabled}; enhanced=$enhanced; wakeProfile=${wakeSetting.label}; requireHey=${wakeSetting.requireHey}")
                 var diagnosticAt=android.os.SystemClock.elapsedRealtime()
                 var diagnosticFrames=0
                 var diagnosticPeak=0f
@@ -129,7 +128,7 @@ object WakeListener {
                         diagnosticAt=diagnosticNow;diagnosticFrames=0;diagnosticPeak=0f;diagnosticEnergy=0.0
                     }
                     if(resetMode.getAndSet(false)) {
-                        spotter.reset(keywordStream);detector.reset();onset.reset();preroll.clear()
+                        spotter.reset();wakeWasIdle=true;detector.reset();onset.reset();preroll.clear()
                     }
                     preroll.add(frame)
                     val probability=detector.compute(frame)
@@ -147,23 +146,27 @@ object WakeListener {
                             }finally { activationPending.set(false) }
                         }
                     }
-                    if(current==null && !liveCall.value) {
-                        keywordStream.acceptWaveform(frame,16000)
-                        drainWakeResults({spotter.isReady(keywordStream)},{spotter.decode(keywordStream)},
-                            {spotter.getResult(keywordStream).keyword},{spotter.reset(keywordStream)}) { wake ->
-                        if(wake.isNotBlank())if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "wake detected: $wake")
-                        if(!liveCall.value && wake.isNotBlank() && activationPending.compareAndSet(false,true)) {
+                    val wakeIdle=current==null && !liveCall.value
+                    if(wakeIdle && !wakeWasIdle)spotter.reset()
+                    wakeWasIdle=wakeIdle
+                    if(wakeIdle) {
+                        val wake=spotter.accept(frame)
+                        if(wake!=null && com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS) {
+                            android.util.Log.i("ElliotWake", "wake detected: $wake")
+                        }
+                        if(wake!=null && !liveCall.value && activationPending.compareAndSet(false,true)) {
                             main.post {
                                 try {
                                     val now=android.os.SystemClock.elapsedRealtime()
                                     if(gen==generation && SentinelRuntime.alive(epoch) && now-lastTrigger>=900) {
-                                        lastTrigger=now;EiliotBrain.interruptForWake();val started=beginInput("wake")
+                                        lastTrigger=now
+                                        EiliotBrain.interruptForWake()
+                                        val started=beginInput("wake")
                                         if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "wake listening started=$started")
                                         if(!SentinelRuntime.foreground)OverlayManager.openPanel()
                                     }
-                                }finally { activationPending.set(false) }
+                                }finally {activationPending.set(false)}
                             }
-                        }
                         }
                     } else if(current!=null && VoiceSession.gate.accepts(current.ticket,current.epoch)) {
                         val needsReset=reset.getAndSet(false)
@@ -209,7 +212,7 @@ object WakeListener {
             } finally {
                 audio?.onFrame=null;runCatching { audio?.close() }
                 enhancedFrames?.clear();runCatching{noiseReducer?.release()}
-                runCatching { stream?.release() };runCatching { kwsStream?.release() };runCatching { recognizer?.release() };runCatching { kws?.release() };runCatching { vad?.release() }
+                runCatching { stream?.release() };runCatching { recognizer?.release() };runCatching { kws?.close() };runCatching { vad?.release() }
                 if(gen==generation) { input=null;ready=false }
             }
         }

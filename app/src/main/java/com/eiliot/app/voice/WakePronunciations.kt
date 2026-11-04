@@ -16,4 +16,8 @@ object WakePronunciations {
         "HH EY1 y ī l iè @hey_elliot_accent",
         "h ēi y ī l iè @hey_elliot_accent"
     ).joinToString("\n")
+
+    fun canLearn(phones:List<String>):Boolean =
+        phones.size in 5..18 && phones.first() in setOf("HH","h") &&
+            phones.all {it.length in 1..12 && it.all(Char::isLetterOrDigit)}
 }

@@ -55,9 +55,20 @@ class SpeechEngineService:Service() {
                 val setting=WakeSetting(false,a.getFloat("score",2f),a.getFloat("threshold",.15f))
                 val kind=if(a.getBoolean("phoneme_model"))"phoneme_kws" else "kws"
                 val folder=contract.spec(kind).folder
-                out.putLong("id",hold(KeywordSpotter(config=KeywordSpotterConfig(modelConfig=model(kind),keywordsFile="${root.path}/$folder/keywords.txt",keywordsScore=setting.score,keywordsThreshold=setting.threshold,numTrailingBlanks=1))))
+                val requireHey=a.getBoolean("require_hey")
+                val keywordFile=if(requireHey)"keywords-hey.txt" else "keywords.txt"
+                out.putLong("id",hold(KeywordSpotter(config=KeywordSpotterConfig(
+                    modelConfig=model(kind),keywordsFile="${root.path}/$folder/$keywordFile",
+                    keywordsScore=setting.score,keywordsThreshold=setting.threshold,
+                    maxActivePaths=if(kind=="kws" && requireHey)8 else 4,numTrailingBlanks=1
+                ))))
             }
             "asr"->out.putLong("id",hold(OnlineRecognizer(config=OnlineRecognizerConfig(modelConfig=model("asr"),decodingMethod="modified_beam_search",maxActivePaths=4,hotwordsScore=1.5f,enableEndpoint=true,endpointConfig=EndpointConfig(EndpointRule(false,2.4f,0f),EndpointRule(true,1.4f,0f),EndpointRule(false,0f,60f))))))
+            "wake_phones"->out.putLong("id",hold(OnlineRecognizer(config=OnlineRecognizerConfig(
+                modelConfig=model("phoneme_kws"),decodingMethod="modified_beam_search",
+                maxActivePaths=4,enableEndpoint=false
+            ))))
+            "phone_tokens"->out.putStringArray("tokens",obj<OnlineRecognizer>(id).getResult(obj(sid)).tokens)
             "whisper"->{
                 val language=a.getString("language").orEmpty();require(language in setOf("","en","hi","bn"))
                 val spec=MultilingualModelPack.spec(a.getString("model")?:MultilingualModelPack.SMALL.id)
@@ -79,7 +90,25 @@ class SpeechEngineService:Service() {
                 check(cleaned.sampleRate==16000 && cleaned.samples.size<=8192 && cleaned.samples.all(Float::isFinite))
                 out.putFloatArray("pcm",cleaned.samples)
             }
-            "stream"->out.putLong("id",hold(when(val owner=objects[id]) {is KeywordSpotter->owner.createStream(a.getString("hotwords").orEmpty());is OnlineRecognizer->owner.createStream(a.getString("hotwords").orEmpty());is OfflineRecognizer->owner.createStream();else->error("Invalid stream owner")}))
+            "stream"->out.putLong("id",hold(when(val owner=objects[id]) {
+                is KeywordSpotter->{
+                    val keywords=a.getString("hotwords").orEmpty()
+                    if(keywords.isNotBlank()) {
+                        require(keywords.length<=1024)
+                        val tokens=File(owner.config.modelConfig.tokens).readLines()
+                            .map {it.substringBeforeLast(' ')}.toSet()
+                        require(keywords.lines().all {line->
+                            val label=line.substringAfter('@',"")
+                            label.matches(Regex("[a-z_]{1,32}")) &&
+                                line.substringBefore('@').trim().split(' ').all {it in tokens}
+                        }) {"Invalid wake pronunciation"}
+                    }
+                    owner.createStream(keywords)
+                }
+                is OnlineRecognizer->owner.createStream(a.getString("hotwords").orEmpty())
+                is OfflineRecognizer->owner.createStream()
+                else->error("Invalid stream owner")
+            }))
             "accept"->{val pcm=checkNotNull(a.getFloatArray("pcm"));require(pcm.size<=16000);when(val stream=objects[id]){is OnlineStream->stream.acceptWaveform(pcm,16000);is OfflineStream->stream.acceptWaveform(pcm,16000);else->error("Invalid speech stream")}}
             "ready"->out.putBoolean("value",when(val owner=objects[id]) {is KeywordSpotter->owner.isReady(obj(sid));is OnlineRecognizer->owner.isReady(obj(sid));else->false})
             "decode"->when(val owner=objects[id]) {is KeywordSpotter->owner.decode(obj(sid));is OnlineRecognizer->owner.decode(obj(sid));is OfflineRecognizer->owner.decode(obj(sid));else->error("Invalid decoder")}

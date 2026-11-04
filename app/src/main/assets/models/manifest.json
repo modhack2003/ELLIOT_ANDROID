@@ -1,5 +1,5 @@
 {
-  "version": 11,
+  "version": 12,
   "files": [
     {
       "path": "NOTICES.md",
@@ -67,6 +67,11 @@
       "sha256": "190d4067b4cc20b72a42a1916e69d92052000fb7051a427ebb1bc72a69207dc1"
     },
     {
+      "path": "kws-phone/keywords-hey.txt",
+      "bytes": 36,
+      "sha256": "8ae5e84cc43c63ede272780aef36def41a7efd28af87a725af39085035411850"
+    },
+    {
       "path": "kws-phone/keywords.txt",
       "bytes": 61,
       "sha256": "7632be3107ad4ff0e10031aeca0a97b9c1a8ae4d2821962530b7fa59c53aef0c"
@@ -95,6 +100,11 @@
       "path": "kws/joiner.onnx",
       "bytes": 163380,
       "sha256": "eae9da0c7e1e6c6a3f4cc42d167899c388f6c6701b94cb96320e4f55df79624c"
+    },
+    {
+      "path": "kws/keywords-hey.txt",
+      "bytes": 35,
+      "sha256": "c4ed0328538ab5cc9b3dbeae9d3a2f80970e428a093ad723df32836b18e8155b"
     },
     {
       "path": "kws/keywords.txt",

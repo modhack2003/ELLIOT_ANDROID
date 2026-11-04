@@ -15,7 +15,8 @@ class WakeCapturePreferenceTest {
     @Test fun changingCaptureInvalidatesSensitivityForOldMicrophone() {
         val app=RuntimeEnvironment.getApplication()
         assertFalse(WakeCapturePreference.reference(app))
-        val profile=WakeSetting(false,2.5f,.1f,true,true,true,phonemeModel=true)
+        val profile=WakeSetting(false,2.5f,.1f,true,true,true,phonemeModel=true,requireHey=true,
+            learnedPhones=listOf("HH","EY1","y","ī","l","iè"))
         VoiceCalibrationStore.save(app,profile)
         assertEquals(profile,VoiceCalibrationStore.load(app))
         WakeCapturePreference.setReference(app,true)

@@ -5,6 +5,14 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class WakeCalibrationPolicyTest {
+    @Test fun learnedWakeNeedsAnOnsetAndValidPhoneTokens() {
+        val base=WakeSetting(false,requireHey=true)
+        val phones=listOf("HH","EY1","y","ī","l","iè")
+        assertEquals(phones,WakeCalibration.learnedSetting(base,phones)?.learnedPhones)
+        assertNull(WakeCalibration.learnedSetting(base,listOf("y","ī","l","iè","T")))
+        assertNull(WakeCalibration.learnedSetting(base,phones+ "@bad"))
+        assertNull(WakeCalibration.learnedSetting(WakeSetting(false),phones))
+    }
     @Test fun alternateNameDoesNotBecomeACommandOrMatchLongerWords() {
         assertEquals("",WakeWords.command("Hey Eliot"))
         assertEquals("what is my battery level",WakeWords.command("Hey Eliot, what is my battery level?"))
@@ -17,6 +25,9 @@ class WakeCalibrationPolicyTest {
         assertNull(WakeCalibrationPolicy.choose(listOf(result(WakeSetting(false),phrases=setOf("name")))))
         assertNull(WakeCalibrationPolicy.choose(listOf(result(WakeSetting(false),falseHits=1))))
         assertNull(WakeCalibrationPolicy.choose(listOf(result(WakeSetting(false),hits=2))))
+        val fullPhrase=result(WakeSetting(false,requireHey=true),phrases=setOf("hey"))
+        assertEquals(fullPhrase,WakeCalibrationPolicy.choose(listOf(fullPhrase)))
+        assertNull(WakeCalibrationPolicy.choose(listOf(fullPhrase.copy(falseHits=1))))
     }
     @Test fun prefersMoreRestrictiveThresholdOnEqualRecall() {
         val strict=result(WakeSetting(true,2f,.15f))

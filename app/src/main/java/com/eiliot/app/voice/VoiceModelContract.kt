@@ -26,7 +26,9 @@ class VoiceModelContract(val source:String) {
             if(kind!="asr") {
                 val tokens=File(root,"${s.folder}/tokens.txt").readLines().map {it.substringBeforeLast(' ')}.toSet()
                 val extra=if(kind=="kws")WakePronunciations.extras else WakePronunciations.phonemeExtras
-                val phrases=File(root,"${s.folder}/keywords.txt").readLines()+extra.lines()
+                val fullPhrases=File(root,"${s.folder}/keywords-hey.txt").readLines()
+                require(fullPhrases.isNotEmpty() && fullPhrases.all {it.substringAfter('@').startsWith("hey_")})
+                val phrases=File(root,"${s.folder}/keywords.txt").readLines()+fullPhrases+extra.lines()
                 require(phrases.all {line->
                     line.substringBefore('@').trim().split(Regex("\\s+")).filter(String::isNotBlank).all {it in tokens}
                 }) {"$kind wake graph contains an unknown token"}

@@ -4,6 +4,11 @@ import android.content.Context
 
 /** Manual microphone choice; this is not a successful sensitivity calibration. */
 object WakeCapturePreference {
+    fun requireHey(c:Context)=c.getSharedPreferences("wake_capture",0).getBoolean("require_hey",false)
+    fun setRequireHey(c:Context,value:Boolean) {
+        check(c.getSharedPreferences("wake_capture",0).edit().putBoolean("require_hey",value).commit())
+        VoiceCalibrationStore.clear(c)
+    }
     fun reference(c:Context)=c.getSharedPreferences("wake_capture",0).getBoolean("direct",false)
     fun noiseReduction(c:Context)=c.getSharedPreferences("wake_capture",0).getBoolean("reduce_noise",false)
     fun softwareNoiseReduction(c:Context)=c.getSharedPreferences("wake_capture",0).getBoolean("software_noise",false)

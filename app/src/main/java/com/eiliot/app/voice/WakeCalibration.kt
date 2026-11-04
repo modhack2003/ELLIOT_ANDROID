@@ -8,18 +8,33 @@ import com.eiliot.app.voice.remote.*
 import kotlinx.coroutines.*
 import java.security.MessageDigest
 
-data class WakeSetting(val referenceCapture:Boolean,val score:Float=2f,val threshold:Float=.15f,val alternateNames:Boolean=false,val noiseReduction:Boolean=false,val softwareNoiseReduction:Boolean=false,val phonemeModel:Boolean=false) {
+data class WakeSetting(
+    val referenceCapture:Boolean,
+    val score:Float=2f,
+    val threshold:Float=.15f,
+    val alternateNames:Boolean=false,
+    val noiseReduction:Boolean=false,
+    val softwareNoiseReduction:Boolean=false,
+    val phonemeModel:Boolean=false,
+    val requireHey:Boolean=false,
+    val learnedPhones:List<String> = emptyList()
+) {
     val label get()=when {
+        learnedPhones.isNotEmpty() -> "Your pronunciation"
         phonemeModel && alternateNames -> "Phoneme accent"
         phonemeModel -> "Phoneme dictionary"
         alternateNames -> "Alternate names"
         else -> "Original"
     }
-    init {require(score.isFinite() && score in 1f..3.5f);require(threshold.isFinite() && threshold in .05f.. .3f)}
+    init {
+        require(score.isFinite() && score in 1f..3.5f)
+        require(threshold.isFinite() && threshold in .05f.. .3f)
+        require(learnedPhones.isEmpty() || (phonemeModel && requireHey && WakePronunciations.canLearn(learnedPhones)))
+    }
 }
 data class WakeTrial(val phrase:String,val positive:Boolean,val audio:FloatArray)
 data class WakeAssessment(val setting:WakeSetting,val hits:Int,val positives:Int,val falseHits:Int,val negatives:Int,val phrases:Set<String>,val phraseHits:Map<String,Int> = emptyMap()) {
-    val eligible get()=positives>=4 && negatives>=2 && hits>=3 && falseHits==0 && phrases.containsAll(listOf("hey","name"))
+    val eligible get()=positives>=4 && negatives>=2 && hits>=3 && falseHits==0 && "hey" in phrases && (setting.requireHey || "name" in phrases)
 }
 object WakeCalibrationPolicy {
     fun choose(results:List<WakeAssessment>)=results.filter {it.eligible}.sortedWith(
@@ -30,7 +45,7 @@ object WakeCalibrationPolicy {
 object VoiceCalibrationStore {
     private fun fingerprint(c:Context):String {
         val hash=MessageDigest.getInstance("SHA-256")
-        hash.update(("wake-calibration-v4:"+android.os.Build.FINGERPRINT).toByteArray())
+        hash.update(("wake-calibration-v6:"+android.os.Build.FINGERPRINT).toByteArray())
         for(name in listOf("voice-engine.json","models/manifest.json"))c.assets.open(name).use {input->
             val bytes=ByteArray(8192);while(true){val n=input.read(bytes);if(n<0)break;hash.update(bytes,0,n)}
         }
@@ -38,11 +53,20 @@ object VoiceCalibrationStore {
     }
     fun load(c:Context):WakeSetting?=runCatching {
         val p=c.getSharedPreferences("voice_calibration",0)
-        if(p.getString("model",null)!=fingerprint(c))null else WakeSetting(p.getBoolean("reference",false),p.getFloat("score",2f),p.getFloat("threshold",.15f),p.getBoolean("alternate_names",false),p.getBoolean("reduce_noise",false),p.getBoolean("software_noise",false),p.getBoolean("phoneme_model",false))
+        if(p.getString("model",null)!=fingerprint(c))null else WakeSetting(
+            p.getBoolean("reference",false),p.getFloat("score",2f),p.getFloat("threshold",.15f),
+            p.getBoolean("alternate_names",false),p.getBoolean("reduce_noise",false),
+            p.getBoolean("software_noise",false),p.getBoolean("phoneme_model",false),
+            p.getBoolean("require_hey",false),
+            p.getString("learned_phones",null).orEmpty().split(' ').filter(String::isNotBlank)
+        )
     }.getOrNull()
     fun save(c:Context,s:WakeSetting) {check(c.getSharedPreferences("voice_calibration",0).edit()
         .putString("model",fingerprint(c)).putBoolean("reference",s.referenceCapture)
-        .putFloat("score",s.score).putFloat("threshold",s.threshold).putBoolean("alternate_names",s.alternateNames).putBoolean("reduce_noise",s.noiseReduction).putBoolean("software_noise",s.softwareNoiseReduction).putBoolean("phoneme_model",s.phonemeModel).commit())}
+        .putFloat("score",s.score).putFloat("threshold",s.threshold)
+        .putBoolean("alternate_names",s.alternateNames).putBoolean("reduce_noise",s.noiseReduction)
+        .putBoolean("software_noise",s.softwareNoiseReduction).putBoolean("phoneme_model",s.phonemeModel)
+        .putBoolean("require_hey",s.requireHey).putString("learned_phones",s.learnedPhones.joinToString(" ")).commit())}
     fun clear(c:Context) {check(c.getSharedPreferences("voice_calibration",0).edit().clear().commit())}
 }
 object WakeCalibration {
@@ -64,8 +88,8 @@ object WakeCalibration {
         val rms=kotlin.math.sqrt(audio.sumOf {it.toDouble()*it}/audio.size)
         return rms>.001 && audio.count {kotlin.math.abs(it)>.99f}.toDouble()/audio.size<.03
     }
-    fun settings(reference:Boolean,noiseReduction:Boolean=false,softwareNoiseReduction:Boolean=false):List<WakeSetting> {
-        val base=WakeSetting(reference,noiseReduction=noiseReduction,softwareNoiseReduction=softwareNoiseReduction)
+    fun settings(reference:Boolean,noiseReduction:Boolean=false,softwareNoiseReduction:Boolean=false,requireHey:Boolean=false):List<WakeSetting> {
+        val base=WakeSetting(reference,noiseReduction=noiseReduction,softwareNoiseReduction=softwareNoiseReduction,requireHey=requireHey)
         val original=listOf(false,true).flatMap {alternate->
             listOf(2f to .15f,2.5f to .1f,3f to .08f,3.5f to .05f).map {(score,threshold)->
                 base.copy(score=score,threshold=threshold,alternateNames=alternate)
@@ -75,23 +99,47 @@ object WakeCalibration {
         return original+listOf(phoneme,phoneme.copy(alternateNames=true))
     }
     suspend fun detect(setting:WakeSetting,audio:FloatArray):Boolean=detectHits(setting,audio).isNotEmpty()
+    suspend fun observePhones(audio:FloatArray):List<String> =withContext(Dispatchers.IO) {
+        require(audio.size in 1..128000)
+        val recognizer=RemotePronunciationRecognizer()
+        try {
+            val stream=recognizer.createStream()
+            try {
+                for(offset in 0 until audio.size+24000 step 512) {
+                    ensureActive()
+                    stream.acceptWaveform(FloatArray(512){i->audio.getOrElse(offset+i){0f}},16000)
+                    while(recognizer.isReady(stream))recognizer.decode(stream)
+                }
+                recognizer.tokens(stream)
+            }finally{runCatching{stream.release()}}
+        }finally{runCatching{recognizer.release()}}
+    }
+    fun learnedSetting(base:WakeSetting,phones:List<String>):WakeSetting? {
+        if(!base.requireHey || !WakePronunciations.canLearn(phones))return null
+        return base.copy(score=2.5f,threshold=.1f,phonemeModel=true,learnedPhones=phones.toList())
+    }
     suspend fun detectHits(setting:WakeSetting,audio:FloatArray):List<String> =withContext(Dispatchers.IO) {
-        val kws=RemoteKeywordSpotter(setting.score,setting.threshold,setting.alternateNames,setting.phonemeModel)
-        val stream=try {kws.createStream()}catch(e:Exception){runCatching{kws.release()};throw e}
+        val detector=RemoteWakeDetector(setting)
         val found=mutableListOf<String>()
         try {
             for(offset in 0 until audio.size+24000 step 512) {
                 ensureActive()
                 val frame=FloatArray(512) {i->audio.getOrElse(offset+i){0f}}
-                stream.acceptWaveform(frame,16000)
-                drainWakeResults({kws.isReady(stream)},{kws.decode(stream)},{kws.getResult(stream).keyword},{kws.reset(stream)}) {found.add(it)}
+                detector.accept(frame)?.let(found::add)
             }
-        } finally {runCatching{stream.release()};runCatching{kws.release()}}
+        } finally {detector.close()}
         found
     }
-    suspend fun assess(reference:Boolean,trials:List<WakeTrial>,noiseReduction:Boolean=false,softwareNoiseReduction:Boolean=false):List<WakeAssessment> {
+    suspend fun assess(reference:Boolean,trials:List<WakeTrial>,noiseReduction:Boolean=false,softwareNoiseReduction:Boolean=false,requireHey:Boolean=false):List<WakeAssessment> {
         val results=mutableListOf<WakeAssessment>()
-        for(setting in settings(reference,noiseReduction,softwareNoiseReduction)) {
+        val candidates=settings(reference,noiseReduction,softwareNoiseReduction,requireHey).toMutableList()
+        if(requireHey) {
+            for(trial in trials.filter {it.positive && it.phrase=="hey"}.take(2)) {
+                val candidate=learnedSetting(candidates.first(),observePhones(trial.audio))
+                if(candidate!=null && candidate !in candidates)candidates.add(candidate)
+            }
+        }
+        for(setting in candidates) {
             var hits=0;var falseHits=0;val phraseHits=mutableMapOf<String,Int>()
             for(t in trials) {val hit=detect(setting,t.audio);if(hit && t.positive){hits++;phraseHits[t.phrase]=(phraseHits[t.phrase]?:0)+1}else if(hit)falseHits++}
             results+=WakeAssessment(setting,hits,trials.count{it.positive},falseHits,trials.count{!it.positive},phraseHits.keys.toSet(),phraseHits.toMap())

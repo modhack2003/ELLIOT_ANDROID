@@ -1,7 +1,71 @@
 # Voice implementation status — 3 November 2026
 
-Current working milestone: 0.6.3-dev.15 / versionCode 25.
+Current working milestone: 0.6.3-dev.18 / versionCode 28.
 Baseline source commit: 0d508c5fbc747010b16c0d51d8151aa3ef48748e.
+
+## Local pronunciation calibration (dev.18)
+
+Dev.17 stayed idle for the ordinary phrase, standalone Elliot and the user's
+full wake phrase. Dev.18 adds pronunciation candidates inferred from up to two
+positive samples with the phoneme model. Candidate tokens must start with a
+supported onset, satisfy length limits and belong to the pinned model vocabulary.
+The diagnostic replay labels candidates inferred from the same recording.
+
+Full phrase calibration uses the selected microphone for six samples, then
+checks the selected profile on four fresh samples. A saved profile retains the
+chosen detector, thresholds, microphone and filtering settings. A learned
+profile also stores a short sequence of sound labels. Calibration audio stays in
+memory. The speech worker validates tokens before passing them to native code.
+
+Twenty-nine focused unit tests and two Vivo native checks passed. They cover the
+full phrase gate, phoneme extraction, loading a learned grammar and rejecting
+silence. Signing, 383 bundled model hashes and native alignment passed.
+Live calibration and wake acceptance are tracked separately.
+
+## Full phrase wake mode (dev.17)
+
+The dev.16 live trial recorded a wake match during ordinary speech. The user
+reported that both the ordinary phrase and Hey Elliot started listening.
+Dev.17 adds Require Hey Elliot in Voice options. This mode uses a verified
+keyword file containing the full phrase and includes only Hey-prefixed aliases.
+The original model uses the two decoding offsets and wider search in this mode.
+The other mode uses the legacy single-stream search and wake vocabulary.
+
+Calibration and live detection share the selected vocabulary. Full phrase
+calibration prompts for Hey Elliot in both positive slots, requires ordinary
+speech rejection, and checks fresh positive and negative samples before saving.
+Changing the phrase requirement clears previous calibration. Fingerprint v6
+covers the revised decoder and assets. Enhanced noise reduction stays available.
+
+Twenty-eight focused unit tests passed. The Vivo native full phrase test passed
+for generated Hey Elliot, standalone Elliot and two ordinary phrases. The
+separate calibration replay test missed a generated sample in its experimental
+phoneme profile. The original-model assertions had passed before that failure.
+The full phrase setting uses the original model on the Vivo. Signing, 383 model
+file hashes and native library alignment passed.
+
+## Wake stream alignment (dev.16)
+
+A fresh Vivo replay in dev.15 matched the name using all eight original-model
+settings. Both phoneme profiles missed. The following live attempt missed while
+microphone frames continued at the expected rate. These were separate utterances.
+
+A controlled desktop probe held the authorized waveform fixed and varied only
+the quiet prefix. The original width-4 search matched 5 of 13 prefixes. Width 8
+matched 8 of 13. Two width-8 streams with startup offsets of 0 and 2560 samples
+matched 12 of 13 tuning prefixes and 10 of 12 additional prefixes. The same voice
+sample appears throughout the probe. Generated Hey Elliot and Elliot matched at
+all four tested offsets, and five ordinary phrases had zero hits at those offsets.
+
+The original wake model now shares one set of weights across the two streams.
+The live listener and calibration replay use the same decoder. A match resets
+both streams and returning to idle after a turn starts fresh streams. Phoneme
+profiles still use one stream. Calibration fingerprint v5 covers the changed
+search. Existing capture preferences remain available.
+
+Twenty-eight focused unit tests and two Vivo native wake and calibration tests
+passed. APK signing, 381 bundled model files and native alignment passed. Live
+voice acceptance is tracked separately from the synthetic and prefix probes.
 
 ## Phoneme wake model comparison (dev.15)
 

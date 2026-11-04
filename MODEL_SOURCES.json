@@ -1,6 +1,6 @@
 {
-  "release": "0.6.3-dev.15",
-  "version_code": 25,
+  "release": "0.6.3-dev.18",
+  "version_code": 28,
   "runtime": {
     "name": "sherpa-onnx",
     "version": "1.13.8",
@@ -136,6 +136,11 @@
     "training_source": "https://modelscope.cn/models/pkufool/icefall-kws-zipformer-zh-en-3M-2025-12-20",
     "files": [
       {
+        "path": "kws-phone/LICENSE.txt",
+        "bytes": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      {
         "path": "kws-phone/decoder.onnx",
         "bytes": 759829,
         "sha256": "63a22dd60f40fff082ac3e09afa507f6787da36df76ded2fbe145fa233e22c21"
@@ -151,14 +156,14 @@
         "sha256": "190d4067b4cc20b72a42a1916e69d92052000fb7051a427ebb1bc72a69207dc1"
       },
       {
+        "path": "kws-phone/keywords-hey.txt",
+        "bytes": 36,
+        "sha256": "8ae5e84cc43c63ede272780aef36def41a7efd28af87a725af39085035411850"
+      },
+      {
         "path": "kws-phone/keywords.txt",
         "bytes": 61,
         "sha256": "7632be3107ad4ff0e10031aeca0a97b9c1a8ae4d2821962530b7fa59c53aef0c"
-      },
-      {
-        "path": "kws-phone/LICENSE.txt",
-        "bytes": 11358,
-        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
       },
       {
         "path": "kws-phone/tokens.txt",
