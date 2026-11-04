@@ -7,7 +7,7 @@ import org.json.JSONObject
 object LocalCommands {
     private fun call(name: String, args: JSONObject = JSONObject()) = ToolCall("local_${System.nanoTime()}", name, args.toString())
     fun parse(raw: String, appLookup: () -> List<LaunchableApp>): ToolCall? {
-        val text = SpokenNumbers.normalize(raw.lowercase().trim().trimEnd('.', '!', '?'))
+        val text = SpokenNumbers.normalize(raw.lowercase().trim().trimEnd('.', '!', '?', '।'))
         if (Regex("\\b(don't|do not|never)\\b").containsMatchIn(text)) return null
         if (Regex("^(?:please )?(?:set |change |turn )?(?:the |my )?(?:media |music )?volume(?: to| at)? \\d{1,3}(?: percent|%)?$").matches(text)) {
             val number = Regex("\\d+").find(text)!!.value.toInt()
@@ -22,7 +22,12 @@ object LocalCommands {
             return call("navigate", JSONObject().put("action", action))
         }
         if (text in setOf("scroll down", "scroll up")) return call("scroll_screen", JSONObject().put("direction", if (text.endsWith("down")) "down" else "up"))
-        if (text in setOf("check my battery", "what is my battery", "check my phone", "check phone status", "check my free storage", "how much battery do i have")) return call("device_info")
+        if (text in setOf(
+                "check my battery", "what is my battery", "what is my battery level", "what's my battery level",
+                "check my phone", "check phone status", "check my free storage", "how much battery do i have",
+                "मेरे फोन का battery level कितना है", "मेरे फोन का बैटरी लेवल कितना है",
+                "আমার ফোনের battery level কত", "আমার ফোনের ব্যাটারি লেভেল কত"
+            )) return call("device_info")
         val open = Regex("^(?:please )?(?:open|launch) (.+)$").matchEntire(raw.lowercase().trim().trimEnd('.', '!', '?'))
         if (open != null) {
             val target = open.groupValues[1].removePrefix("the ")

@@ -41,10 +41,11 @@ import kotlinx.coroutines.*
     var lastClip by remember {mutableStateOf<FloatArray?>(null)}
     var cleanedClip by remember {mutableStateOf<FloatArray?>(null)}
     var referenceStt by remember {mutableStateOf(VoiceCalibrationStore.load(context)?.referenceCapture?:WakeCapturePreference.reference(context))}
-    var multilingual by remember {mutableStateOf(MultilingualModelPack.available(context))}
-    var selectedPack by remember {mutableStateOf(MultilingualModelPack.SMALL)}
-    var language by remember {mutableStateOf("en")}
-    var packReady by remember {mutableStateOf(MultilingualModelPack.available(context))}
+    var liveSpeech by remember {mutableStateOf(CommandSpeech.load(context))}
+    var selectedPack by remember {mutableStateOf(liveSpeech?.model ?: MultilingualModelPack.SMALL)}
+    var multilingual by remember {mutableStateOf(liveSpeech!=null || MultilingualModelPack.available(context,selectedPack))}
+    var language by remember {mutableStateOf(liveSpeech?.language ?: "en")}
+    var packReady by remember {mutableStateOf(MultilingualModelPack.available(context,selectedPack))}
     var clipNumber by remember {mutableIntStateOf(0)}
     var clipMicrophone by remember {mutableStateOf("")}
     var clipEffects by remember {mutableStateOf("")}
@@ -239,7 +240,8 @@ import kotlinx.coroutines.*
                     catch(e:Exception){status="The setting could not be saved. Please retry or close this check."}
                 },enabled=!busy){Text("Save calibrated setting")}
                 if(transcriptionOnly && ready && !busy) {
-                    Text("Speech model · diagnostic only")
+                    Text("Speech model")
+                    Text("Live requests use ${liveSpeech?.label ?: "the built-in English recognizer"}.")
                     MultilingualModelPack.models.forEach {model->
                         FilterChip(multilingual && selectedPack==model,{
                             multilingual=true;selectedPack=model;packReady=MultilingualModelPack.available(context,model)
@@ -259,10 +261,25 @@ import kotlinx.coroutines.*
                         }
                     }){Text(if(packReady)"Verify or repair selected model" else "Download model · ${selectedPack.bytes/1000000} MB")}
                     if(multilingual)FlowRow(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-                        listOf("en" to "English","hi" to "Hindi","bn" to "Bengali","" to "Auto").forEach {(code,label)->
+                        CommandSpeech.languages.forEach {(code,label)->
                             FilterChip(language==code,{language=code},label={Text(label)})
                         }
                     }
+                    if(multilingual && selectedPack!=MultilingualModelPack.TURBO_FULL_DECODER) {
+                        Text("For short requests, enable Voice & wake word. After “Hey Elliot”, pause before your request. Transcription can take several seconds.")
+                        TextButton(onClick={
+                            try {
+                                val selection=CommandSpeech(selectedPack,language)
+                                CommandSpeech.save(context,selection)
+                                liveSpeech=selection
+                                onClose()
+                            }catch(e:Exception){status="The speech pack could not be selected. Verify it and try again."}
+                        },enabled=packReady){Text("Use for live requests")}
+                    }
+                    if(liveSpeech!=null)TextButton(onClick={
+                        try {CommandSpeech.save(context,null);liveSpeech=null;onClose()}
+                        catch(e:Exception){status="The speech selection could not be changed."}
+                    }){Text("Use built-in English for live requests")}
                     Text(when(if(multilingual)language else "en") {
                         "hi"->"Say: Elliot, मेरे फोन का battery level कितना है?"
                         "bn"->"Say: Elliot, আমার ফোনের battery level কত?"

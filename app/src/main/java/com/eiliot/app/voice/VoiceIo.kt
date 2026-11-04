@@ -205,11 +205,11 @@ object VoiceIo {
         main.postDelayed({ if (SentinelRuntime.alive(epoch)) WakeListener.resumeWhenIdle() }, 500)
     }
     fun usesDeviceRecognizer() = recognizer != null
-    fun beginLocalListening(origin: String): Long {
+    fun beginLocalListening(origin: String, modelLabel: String? = null): Long {
         stopListening()
         val ticket = VoiceSession.gate.begin(SentinelRuntime.epoch, VoicePhase.LISTENING, origin)
         localTicket = ticket; _isListening.value = true; transcript.value = ""
-        status.value = "Offline English conversation · say your request"
+        status.value = modelLabel?.let { "$it · say your request" } ?: "Offline English conversation · say your request"
         OverlayManager.setOrbState(OrbState.LISTENING)
         return ticket
     }

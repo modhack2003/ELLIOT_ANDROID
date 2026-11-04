@@ -7,6 +7,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.eiliot.app.core.SentinelRuntime
+import com.eiliot.app.tools.LocalCommands
 import com.eiliot.app.voice.*
 import com.eiliot.app.voice.remote.*
 import kotlinx.coroutines.*
@@ -24,9 +25,9 @@ class WhisperDeviceTest {
         checkModel(MultilingualModelPack.SMALL)
     }
     @Test fun multilingualTurboLoadsAndTranscribesOnVivo():Unit=runBlocking {
-        checkModel(MultilingualModelPack.TURBO)
+        checkModel(MultilingualModelPack.TURBO, liveCommand=true)
     }
-    private suspend fun checkModel(model:MultilingualModelPack.Spec) {
+    private suspend fun checkModel(model:MultilingualModelPack.Spec, liveCommand:Boolean=false) {
         withContext(Dispatchers.IO) {
             MultilingualModelPack.prepare(app,model){progress->
                 InstrumentationRegistry.getInstrumentation().sendStatus(0,Bundle().apply {putString("model_preparation",progress)})
@@ -37,7 +38,18 @@ class WhisperDeviceTest {
             val source=FloatArray(chunks.sumOf{it.size});var at=0
             chunks.forEach{it.copyInto(source,at);at+=it.size}
             val rate=tts.sampleRate()
-            val audio=FloatArray(source.size*16000/rate){i->source[minOf((i.toLong()*rate/16000).toInt(),source.lastIndex)]}
+            val generated=FloatArray(source.size*16000/rate){i->source[minOf((i.toLong()*rate/16000).toInt(),source.lastIndex)]}
+            val audio=if(liveCommand) {
+                val input=FloatArray(8192)+generated+FloatArray(32000)
+                val capture=CommandUtterance(waitForWakePause=true)
+                val vad=RemoteVad()
+                try {
+                    input.indices.step(512).firstNotNullOf {at->
+                        val frame=FloatArray(512) {i->input.getOrElse(at+i){0f}}
+                        (capture.accept(frame,vad.compute(frame)) as? CommandUtterance.Result.Ready)?.pcm
+                    }
+                }finally {capture.clear();vad.release()}
+            }else generated
             val started=SystemClock.elapsedRealtime();val recognizer=RemoteWhisper("en",model.id)
             try {
                 val loadMs=SystemClock.elapsedRealtime()-started
@@ -48,6 +60,7 @@ class WhisperDeviceTest {
                     putString("audio_seconds",(audio.size/16000.0).toString());putString("synthetic_text",text)
                 })
                 assertTrue("Whisper output: $text",text.contains("battery",ignoreCase=true))
+                if(liveCommand)assertEquals("Whisper output: $text","device_info",LocalCommands.parse(text){emptyList()}?.name)
                 assertThrows(IllegalArgumentException::class.java){recognizer.transcribe(FloatArray(29*16000))}
             }finally{recognizer.release()}
         }

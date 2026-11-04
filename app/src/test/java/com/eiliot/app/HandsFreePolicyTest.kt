@@ -106,6 +106,10 @@ class HandsFreePolicyTest {
         assertEquals("com.example.video",JSONObject(LocalCommands.parse("open YouTube") { apps }!!.arguments).getString("package"))
         assertNull(LocalCommands.parse("open YouTube") { apps + LaunchableApp("YouTube","com.example.other") })
         assertNull(LocalCommands.parse("don't set volume to 30 percent") { emptyList() })
+        for(question in listOf("What is my battery level?", "मेरे फोन का battery level कितना है।", "আমার ফোনের battery level কত?")) {
+            assertEquals("device_info",LocalCommands.parse(question) {emptyList()}?.name)
+        }
+        assertNull(LocalCommands.parse("What does my back to deliver") {emptyList()})
     }
     @Test fun spokenDurationsAreBoundedAndSupportCompoundUnits() {
         assertEquals(3720,SpokenNumbers.timerSeconds("one hour and two minutes"))

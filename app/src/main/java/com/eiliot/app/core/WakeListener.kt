@@ -11,7 +11,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.concurrent.atomic.AtomicBoolean
 
-/** One capture: restricted KWS at idle; full streaming ASR only during an utterance. */
+/** One microphone capture, with restricted keyword spotting at idle. */
 object WakeListener {
     @Volatile var calibrationActive=false
     val status=MutableStateFlow("Preparing offline listening")
@@ -23,7 +23,10 @@ object WakeListener {
     @Volatile private var running=false
     @Volatile private var generation=0L
     @Volatile private var ready=false
-    private data class Turn(val ticket:Long,val epoch:Long,val origin:String,val deadline:ListeningDeadline,val includePreRoll:Boolean)
+    private data class Turn(
+        val ticket:Long,val epoch:Long,val origin:String,val deadline:ListeningDeadline,
+        val includePreRoll:Boolean,val commandSpeech:CommandSpeech?
+    )
     @Volatile private var turn:Turn?=null
     private var timeout:Runnable?=null
     private var lastTrigger=0L
@@ -49,9 +52,10 @@ object WakeListener {
     fun beginInput(origin:String,includePreRoll:Boolean=true):Boolean {
         if(!available() || !SentinelRuntime.alive())return false
         cancelTurn()
-        val ticket=VoiceIo.beginLocalListening(origin)
+        val commandSpeech=if(origin=="live call")null else CommandSpeech.load(SentinelRuntime.context)
+        val ticket=VoiceIo.beginLocalListening(origin,commandSpeech?.label)
         val deadline=ListeningDeadline(android.os.SystemClock.elapsedRealtime(),if(origin=="live call")75000 else 18000)
-        turn=Turn(ticket,SentinelRuntime.epoch,origin,deadline,includePreRoll);reset.set(true)
+        turn=Turn(ticket,SentinelRuntime.epoch,origin,deadline,includePreRoll,commandSpeech);reset.set(true)
         val expiry=object:Runnable {
             override fun run() {
                 if(turn?.ticket!=ticket)return
@@ -65,6 +69,13 @@ object WakeListener {
         return true
     }
     fun cancelTurn() { timeout?.let(main::removeCallbacks);timeout=null;turn=null;reset.set(true) }
+    private fun finishCommand(current:Turn,heard:String?,error:String?=null) {
+        if(turn?.ticket!=current.ticket || !VoiceSession.gate.accepts(current.ticket,current.epoch))return
+        cancelTurn()
+        VoiceIo.endLocalListening(current.ticket)
+        if(heard.isNullOrBlank())EiliotBrain.notice(error ?: "No request recognized. Please try again.")
+        else EiliotBrain.receiveVoice(heard)
+    }
     fun suspendCapture() {
         generation++;ready=false;cancelTurn();main.removeCallbacks(resume)
         val old=input;input=null;old?.stopCapture();capture?.cancel()
@@ -84,6 +95,10 @@ object WakeListener {
             var audio:VoiceAudioInput?=null
             var noiseReducer:RemoteDenoiser?=null
             var enhancedFrames:PcmFrameBuffer?=null
+            var utterance:CommandUtterance?=null
+            var commandTicket=Long.MIN_VALUE
+            var decoderJob:Job?=null
+            var decodingTicket=Long.MIN_VALUE
             try {
                 status.value="Getting your offline voice ready"
                 val root=ModelAssets.await(SentinelRuntime.context)
@@ -116,7 +131,7 @@ object WakeListener {
                 var diagnosticPeak=0f
                 var diagnosticEnergy=0.0
                 echoStatus.value=if(audio.echoEnabled)"Device echo cancellation is on" else "Headphones can help avoid speaker echo"
-                val processFrame:(FloatArray)->Unit={ frame ->
+                val processFrame:(FloatArray)->Unit=process@ { frame ->
                     if(gen!=generation || !SentinelRuntime.alive(epoch))throw CancellationException()
                     if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS) {
                         diagnosticFrames++
@@ -133,7 +148,12 @@ object WakeListener {
                     preroll.add(frame)
                     val probability=detector.compute(frame)
                     val current=turn
-                    if(probability>.65f)current?.deadline?.speech(android.os.SystemClock.elapsedRealtime())
+                    if(current?.ticket!=commandTicket) {
+                        utterance?.clear()
+                        utterance=null
+                    }
+                    if(current?.ticket!=decodingTicket)decoderJob?.cancel()
+                    if(probability>.65f && current?.commandSpeech==null)current?.deadline?.speech(android.os.SystemClock.elapsedRealtime())
                     val eligible=liveCall.value && current==null && !VoiceIo.usesDeviceRecognizer()
                     if(onset.accept(probability,eligible) && activationPending.compareAndSet(false,true)) {
                         main.post {
@@ -170,6 +190,54 @@ object WakeListener {
                         }
                     } else if(current!=null && VoiceSession.gate.accepts(current.ticket,current.epoch)) {
                         val needsReset=reset.getAndSet(false)
+                        val commandSpeech=current.commandSpeech
+                        if(commandSpeech!=null) {
+                            if(decodingTicket==current.ticket)return@process
+                            if(utterance==null || needsReset) {
+                                stream?.release()
+                                stream=null
+                                utterance?.clear()
+                                utterance=CommandUtterance(current.origin=="wake" && current.includePreRoll)
+                                commandTicket=current.ticket
+                            }
+                            val recording=checkNotNull(utterance)
+                            val result=recording.accept(frame,probability)
+                            if(recording.speechStarted)current.deadline.speech(android.os.SystemClock.elapsedRealtime())
+                            if(result==null)return@process
+                            recording.clear()
+                            utterance=null
+                            val previous=decoderJob
+                            decodingTicket=current.ticket
+                            if(result is CommandUtterance.Result.TooLong) {
+                                main.post {finishCommand(current,null,"Please keep this voice request under 12 seconds.")}
+                                return@process
+                            }
+                            val pcm=(result as CommandUtterance.Result.Ready).pcm
+                            main.post {
+                                if(turn?.ticket==current.ticket)EiliotBrain.notice("Transcribing on this phone…")
+                            }
+                            decoderJob=launch {
+                                try {
+                                    previous?.join()
+                                    ensureActive()
+                                    val started=android.os.SystemClock.elapsedRealtime()
+                                    val whisper=RemoteWhisper(commandSpeech.language,commandSpeech.model.id)
+                                    val raw=try {whisper.transcribe(pcm)}finally {runCatching {whisper.release()}}
+                                    if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS) {
+                                        android.util.Log.i("ElliotWake","command model=${commandSpeech.model.id}; language=${commandSpeech.language}; samples=${pcm.size}; elapsedMs=${android.os.SystemClock.elapsedRealtime()-started}; recognized=${raw.isNotBlank()}")
+                                    }
+                                    val heard=raw.takeUnless { '\uFFFD' in it }?.let {TranscriptNormalizer.normalize(it,apps)}
+                                    withContext(Dispatchers.Main) {finishCommand(current,heard)}
+                                }catch(e:CancellationException) {
+                                    throw e
+                                }catch(e:Exception) {
+                                    withContext(Dispatchers.Main) {
+                                        finishCommand(current,null,"Offline transcription failed. Verify the selected speech pack in Settings.")
+                                    }
+                                }
+                            }.also {job->job.invokeOnCompletion {pcm.fill(0f)}}
+                            return@process
+                        }
                         if(decodedTicket!=current.ticket || needsReset) {
                             stream?.release();stream=asr.createStream(hotwords);decodedTicket=current.ticket
                             stream!!.acceptWaveform(if(current.includePreRoll)preroll.snapshot()else frame,16000)
@@ -210,6 +278,7 @@ object WakeListener {
                     main.post { if(gen==generation) {val pending=turn;cancelTurn();pending?.let {VoiceIo.endLocalListening(it.ticket)}} }
                 }
             } finally {
+                utterance?.clear()
                 audio?.onFrame=null;runCatching { audio?.close() }
                 enhancedFrames?.clear();runCatching{noiseReducer?.release()}
                 runCatching { stream?.release() };runCatching { recognizer?.release() };runCatching { kws?.close() };runCatching { vad?.release() }

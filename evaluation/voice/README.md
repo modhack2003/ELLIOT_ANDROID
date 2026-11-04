@@ -50,9 +50,12 @@ guarantee of unprocessed hardware audio. Runtime diagnostics default off.
 
 ## Reusing one recording for model comparisons (dev.6)
 
-Settings > Check speech recognition is isolated from assistant actions. Optional
-Whisper Small (375 MB) and Large-v3 Turbo (1036 MB) are diagnostic candidates;
-normal wake/manual commands still use the bundled English recognizer.
+Recordings made in Settings > Check speech recognition are isolated from
+assistant actions. Whisper Small (375 MB) and Large-v3 Turbo (1036 MB) can also
+be selected for short live requests with **Use for live requests**. This uses
+the offline microphone capture while Voice & wake word is enabled. Pause
+after the wake phrase before giving a request. The bundled English recognizer
+remains the default and handles live calls.
 `model-candidates.json` records their exact revisions, files and hashes. Download
 the selected pack in the screen; Verify or repair detects same-size corruption.
 No model file is accepted solely because it has the expected filename or size.

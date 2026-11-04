@@ -1,6 +1,6 @@
 {
-  "release": "0.6.3-dev.21",
-  "version_code": 31,
+  "release": "0.6.3-dev.22",
+  "version_code": 32,
   "runtime": {
     "name": "sherpa-onnx",
     "version": "1.13.8",
@@ -36,7 +36,7 @@
   "voice_contract": "app/src/main/assets/voice-engine.json",
   "optional_asr": {
     "runtime": "sherpa-onnx 1.13.8, CPU, 4 threads for Whisper",
-    "scope": "Diagnostic screen only; normal commands still use English streaming Zipformer 20M",
+    "scope": "Small and Turbo int8 are opt-in for short live requests and available for diagnostics. Zipformer 20M remains the default and handles live calls. The unquantized Turbo decoder is diagnostic only.",
     "model_catalog_source": "app/src/main/java/com/eiliot/app/voice/MultilingualModelPack.kt",
     "task": "transcribe",
     "languages_to_evaluate": [

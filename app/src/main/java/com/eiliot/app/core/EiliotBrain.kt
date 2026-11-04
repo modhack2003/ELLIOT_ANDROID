@@ -14,6 +14,7 @@ import com.eiliot.app.tools.*
 import com.eiliot.app.overlay.OrbState
 import com.eiliot.app.overlay.OverlayManager
 import com.eiliot.app.voice.VoiceIo
+import com.eiliot.app.voice.CommandSpeech
 import com.eiliot.app.voice.VoiceSession
 import com.eiliot.app.voice.VoicePhase
 import com.eiliot.app.capabilities.CapabilityRegistry
@@ -66,6 +67,10 @@ object EiliotBrain {
         if (!SentinelRuntime.alive()) { _state.value = _state.value.copy(status = "Resume ELLIOT first"); return }
         if (VoiceIo.isSpeaking.value || VoiceIo.isListening.value || state.value.busy) { cancelCurrent(); return }
         if (WakeListener.beginInput("tap")) { _state.value = state.value.copy(status = "Listening…", error = null); return }
+        if (CommandSpeech.load(SentinelRuntime.context) != null) {
+            notice("Offline command listening is unavailable. Check Voice & wake word in Settings.")
+            return
+        }
         _state.value = _state.value.copy(status = "Listening…", error = null)
         VoiceIo.startListening(onResult = { receiveVoice(it) }, onError = {
             _state.value = _state.value.copy(status = it); WakeListener.resumeWhenIdle()
@@ -100,6 +105,7 @@ object EiliotBrain {
     fun listenForFollowUp(allowBusy: Boolean = false) {
         if (!SentinelRuntime.alive() || (!allowBusy && state.value.busy) || VoiceIo.isListening.value || VoiceIo.isSpeaking.value) return
         if (WakeListener.beginInput("follow-up")) { notice("Listening for your reply…"); return }
+        if (CommandSpeech.load(SentinelRuntime.context) != null) return
         VoiceIo.startListening(onResult = { receiveVoice(it) }, onError = { notice(it) })
     }
     fun receiveVoice(raw: String) {

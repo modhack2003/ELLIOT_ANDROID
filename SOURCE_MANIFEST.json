@@ -1,6 +1,6 @@
 {
-  "release": "0.6.3-dev.21",
-  "version_code": 31,
+  "release": "0.6.3-dev.22",
+  "version_code": 32,
   "files": [
     {
       "path": ".gitignore",
@@ -34,8 +34,8 @@
     },
     {
       "path": "MODEL_SOURCES.json",
-      "bytes": 7280,
-      "sha256": "c99dd4d4d1deb482a24a311d33a7502136e0dfe0f03d5c7f9f57cfdd9c15f88b"
+      "bytes": 7393,
+      "sha256": "b8a15e9c39fc636aa293ff3d31f41cccbe187b5a097e53232241d87f99b0505b"
     },
     {
       "path": "NEXT_BUILD_PLAN.md",
@@ -75,7 +75,7 @@
     {
       "path": "app/build.gradle.kts",
       "bytes": 5221,
-      "sha256": "ac26eb7f5689ed01c3982c75c918c0836182e0e408d1c67ff876e8730e77b2c3"
+      "sha256": "fb5153b7086651b4c5cc8d7ab7cce7f682153e2cad7627ffcb2c57fbbd964946"
     },
     {
       "path": "app/libs/sherpa-onnx-1.13.8.aar",
@@ -94,8 +94,8 @@
     },
     {
       "path": "app/src/androidTest/java/com/eiliot/app/WhisperDeviceTest.kt",
-      "bytes": 3154,
-      "sha256": "3f4e95674753002f0fa168a03b538d3b0fe5187a299584a32c86e86fb29d1faf"
+      "bytes": 3969,
+      "sha256": "63c994676c297b32420832078b3464979132b068e0f05ab5859beca70fbfd6f5"
     },
     {
       "path": "app/src/main/AndroidManifest.xml",
@@ -2079,8 +2079,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/core/EiliotBrain.kt",
-      "bytes": 20927,
-      "sha256": "ea9974a4a380db5820ca41a96f9aa6839df48477f7d4f34849ca3f097ba044bf"
+      "bytes": 21238,
+      "sha256": "75945947d9348564547635db68a5b4a19bc2152ac27231772ec9dd7f24e3f9f9"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/core/EiliotNotificationListener.kt",
@@ -2124,8 +2124,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/core/WakeListener.kt",
-      "bytes": 15180,
-      "sha256": "2a459d981bb3d4c1643bf83c6ab990d93fb41ecda770a21246d007b512130aa4"
+      "bytes": 19711,
+      "sha256": "41cf427e6d7f1bc537fc84a197c4d7aeac5b960d562468772bf189efa7754455"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/data/CryptoVault.kt",
@@ -2239,8 +2239,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/tools/LocalCommands.kt",
-      "bytes": 3486,
-      "sha256": "0e8b53679d0f990677c2770b61d961ba604e9e3ca02d9acad40ceab73e86baad"
+      "bytes": 3914,
+      "sha256": "50c21e766f555f57e79b424d6cde59408a38e635b0d3710b303f6ebd5dbd887c"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/tools/PhoneTools.kt",
@@ -2369,13 +2369,23 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/VoiceCalibrationDialog.kt",
-      "bytes": 23914,
-      "sha256": "22ee242208fbd1abefa1e2c9640dd03046fefaaffe6f0831d1c20bdeb51f5b6d"
+      "bytes": 25266,
+      "sha256": "86eecd0ee51b5c2a6dab97f3ea79ff852e4bb5bb85dce5b400e95adbf170684e"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/AcousticWake.kt",
       "bytes": 9494,
       "sha256": "295819c8ce2eefa1ed4c8cd3b051ca260049e95ba2aa45f1c51c2e3fca83a755"
+    },
+    {
+      "path": "app/src/main/java/com/eiliot/app/voice/CommandSpeech.kt",
+      "bytes": 1252,
+      "sha256": "acbf5a94b5edf5f3c3a03523fe848634ca6c1d509b2067ff581149b8130151eb"
+    },
+    {
+      "path": "app/src/main/java/com/eiliot/app/voice/CommandUtterance.kt",
+      "bytes": 1739,
+      "sha256": "e20337f4202e3b85bb6fa9067b9688483b3d9766b2194625c0361d154a928122"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/DiagnosticWav.kt",
@@ -2424,8 +2434,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/VoiceIo.kt",
-      "bytes": 18305,
-      "sha256": "ad2032947b0c763357aeba67c87f1792d23bcbcfcc4a6fea61ee8ec5c3714236"
+      "bytes": 18382,
+      "sha256": "45c476886ae2e0289be399173ec065685d5c9a88c08a79dcf93765566aeefd05"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/VoiceModelContract.kt",
@@ -2543,6 +2553,11 @@
       "sha256": "95348240d6e5491fbc61dfd4bcc0699b7e14ab51769b1bff4d43949e9c16cf47"
     },
     {
+      "path": "app/src/test/java/com/eiliot/app/CommandUtteranceTest.kt",
+      "bytes": 1611,
+      "sha256": "e55e4deb700db9b0ebe9a0d5c19333772f1b3aaeaeff3d4b20d4e36902bede3c"
+    },
+    {
       "path": "app/src/test/java/com/eiliot/app/CompanionToolsTest.kt",
       "bytes": 11054,
       "sha256": "f0acb9ee0e5c6bc4b672bfc5e56c22160cb29df5f88ef893376b43ad7e24dde3"
@@ -2564,8 +2579,8 @@
     },
     {
       "path": "app/src/test/java/com/eiliot/app/HandsFreePolicyTest.kt",
-      "bytes": 7355,
-      "sha256": "44a17fe6bbea713eaf15a8699ebc80110c141dcbdab51b07145a1be7d1b3a275"
+      "bytes": 7731,
+      "sha256": "2179c8a779de39bea06bc8c2691e00d720be26ab8c21beeea11bec66db94da3b"
     },
     {
       "path": "app/src/test/java/com/eiliot/app/ListeningPolicyTest.kt",
@@ -3044,13 +3059,13 @@
     },
     {
       "path": "evaluation/voice/README.md",
-      "bytes": 4661,
-      "sha256": "64a478bb08d71c1aba106349bbdc22ccb7c6e5c6273ce077b4a39bc22bd215ea"
+      "bytes": 4857,
+      "sha256": "ae357d96f9fc30df9ac5c71d2630348d0b854a581d437a69c76082ea0c39f1ed"
     },
     {
       "path": "evaluation/voice/model-candidates.json",
-      "bytes": 3104,
-      "sha256": "2906c2e32d36047426f9a44339df00cb458bbc2d27c21854b7eac677784b2120"
+      "bytes": 3217,
+      "sha256": "d53faaf0740049dc648c97f3a6bbde789a0e618407b5c34909d93114b612b3fe"
     },
     {
       "path": "evaluation/voice/prompts.json",
