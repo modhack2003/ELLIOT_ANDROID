@@ -89,7 +89,10 @@ object WakeListener {
                 val root=ModelAssets.await(SentinelRuntime.context)
                 NativeSpeechClient.connect(SentinelRuntime.context)
                 val calibration=VoiceCalibrationStore.load(SentinelRuntime.context)
-                val spotter=RemoteKeywordSpotter(calibration?.score,calibration?.threshold,calibration?.alternateNames?:false)
+                val spotter=RemoteKeywordSpotter(
+                    calibration?.score,calibration?.threshold,
+                    calibration?.alternateNames?:false,calibration?.phonemeModel?:false
+                )
                 kws=spotter;val keywordStream=spotter.createStream();kwsStream=keywordStream
                 val asr=RemoteRecognizer()
                 recognizer=asr
@@ -108,7 +111,7 @@ object WakeListener {
                 audio=VoiceAudioInput(SentinelRuntime.context,direct,reduceNoise) { }
                 ensureActive();check(gen==generation && SentinelRuntime.alive(epoch))
                 input=audio;ready=true
-                if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "capture ready; direct=$direct; live=${liveCall.value}; wake=${SentinelRuntime.store.wakeEnabled}; echo=${audio.echoEnabled}; noise=${audio.noiseEnabled}; gain=${audio.gainEnabled}; enhanced=$enhanced")
+                if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "capture ready; direct=$direct; live=${liveCall.value}; wake=${SentinelRuntime.store.wakeEnabled}; echo=${audio.echoEnabled}; noise=${audio.noiseEnabled}; gain=${audio.gainEnabled}; enhanced=$enhanced; wakeProfile=${calibration?.label?:"Original"}")
                 var diagnosticAt=android.os.SystemClock.elapsedRealtime()
                 var diagnosticFrames=0
                 var diagnosticPeak=0f

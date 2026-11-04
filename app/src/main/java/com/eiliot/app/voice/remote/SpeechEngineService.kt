@@ -53,7 +53,9 @@ class SpeechEngineService:Service() {
         when(op) {
             "kws"->{
                 val setting=WakeSetting(false,a.getFloat("score",2f),a.getFloat("threshold",.15f))
-                out.putLong("id",hold(KeywordSpotter(config=KeywordSpotterConfig(modelConfig=model("kws"),keywordsFile="${root.path}/kws/keywords.txt",keywordsScore=setting.score,keywordsThreshold=setting.threshold,numTrailingBlanks=1))))
+                val kind=if(a.getBoolean("phoneme_model"))"phoneme_kws" else "kws"
+                val folder=contract.spec(kind).folder
+                out.putLong("id",hold(KeywordSpotter(config=KeywordSpotterConfig(modelConfig=model(kind),keywordsFile="${root.path}/$folder/keywords.txt",keywordsScore=setting.score,keywordsThreshold=setting.threshold,numTrailingBlanks=1))))
             }
             "asr"->out.putLong("id",hold(OnlineRecognizer(config=OnlineRecognizerConfig(modelConfig=model("asr"),decodingMethod="modified_beam_search",maxActivePaths=4,hotwordsScore=1.5f,enableEndpoint=true,endpointConfig=EndpointConfig(EndpointRule(false,2.4f,0f),EndpointRule(true,1.4f,0f),EndpointRule(false,0f,60f))))))
             "whisper"->{

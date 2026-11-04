@@ -72,10 +72,10 @@ import kotlinx.coroutines.*
                 clip=audio
                 if(recordNew) {discardCleaned();lastClip?.fill(0f);lastClip=audio.copyOf();clipNumber++;clipMicrophone=if(referenceStt)"Direct"else "Processed";transcript=""}
                 check(WakeCalibration.usable(audio)){"Quiet or distorted recording"}
-                status="Checking the same recording with original and alternate name spellings…"
+                status="Checking the same recording with both wake models…"
                 val rows=WakeCalibration.settings(referenceStt,WakeCapturePreference.noiseReduction(context),clipEnhanced).map {setting->
                     val hits=WakeCalibration.detectHits(setting,audio)
-                    "${if(setting.alternateNames)"Alternate names"else "Original"} · ${setting.score}/${setting.threshold}: ${hits.joinToString().ifEmpty {"missed"}}"
+                    "${setting.label} · ${setting.score}/${setting.threshold}: ${hits.joinToString().ifEmpty {"missed"}}"
                 }
                 transcript="Wake replay · recording $clipNumber · $clipMicrophone · $clipEffects:\n"+rows.joinToString("\n")
                 status="Wake check complete. These results do not change your settings. Ordinary speech and fresh wake checks must pass before saving sensitivity."
@@ -98,7 +98,7 @@ import kotlinx.coroutines.*
                 status="Checking wake detection on the cleaned recording…"
                 val rows=WakeCalibration.settings(referenceStt).map {setting->
                     val hits=WakeCalibration.detectHits(setting,audio)
-                    "${if(setting.alternateNames)"Alternate names"else "Original"} · ${setting.score}/${setting.threshold}: ${hits.joinToString().ifEmpty {"missed"}}"
+                    "${setting.label} · ${setting.score}/${setting.threshold}: ${hits.joinToString().ifEmpty {"missed"}}"
                 }
                 discardCleaned();cleanedClip=audio;cleaned=null
                 val report="Cleaned wake replay · recording $clipNumber · GTCRN:\n"+rows.joinToString("\n")
@@ -188,8 +188,8 @@ import kotlinx.coroutines.*
                 Text(if(transcriptionOnly)"Record a sentence, compare the recognized words, and listen back. Audio stays in memory unless you tap Save one local test recording. No command will run."
                     else "We compare two microphone paths using your normal accent. Audio stays in memory and is discarded when you close. This does not train the speech model.")
                 Text(status)
-                if(!transcriptionOnly && step>=12)assessments.forEachIndexed {i,result->
-                        Text("Microphone ${if(result.setting.referenceCapture)2 else 1}, ${if(result.setting.alternateNames)"alternate names"else "original"}, sensitivity ${i%4+1}: Hey Elliot ${result.phraseHits["hey"]?:0}/2; Elliot ${result.phraseHits["name"]?:0}/2; unwanted wakes ${result.falseHits}/2.",style=MaterialTheme.typography.bodySmall)
+                if(!transcriptionOnly && step>=12)assessments.forEach {result->
+                        Text("Microphone ${if(result.setting.referenceCapture)2 else 1}, ${result.setting.label}, ${result.setting.score}/${result.setting.threshold}: Hey Elliot ${result.phraseHits["hey"]?:0}/2; Elliot ${result.phraseHits["name"]?:0}/2; unwanted wakes ${result.falseHits}/2.",style=MaterialTheme.typography.bodySmall)
                 }
                 if(!transcriptionOnly && (step<12 || (step<16 && candidate!=null))) {
                     val index=if(step<12)step%6 else step-12

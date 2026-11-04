@@ -8,7 +8,13 @@ import com.eiliot.app.voice.remote.*
 import kotlinx.coroutines.*
 import java.security.MessageDigest
 
-data class WakeSetting(val referenceCapture:Boolean,val score:Float=2f,val threshold:Float=.15f,val alternateNames:Boolean=false,val noiseReduction:Boolean=false,val softwareNoiseReduction:Boolean=false) {
+data class WakeSetting(val referenceCapture:Boolean,val score:Float=2f,val threshold:Float=.15f,val alternateNames:Boolean=false,val noiseReduction:Boolean=false,val softwareNoiseReduction:Boolean=false,val phonemeModel:Boolean=false) {
+    val label get()=when {
+        phonemeModel && alternateNames -> "Phoneme accent"
+        phonemeModel -> "Phoneme dictionary"
+        alternateNames -> "Alternate names"
+        else -> "Original"
+    }
     init {require(score.isFinite() && score in 1f..3.5f);require(threshold.isFinite() && threshold in .05f.. .3f)}
 }
 data class WakeTrial(val phrase:String,val positive:Boolean,val audio:FloatArray)
@@ -32,11 +38,11 @@ object VoiceCalibrationStore {
     }
     fun load(c:Context):WakeSetting?=runCatching {
         val p=c.getSharedPreferences("voice_calibration",0)
-        if(p.getString("model",null)!=fingerprint(c))null else WakeSetting(p.getBoolean("reference",false),p.getFloat("score",2f),p.getFloat("threshold",.15f),p.getBoolean("alternate_names",false),p.getBoolean("reduce_noise",false),p.getBoolean("software_noise",false))
+        if(p.getString("model",null)!=fingerprint(c))null else WakeSetting(p.getBoolean("reference",false),p.getFloat("score",2f),p.getFloat("threshold",.15f),p.getBoolean("alternate_names",false),p.getBoolean("reduce_noise",false),p.getBoolean("software_noise",false),p.getBoolean("phoneme_model",false))
     }.getOrNull()
     fun save(c:Context,s:WakeSetting) {check(c.getSharedPreferences("voice_calibration",0).edit()
         .putString("model",fingerprint(c)).putBoolean("reference",s.referenceCapture)
-        .putFloat("score",s.score).putFloat("threshold",s.threshold).putBoolean("alternate_names",s.alternateNames).putBoolean("reduce_noise",s.noiseReduction).putBoolean("software_noise",s.softwareNoiseReduction).commit())}
+        .putFloat("score",s.score).putFloat("threshold",s.threshold).putBoolean("alternate_names",s.alternateNames).putBoolean("reduce_noise",s.noiseReduction).putBoolean("software_noise",s.softwareNoiseReduction).putBoolean("phoneme_model",s.phonemeModel).commit())}
     fun clear(c:Context) {check(c.getSharedPreferences("voice_calibration",0).edit().clear().commit())}
 }
 object WakeCalibration {
@@ -58,10 +64,21 @@ object WakeCalibration {
         val rms=kotlin.math.sqrt(audio.sumOf {it.toDouble()*it}/audio.size)
         return rms>.001 && audio.count {kotlin.math.abs(it)>.99f}.toDouble()/audio.size<.03
     }
-    fun settings(reference:Boolean,noiseReduction:Boolean=false,softwareNoiseReduction:Boolean=false)=listOf(false,true).flatMap {alternate->listOf(2f to .15f,2.5f to .1f,3f to .08f,3.5f to .05f).map {(score,threshold)->WakeSetting(reference,score,threshold,alternate,noiseReduction,softwareNoiseReduction)}}
+    fun settings(reference:Boolean,noiseReduction:Boolean=false,softwareNoiseReduction:Boolean=false):List<WakeSetting> {
+        val base=WakeSetting(reference,noiseReduction=noiseReduction,softwareNoiseReduction=softwareNoiseReduction)
+        val original=listOf(false,true).flatMap {alternate->
+            listOf(2f to .15f,2.5f to .1f,3f to .08f,3.5f to .05f).map {(score,threshold)->
+                base.copy(score=score,threshold=threshold,alternateNames=alternate)
+            }
+        }
+        val phoneme=base.copy(score=2.5f,threshold=.1f,phonemeModel=true)
+        return original+listOf(phoneme,phoneme.copy(alternateNames=true))
+    }
     suspend fun detect(setting:WakeSetting,audio:FloatArray):Boolean=detectHits(setting,audio).isNotEmpty()
     suspend fun detectHits(setting:WakeSetting,audio:FloatArray):List<String> =withContext(Dispatchers.IO) {
-        val kws=RemoteKeywordSpotter(setting.score,setting.threshold,setting.alternateNames);val stream=kws.createStream();val found=mutableListOf<String>()
+        val kws=RemoteKeywordSpotter(setting.score,setting.threshold,setting.alternateNames,setting.phonemeModel)
+        val stream=try {kws.createStream()}catch(e:Exception){runCatching{kws.release()};throw e}
+        val found=mutableListOf<String>()
         try {
             for(offset in 0 until audio.size+24000 step 512) {
                 ensureActive()

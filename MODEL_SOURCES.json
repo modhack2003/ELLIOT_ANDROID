@@ -1,6 +1,6 @@
 {
-  "release": "0.6.3-dev.14",
-  "version_code": 24,
+  "release": "0.6.3-dev.15",
+  "version_code": 25,
   "runtime": {
     "name": "sherpa-onnx",
     "version": "1.13.8",
@@ -128,5 +128,44 @@
     "sha256": "e77603ac0c23dac3227dd2d7135b3a585cbee2679048aecfa886657d3ae1b534",
     "license": "MIT",
     "upstream": "https://github.com/Xiaobin-Rong/gtcrn"
+  },
+  "phoneme_kws": {
+    "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/kws-models/sherpa-onnx-kws-zipformer-zh-en-3M-2025-12-20.tar.bz2",
+    "archive_sha256": "68447f4fbc67e70eee3a93961f36e81e98f47aef73ce7e7ca00885c6cd3616a6",
+    "license": "Apache-2.0",
+    "training_source": "https://modelscope.cn/models/pkufool/icefall-kws-zipformer-zh-en-3M-2025-12-20",
+    "files": [
+      {
+        "path": "kws-phone/decoder.onnx",
+        "bytes": 759829,
+        "sha256": "63a22dd60f40fff082ac3e09afa507f6787da36df76ded2fbe145fa233e22c21"
+      },
+      {
+        "path": "kws-phone/encoder.onnx",
+        "bytes": 4599656,
+        "sha256": "408bbd740838c42d5bf6d1c5b80b3c88b616c7860b92d980328b5b068c76ae48"
+      },
+      {
+        "path": "kws-phone/joiner.onnx",
+        "bytes": 86629,
+        "sha256": "190d4067b4cc20b72a42a1916e69d92052000fb7051a427ebb1bc72a69207dc1"
+      },
+      {
+        "path": "kws-phone/keywords.txt",
+        "bytes": 61,
+        "sha256": "7632be3107ad4ff0e10031aeca0a97b9c1a8ae4d2821962530b7fa59c53aef0c"
+      },
+      {
+        "path": "kws-phone/LICENSE.txt",
+        "bytes": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      {
+        "path": "kws-phone/tokens.txt",
+        "bytes": 1928,
+        "sha256": "2d3f32311f9b692b964da3c90e830258d3e78e013cb0c992dbfb15cd5a1a71b0"
+      }
+    ],
+    "scope": "Calibration candidate for the local preview"
   }
 }

@@ -105,3 +105,17 @@ Optional streaming filter and diagnostic original/cleaned comparison through She
 
 All bundled files are verified by the updated model manifest before use.
 Processing occurs locally in the private speech worker. No voice upload occurs.
+
+## Phoneme wake model candidate
+
+Zipformer zh-en 3M (2025-12-20), chunk 16, left context 64. The encoder and
+joiner are int8 and the decoder is FP32. The upstream author lists Apache 2.0.
+The APK includes the license in models/kws-phone/LICENSE.txt and identifies the
+exact graphs, tokens and keywords through the model manifest.
+
+- Training source [pkufool model card](https://modelscope.cn/models/pkufool/icefall-kws-zipformer-zh-en-3M-2025-12-20)
+- Export [Sherpa release archive](https://github.com/k2-fsa/sherpa-onnx/releases/download/kws-models/sherpa-onnx-kws-zipformer-zh-en-3M-2025-12-20.tar.bz2)
+- Archive SHA-256 `68447f4fbc67e70eee3a93961f36e81e98f47aef73ce7e7ca00885c6cd3616a6`
+
+The English dictionary phones come from en.phone. The accent phones are a
+calibration candidate derived from local inference on the authorized sample.

@@ -13,7 +13,9 @@ class VoiceModelContract(val source:String) {
     val threads=json.getInt("threads")
     fun spec(kind:String):EngineSpec { val v=json.getJSONObject(kind);return EngineSpec(v.getString("model_type"),v.getString("folder"),v.getString("modeling_unit"),v.getString("bpe_vocab")) }
     fun validate(root:File) {
-        for(kind in listOf("kws","asr")) {
+        val kinds=listOf("kws","asr","phoneme_kws").filter {json.has(it)}
+        require("kws" in kinds && "asr" in kinds)
+        for(kind in kinds) {
             val s=spec(kind);require(s.family in setOf("zipformer","zipformer2"))
             val m=OnnxMetadata.read(File(root,"${s.folder}/encoder.onnx"))
             require(m["model_type"]==s.family) { "$kind loader ${s.family} does not match ${m["model_type"]}" }
@@ -21,10 +23,14 @@ class VoiceModelContract(val source:String) {
             require(fields.all { !m[it].isNullOrBlank() }) { "$kind encoder metadata is incomplete" }
             for(file in listOf("encoder.onnx","decoder.onnx","joiner.onnx","tokens.txt"))require(File(root,"${s.folder}/$file").length()>0)
             if(s.vocabulary.isNotBlank())require(File(root,s.vocabulary).length()>0)
-        }
-        val tokens=File(root,"kws/tokens.txt").readLines().map { it.substringBeforeLast(' ') }.toSet()
-        File(root,"kws/keywords.txt").forEachLine { line ->
-            require(line.substringBefore('@').trim().split(Regex("\\s+")).filter(String::isNotBlank).all {it in tokens}) { "Wake graph contains an unknown token" }
+            if(kind!="asr") {
+                val tokens=File(root,"${s.folder}/tokens.txt").readLines().map {it.substringBeforeLast(' ')}.toSet()
+                val extra=if(kind=="kws")WakePronunciations.extras else WakePronunciations.phonemeExtras
+                val phrases=File(root,"${s.folder}/keywords.txt").readLines()+extra.lines()
+                require(phrases.all {line->
+                    line.substringBefore('@').trim().split(Regex("\\s+")).filter(String::isNotBlank).all {it in tokens}
+                }) {"$kind wake graph contains an unknown token"}
+            }
         }
     }
     companion object {

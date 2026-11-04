@@ -8,4 +8,12 @@ object WakePronunciations {
         "▁E LL I O T T @elliott",
         "▁HE Y ▁E LL I O T T @hey_elliott"
     ).joinToString("\n")
+
+    // The saved comparison clip yielded these name phones. Both Hey prefixes
+    // are candidates for a fresh check, since that clip starts with Elliot.
+    val phonemeExtras=listOf(
+        "y ī l iè @elliot_accent",
+        "HH EY1 y ī l iè @hey_elliot_accent",
+        "h ēi y ī l iè @hey_elliot_accent"
+    ).joinToString("\n")
 }

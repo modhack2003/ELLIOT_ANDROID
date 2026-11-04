@@ -1,1 +1,1 @@
-{"revision":10,"runtime":"1.13.8","threads":2,"kws":{"model_type":"zipformer2","folder":"kws","modeling_unit":"","bpe_vocab":""},"asr":{"model_type":"zipformer","folder":"asr","modeling_unit":"bpe","bpe_vocab":"asr/bpe.vocab"}}
+{"revision":11,"runtime":"1.13.8","threads":2,"kws":{"model_type":"zipformer2","folder":"kws","modeling_unit":"","bpe_vocab":""},"asr":{"model_type":"zipformer","folder":"asr","modeling_unit":"bpe","bpe_vocab":"asr/bpe.vocab"},"phoneme_kws":{"model_type":"zipformer2","folder":"kws-phone","modeling_unit":"","bpe_vocab":""}}

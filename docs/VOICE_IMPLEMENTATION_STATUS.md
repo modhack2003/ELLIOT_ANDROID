@@ -1,7 +1,28 @@
 # Voice implementation status — 3 November 2026
 
-Current working milestone: 0.6.3-dev.14 / versionCode 24.
+Current working milestone: 0.6.3-dev.15 / versionCode 25.
 Baseline source commit: 0d508c5fbc747010b16c0d51d8151aa3ef48748e.
+
+## Phoneme wake model comparison (dev.15)
+
+The wake replay and calibration screens compare the original eight settings
+with two profiles for the phoneme-based Zipformer model. Both use score 2.5 and
+threshold .1. The dictionary profile uses the upstream English lexicon. The
+accent profile also includes the name sound sequence emitted by unconstrained
+phoneme decoding of the single authorized local recording. The two possible
+Hey prefixes need a fresh test because that recording starts with Elliot.
+A profile becomes active in normal listening after passing calibration and being
+saved. The model selection persists with the capture and sensitivity settings.
+
+On the desktop, the dictionary profile recognized generated Hey Elliot and
+rejected the generated ordinary phrases. It missed generated standalone Elliot
+and the name at the start of the saved recording. The observed name sequence
+matched the saved recording. That clip was used to choose the sequence.
+
+Sixteen focused tests passed. One native Vivo replay and profile round-trip
+check passed, including the phoneme model and a silence control. Signing,
+381 model-file and native library alignment checks passed. Real wake reliability
+requires fresh positive and ordinary-speech checks.
 
 ## Normal-listening noise filtering (dev.14)
 

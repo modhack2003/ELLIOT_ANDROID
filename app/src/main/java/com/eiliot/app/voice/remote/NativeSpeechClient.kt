@@ -125,11 +125,24 @@ open class RemoteDecoder(kind:String,options:Bundle=Bundle()):RemoteObject(newHa
     fun getResult(stream:RemoteStream)=RemoteResult(rpc("result",args(stream)).getString("text").orEmpty())
     fun reset(stream:RemoteStream) {rpc("reset",args(stream))}
 }
-class RemoteKeywordSpotter(score:Float?=null,threshold:Float?=null,private val alternateNames:Boolean=false):RemoteDecoder("kws",Bundle().apply {
+class RemoteKeywordSpotter(
+    score:Float?=null,
+    threshold:Float?=null,
+    private val alternateNames:Boolean=false,
+    private val phonemeModel:Boolean=false
+):RemoteDecoder("kws",Bundle().apply {
     // Reset must pass defaults explicitly: worker SharedPreferences may cache an old profile.
     putFloat("score",score?:2f);putFloat("threshold",threshold?:.15f)
+    putBoolean("phoneme_model",phonemeModel)
 }) {
-    override fun createStream(hotwords:String)=super.createStream(if(alternateNames)com.eiliot.app.voice.WakePronunciations.extras else "")
+    override fun createStream(hotwords:String):RemoteStream {
+        val keywords=when {
+            !alternateNames -> ""
+            phonemeModel -> WakePronunciations.phonemeExtras
+            else -> WakePronunciations.extras
+        }
+        return super.createStream(keywords)
+    }
 }
 class RemoteRecognizer:RemoteDecoder("asr") {
     fun isEndpoint(stream:RemoteStream)=rpc("endpoint",args(stream)).getBoolean("value")
