@@ -8,6 +8,8 @@ import com.eiliot.app.voice.remote.*
 import kotlinx.coroutines.*
 import java.security.MessageDigest
 
+enum class PhonemeBackup { DICTIONARY, ACCENT }
+
 data class WakeSetting(
     val referenceCapture:Boolean,
     val score:Float=2f,
@@ -17,9 +19,11 @@ data class WakeSetting(
     val softwareNoiseReduction:Boolean=false,
     val phonemeModel:Boolean=false,
     val requireHey:Boolean=false,
-    val learnedPronunciations:List<List<String>> = emptyList()
+    val learnedPronunciations:List<List<String>> = emptyList(),
+    val phonemeBackup:PhonemeBackup?=null
 ) {
     val label get()=when {
+        phonemeBackup!=null -> if(learnedPronunciations.isEmpty())"Two wake models" else "Two wake models with your pronunciation"
         learnedPronunciations.isNotEmpty() -> "Your pronunciation"
         phonemeModel && alternateNames -> "Phoneme accent"
         phonemeModel -> "Phoneme dictionary"
@@ -29,8 +33,9 @@ data class WakeSetting(
     init {
         require(score.isFinite() && score in 1f..3.5f)
         require(threshold.isFinite() && threshold in .05f.. .3f)
+        require(phonemeBackup==null || (requireHey && !phonemeModel))
         require(learnedPronunciations.isEmpty() || (
-            phonemeModel && requireHey && learnedPronunciations.size<=4 &&
+            (phonemeModel || phonemeBackup!=null) && requireHey && learnedPronunciations.size<=4 &&
                 learnedPronunciations.all(WakePronunciations::canLearn)
         ))
     }
@@ -40,10 +45,24 @@ data class WakeAssessment(val setting:WakeSetting,val hits:Int,val positives:Int
     val eligible get()=positives>=4 && negatives>=2 && hits>=3 && falseHits==0 && "hey" in phrases && (setting.requireHey || "name" in phrases)
 }
 object WakeCalibrationPolicy {
-    fun choose(results:List<WakeAssessment>)=results.filter {it.eligible}.sortedWith(
-        compareByDescending<WakeAssessment> {it.hits}.thenByDescending {it.setting.threshold}.thenBy {it.setting.score}
-    ).firstOrNull()
+    fun ranked(results:List<WakeAssessment>)=results.filter {it.eligible}.sortedWith(
+        compareByDescending<WakeAssessment> {it.hits}.thenBy {it.setting.phonemeBackup!=null}
+            .thenByDescending {it.setting.threshold}.thenBy {it.setting.score}
+    )
     fun validationPass(hits:List<Boolean>)=hits==listOf(true,true,false,false)
+
+    suspend fun validate(
+        candidates:List<WakeAssessment>,
+        replay:suspend (WakeAssessment)->List<Boolean>
+    ):Pair<WakeAssessment?,List<Boolean>> {
+        var firstResult=emptyList<Boolean>()
+        for((index,candidate) in candidates.withIndex()) {
+            val hits=replay(candidate)
+            if(validationPass(hits))return candidate to hits
+            if(index==0)firstResult=hits
+        }
+        return null to firstResult
+    }
 }
 object VoiceCalibrationStore {
     private fun fingerprint(c:Context):String {
@@ -62,7 +81,8 @@ object VoiceCalibrationStore {
             p.getBoolean("software_noise",false),p.getBoolean("phoneme_model",false),
             p.getBoolean("require_hey",false),
             p.getString("learned_phones",null).orEmpty().split('|').filter(String::isNotBlank)
-                .map {it.split(' ').filter(String::isNotBlank)}
+                .map {it.split(' ').filter(String::isNotBlank)},
+            p.getString("phoneme_backup",null)?.let(PhonemeBackup::valueOf)
         )
     }.getOrNull()
     fun save(c:Context,s:WakeSetting) {check(c.getSharedPreferences("voice_calibration",0).edit()
@@ -70,7 +90,8 @@ object VoiceCalibrationStore {
         .putFloat("score",s.score).putFloat("threshold",s.threshold)
         .putBoolean("alternate_names",s.alternateNames).putBoolean("reduce_noise",s.noiseReduction)
         .putBoolean("software_noise",s.softwareNoiseReduction).putBoolean("phoneme_model",s.phonemeModel)
-        .putBoolean("require_hey",s.requireHey).putString("learned_phones",s.learnedPronunciations.joinToString("|"){it.joinToString(" ")}).commit())}
+        .putBoolean("require_hey",s.requireHey).putString("learned_phones",s.learnedPronunciations.joinToString("|"){it.joinToString(" ")})
+        .putString("phoneme_backup",s.phonemeBackup?.name).commit())}
     fun clear(c:Context) {check(c.getSharedPreferences("voice_calibration",0).edit().clear().commit())}
 }
 object WakeCalibration {
@@ -136,8 +157,28 @@ object WakeCalibration {
         }
         return found
     }
+    private suspend fun replayTrials(setting:WakeSetting,trials:List<WakeTrial>):List<Boolean> =
+        RemoteWakeDetector(setting).use {detector->
+            trials.mapIndexed {index,trial->
+                if(index>0)detector.reset()
+                replay(detector,trial.audio,true).isNotEmpty()
+            }
+        }
+
+    private fun assessment(setting:WakeSetting,trials:List<WakeTrial>,hits:List<Boolean>):WakeAssessment {
+        val positives=trials.count {it.positive}
+        val phraseHits=trials.zip(hits).filter {(trial,hit)->trial.positive && hit}
+            .groupingBy {(trial,_)->trial.phrase}.eachCount()
+        val falseHits=trials.zip(hits).count {(trial,hit)->!trial.positive && hit}
+        return WakeAssessment(setting,phraseHits.values.sum(),positives,falseHits,trials.size-positives,phraseHits.keys,phraseHits)
+    }
+
+    suspend fun validate(candidates:List<WakeAssessment>,trials:List<WakeTrial>):Pair<WakeAssessment?,List<Boolean>> =
+        withContext(Dispatchers.IO) {
+            WakeCalibrationPolicy.validate(candidates) {replayTrials(it.setting,trials)}
+        }
+
     suspend fun assess(reference:Boolean,trials:List<WakeTrial>,noiseReduction:Boolean=false,softwareNoiseReduction:Boolean=false,requireHey:Boolean=false):List<WakeAssessment> =withContext(Dispatchers.IO) {
-        val results=mutableListOf<WakeAssessment>()
         val candidates=settings(reference,noiseReduction,softwareNoiseReduction,requireHey).toMutableList()
         if(requireHey) {
             val learned=trials.filter {it.positive && it.phrase=="hey"}.take(4)
@@ -148,19 +189,22 @@ object WakeCalibration {
                 candidates.add(learned.first().copy(learnedPronunciations=pronunciations))
             }
         }
-        for(setting in candidates) {
-            var hits=0;var falseHits=0;val phraseHits=mutableMapOf<String,Int>()
-            RemoteWakeDetector(setting).use {detector->
-                for((index,trial) in trials.withIndex()) {
-                    if(index>0)detector.reset()
-                    val hit=replay(detector,trial.audio,true).isNotEmpty()
-                    if(hit && trial.positive) {
-                        hits++
-                        phraseHits[trial.phrase]=(phraseHits[trial.phrase]?:0)+1
-                    }else if(hit)falseHits++
+        val checked=candidates.associateWith {replayTrials(it,trials)}
+        val results=checked.map {(setting,hits)->assessment(setting,trials,hits)}.toMutableList()
+        if(requireHey) {
+            val clean=results.filter {it.hits>0 && it.falseHits==0}
+            val combined=mutableListOf<WakeAssessment>()
+            for(primary in clean.filter {!it.setting.phonemeModel}) {
+                for(backup in clean.filter {it.setting.phonemeModel}) {
+                    val hits=checked.getValue(primary.setting).zip(checked.getValue(backup.setting)) {a,b->a || b}
+                    val mode=if(backup.setting.alternateNames)PhonemeBackup.ACCENT else PhonemeBackup.DICTIONARY
+                    val setting=primary.setting.copy(phonemeBackup=mode,learnedPronunciations=backup.setting.learnedPronunciations)
+                    val result=assessment(setting,trials,hits)
+                    if(result.eligible && result.hits>maxOf(primary.hits,backup.hits))combined+=result
                 }
             }
-            results+=WakeAssessment(setting,hits,trials.count{it.positive},falseHits,trials.count{!it.positive},phraseHits.keys.toSet(),phraseHits.toMap())
+            // Only the best pair advances. Each additional pair needs two loaded models.
+            results+=WakeCalibrationPolicy.ranked(combined).take(1)
         }
         results
     }

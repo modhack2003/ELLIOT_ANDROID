@@ -112,6 +112,35 @@ class NativeSpeechDeviceTest {
             assertFalse(WakeCalibration.detect(setting,FloatArray(16000)))
         }
     }
+    @Test fun pairedWakeModelsPassFreshChecksAndRoundTrip()=runBlocking {
+        withContext(Dispatchers.IO) {
+            NativeSpeechClient.connect(app)
+            val tts=RemoteTts()
+            fun synthesize(phrase:String,speed:Float):FloatArray {
+                val chunks=mutableListOf<FloatArray>()
+                tts.generateWithCallback(phrase,0,speed){chunks.add(it.copyOf());1}
+                val samples=chunks.flatMap {it.asList()}.toFloatArray()
+                val rate=tts.sampleRate()
+                return FloatArray(samples.size*16000/rate){i->samples[(i.toLong()*rate/16000).toInt()]}
+            }
+            val trials=listOf(
+                WakeTrial("hey",true,synthesize("Hey Elliot",1f)),
+                WakeTrial("hey",true,FloatArray(11264)+synthesize("Hey Elliot, what is my battery level?",1f)),
+                WakeTrial("name",false,synthesize("Elliot",1f)),
+                WakeTrial("ordinary",false,synthesize("Hey, what are you doing?",1f))
+            )
+            val strict=WakeSetting(false,requireHey=true,phonemeBackup=PhonemeBackup.DICTIONARY)
+            val candidate=WakeAssessment(strict,3,4,0,2,setOf("hey"))
+            assertEquals(candidate to listOf(true,true,false,false),WakeCalibration.validate(listOf(candidate),trials))
+            val previous=VoiceCalibrationStore.load(app)
+            try {
+                VoiceCalibrationStore.save(app,strict)
+                assertEquals(strict,VoiceCalibrationStore.load(app))
+            }finally {
+                if(previous==null)VoiceCalibrationStore.clear(app)else VoiceCalibrationStore.save(app,previous)
+            }
+        }
+    }
     @Test fun packagedCallbackHasNativeSignature() {
         val callback=NativeTtsCallback { 0 }
         val method=callback.javaClass.getMethod("invoke",FloatArray::class.java)

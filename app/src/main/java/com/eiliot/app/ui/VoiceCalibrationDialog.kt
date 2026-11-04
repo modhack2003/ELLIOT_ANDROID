@@ -25,12 +25,15 @@ import kotlinx.coroutines.*
     val currentReference=remember {WakeCapturePreference.reference(context)}
     val secondWake=if(requireHey)"Hey Elliot"else "Elliot"
     val finalControl=if(requireHey)"Elliot"else "What is my battery level?"
-    val prompts=listOf("Hey Elliot",secondWake,"Hey Elliot",secondWake,"Hello, how are you?","What is my battery level?")
+    val prompts=listOf(
+        "Hey Elliot",secondWake,"Hey Elliot",secondWake,"Hello, how are you?",
+        if(requireHey)"Hey Ellie"else "What is my battery level?"
+    )
     var step by remember {mutableIntStateOf(0)}
     var busy by remember {mutableStateOf(false)};var ready by remember {mutableStateOf(false)}
     var status by remember {mutableStateOf("Preparing microphone checks…")}
     val trials=remember {mutableListOf<WakeTrial>()};val assessments=remember {mutableListOf<WakeAssessment>()}
-    val validation=remember {mutableListOf<Boolean>()}
+    var eligible by remember {mutableStateOf(emptyList<WakeAssessment>())}
     var candidate by remember {mutableStateOf<WakeAssessment?>(null)}
     var validated by remember {mutableStateOf(false)}
     var transcript by remember {mutableStateOf("")}
@@ -124,7 +127,7 @@ import kotlinx.coroutines.*
             var audio:FloatArray?=null
             try {
                 status="Preparing the microphone. Wait for Speak now…"
-                val reference=if(step<initialSteps) {if(requireHey)currentReference else step>=6} else checkNotNull(candidate).setting.referenceCapture
+                val reference=if(step<initialSteps) {if(requireHey)currentReference else step>=6} else eligible.first().setting.referenceCapture
                 val clip=WakeCalibration.capture(context,reference,onEffects={clipEffects=it},onReady={status="Speak now. Recording for four seconds…"});audio=clip
                 discardCleaned();lastClip?.fill(0f);lastClip=clip.copyOf()
                 if(!WakeCalibration.usable(clip)){status="Too quiet or distorted. Adjust your distance and retry.";return@launch}
@@ -138,18 +141,26 @@ import kotlinx.coroutines.*
                     }
                     step++
                     if(step==initialSteps) {
-                        candidate=WakeCalibrationPolicy.choose(assessments)
-                        status=if(candidate==null)"No setting passed the wake and ordinary speech checks. Your previous settings are unchanged. The results below show which attempts were missed."
-                            else "A candidate passed the initial checks. Now use four fresh samples to verify it."
+                        val ranked=WakeCalibrationPolicy.ranked(assessments)
+                        // Fresh audio must use the same microphone path as its initial samples.
+                        val referenceForValidation=ranked.firstOrNull()?.setting?.referenceCapture
+                        eligible=ranked.filter {it.setting.referenceCapture==referenceForValidation}
+                        status=if(eligible.isEmpty())"No setting passed the wake and ordinary speech checks. The results below show which attempts were missed."
+                            else "Record four fresh samples to check the ${eligible.size} eligible settings on this microphone."
                     }else status="Sample accepted. Use your normal voice for the next one."
                 }else {
-                    val hit=WakeCalibration.detect(checkNotNull(candidate).setting,clip)
-                    validation+=hit;step++
+                    val i=step-initialSteps
+                    trials+=WakeTrial(if(i==1 && !requireHey)"name"else "hey",i<2,clip);audio=null
+                    step++
                     if(step==finalStep) {
-                        validated=WakeCalibrationPolicy.validationPass(validation)
+                        status="Checking the fresh recordings against the eligible settings…"
+                        val (passed,validation)=WakeCalibration.validate(eligible,trials)
+                        discard()
+                        candidate=passed
+                        validated=passed!=null
                         status=if(validated)"Both fresh wake attempts worked and both ordinary phrases were rejected. You can save this setting."
-                            else "Fresh checks found ${validation.take(2).count {it}} of 2 wakes and ${validation.drop(2).count {it}} unwanted wakes."
-                    }else status="Check complete. Continue with the next phrase."
+                            else "No setting passed the fresh checks. The top initial setting found ${validation.take(2).count {it}} of 2 wakes and ${validation.drop(2).count {it}} unwanted wakes."
+                    }else status="Sample accepted. Continue with the next phrase."
                 }
             }catch(e:CancellationException){throw e}
             catch(e:Exception){ready=false;discard();status="Microphone check failed. Close and retry; no new settings were saved."}
@@ -201,7 +212,7 @@ import kotlinx.coroutines.*
                 if(!transcriptionOnly && step>=initialSteps)assessments.forEach {result->
                         Text("Microphone ${if(result.setting.referenceCapture)2 else 1}, ${result.setting.label}, ${result.setting.score}/${result.setting.threshold}: Hey Elliot ${result.phraseHits["hey"]?:0}/${if(requireHey)4 else 2}. ${if(requireHey)""else "Elliot ${result.phraseHits["name"]?:0}/2. "}Unwanted wakes ${result.falseHits}/2.",style=MaterialTheme.typography.bodySmall)
                 }
-                if(!transcriptionOnly && (step<initialSteps || (step<finalStep && candidate!=null))) {
+                if(!transcriptionOnly && (step<initialSteps || (step<finalStep && eligible.isNotEmpty()))) {
                     val index=if(step<initialSteps)step%6 else step-initialSteps
                     val phrase=if(step<initialSteps)prompts[index]else listOf("Hey Elliot",secondWake,"Hello, how are you?",finalControl)[index]
                     Text(if(step<initialSteps)"Microphone check ${step/6+1} · sample ${step%6+1} of 6" else "Fresh validation ${step-initialSteps+1} of 4")
