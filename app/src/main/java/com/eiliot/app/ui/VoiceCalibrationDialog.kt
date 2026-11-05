@@ -310,7 +310,7 @@ import kotlinx.coroutines.*
                             FilterChip(language==code,{language=code},label={Text(label)})
                         }
                     }
-                    if(multilingual && selectedPack!=MultilingualModelPack.TURBO_FULL_DECODER) {
+                    if(multilingual) {
                         Text("For short requests, enable Voice & wake word. After “Hey Elliot”, pause before your request. Transcription can take several seconds.")
                         TextButton(onClick={
                             try {

@@ -2379,8 +2379,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/VoiceCalibrationDialog.kt",
-      "bytes": 27744,
-      "sha256": "1db84cb9e5ce9a0678d11bfafffa109a3e23213e18fe69f58d723fbe4d1321b9"
+      "bytes": 27686,
+      "sha256": "189ab803b440293830956c96b2cd97899940027c0ec0fe7847d578b4bcab7a48"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/AcousticWake.kt",
@@ -2389,8 +2389,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/CommandSpeech.kt",
-      "bytes": 1252,
-      "sha256": "acbf5a94b5edf5f3c3a03523fe848634ca6c1d509b2067ff581149b8130151eb"
+      "bytes": 1216,
+      "sha256": "280e985a3b51280a46d8a7fa87c1535c531cb58fa4558c19a0de17dd906cfe81"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/CommandUtterance.kt",
