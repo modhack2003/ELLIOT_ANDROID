@@ -9,14 +9,14 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/modhack2003/ELLIOT_ANDROID/releases/tag/v0.6.3-dev.24"><img src="https://img.shields.io/badge/preview-0.6.3--dev.24-20D8E5?style=flat-square" alt="Preview 0.6.3-dev.24" /></a>
+  <img src="https://img.shields.io/badge/source-0.6.3--dev.24-20D8E5?style=flat-square" alt="Source version 0.6.3-dev.24" />
   <img src="https://img.shields.io/badge/Android-8.0%2B-54D88D?style=flat-square&logo=android&logoColor=white" alt="Android 8.0 or later" />
   <img src="https://img.shields.io/badge/Kotlin-Jetpack%20Compose-9D8AFF?style=flat-square&logo=kotlin&logoColor=white" alt="Kotlin and Jetpack Compose" />
   <img src="https://img.shields.io/badge/speech-on--device-14AABF?style=flat-square" alt="On-device speech" />
 </p>
 
 <p align="center">
-  <a href="#try-the-preview">Try the preview</a> &nbsp;·&nbsp;
+  <a href="#quick-start">Quick start</a> &nbsp;·&nbsp;
   <a href="#meet-the-app">Meet the app</a> &nbsp;·&nbsp;
   <a href="#how-voice-works">How voice works</a> &nbsp;·&nbsp;
   <a href="#build-from-source">Build from source</a>
@@ -24,16 +24,14 @@
 
 ELLIOT is a voice and text companion for Android. Say the wake phrase, tap the microphone, or type. Built-in commands can check your battery, set a timer, and change media volume offline. Wake detection, bundled speech recognition, and bundled voice playback run on the phone. For broader conversations, you can select a supported on-device or cloud provider in Settings.
 
-## Try the preview
+## Quick start
 
-[**Download the ARM64 preview APK and read the release notes**](https://github.com/modhack2003/ELLIOT_ANDROID/releases/tag/v0.6.3-dev.24)
-
-1. Install the APK on an **ARM64 Android 8.0+** device. To update in place, Android requires the same package ID and signing certificate.
+1. [Build the ARM64 preview from source](#build-from-source) and install your build on an **ARM64 Android 8.0+** device. In-place updates require the same package ID and signing certificate.
 2. Open **ELLIOT**, tap **Resume**, grant microphone access, and enable **Voice & wake word** in Settings.
 3. Say **“Hey Elliot”**, pause, and ask **“What is my battery level?”** You can also tap the microphone to start a request.
 4. For an optional speech model, open **Settings → Check speech recognition**, select a pack and language, and choose **Use for live requests** once the pack is ready.
 
-The preview uses the package ID `com.eiliot.app.preview`. Android may ask you to authorize installation from your download source.
+The preview uses the package ID `com.eiliot.app.preview`.
 
 ## Meet the app
 
