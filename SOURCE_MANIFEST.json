@@ -84,8 +84,8 @@
     },
     {
       "path": "app/build.gradle.kts",
-      "bytes": 5114,
-      "sha256": "c775b94c1384504188f9d485e5e1c8b75ddf9a36edd3ed09357476ea746f82ea"
+      "bytes": 5621,
+      "sha256": "02494892674c266d3effba51326a4d78662754a4b03d41f52dfec789703971b8"
     },
     {
       "path": "app/libs/sherpa-onnx-1.13.8.aar",
@@ -230,7 +230,7 @@
     {
       "path": "app/src/main/assets/models/manifest.json",
       "bytes": 62850,
-      "sha256": "85bc38010baab8aa5e7e6d3648627d2f6c7e8e1944f40c8c93f5fe607da84430"
+      "sha256": "5522ebdd08284053db84928cd87068671fbf7e072ce2376b2651afe8ad8ac6e1"
     },
     {
       "path": "app/src/main/assets/models/silero_vad.onnx",
