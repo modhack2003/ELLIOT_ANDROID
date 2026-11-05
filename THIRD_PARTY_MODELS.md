@@ -2,6 +2,19 @@
 
 The application bundles actual model weights; no default acoustic model download is needed.
 
+## Android preview native source
+
+The Android preview contains the Sherpa-onnx 1.13.8 AAR with its eSpeak NG
+phonemizer. The versioned upstream source and Android build recipe are available
+alongside the component pins below.
+
+| Component | Source and build references |
+| --- | --- |
+| Sherpa-onnx 1.13.8 | [Source archive](https://github.com/k2-fsa/sherpa-onnx/archive/refs/tags/v1.13.8.tar.gz) · [ARM64 Android build script](https://github.com/k2-fsa/sherpa-onnx/blob/v1.13.8/build-android-arm64-v8a.sh) |
+| eSpeak NG | [Pinned source archive](https://github.com/csukuangfj/espeak-ng/archive/ed530aa113046142eb5115cf2fc9157854d0ffe1.zip) · [Build configuration](https://github.com/k2-fsa/sherpa-onnx/blob/v1.13.8/cmake/espeak-ng-for-piper.cmake) · [GPL 3.0 text](docs/licenses/espeak-ng-GPL-3.0.txt) |
+| Piper Phonemize | [Pinned source archive](https://github.com/csukuangfj/piper-phonemize/archive/f3ff95afc03640bc1399e113e83361192a2fafb4.zip) · [Build configuration](https://github.com/k2-fsa/sherpa-onnx/blob/v1.13.8/cmake/piper-phonemize.cmake) |
+| ONNX Runtime 1.28.2 | [Source archive](https://github.com/microsoft/onnxruntime/archive/refs/tags/v1.28.2.tar.gz) |
+
 | Component | Source | Attribution / terms |
 | --- | --- | --- |
 | Runtime | https://github.com/k2-fsa/sherpa-onnx/tree/v1.13.8 | Sherpa source Apache-2.0, ONNX Runtime MIT; this pre-2.0 TTS binary includes GPL-3.0-or-later eSpeak phonemization. Runtime source: https://github.com/k2-fsa/sherpa-onnx/tree/v1.13.8 ; eSpeak source: https://github.com/espeak-ng/espeak-ng ; retain corresponding-source/build access for redistribution. |

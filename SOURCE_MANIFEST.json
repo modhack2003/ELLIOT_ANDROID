@@ -3,6 +3,11 @@
   "version_code": 34,
   "files": [
     {
+      "path": ".gitattributes",
+      "bytes": 20,
+      "sha256": "8a9464622b26167b808cf4115fe034faa632198181c687f4fdd2b3d37814adbb"
+    },
+    {
       "path": ".gitignore",
       "bytes": 177,
       "sha256": "a773ea491a6180dab1b9f7751c4ab366b0c4e5874bc9476622db6ba5bd562181"
@@ -34,8 +39,8 @@
     },
     {
       "path": "MODEL_SOURCES.json",
-      "bytes": 7393,
-      "sha256": "07e39e064ce66099a38ec25c01cecb618cdf59faf6e030e05642fddf7bf3aef6"
+      "bytes": 7217,
+      "sha256": "86d177ab16c166912a95f55fcfac551735436049cb9bd26d5bdcd8d0509316ec"
     },
     {
       "path": "NEXT_BUILD_PLAN.md",
@@ -49,8 +54,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 6261,
-      "sha256": "62ab40939b463a0ed2ffa9c31cd2ea06bb3f2a07c2b840c72bbedce82f3ba18b"
+      "bytes": 8006,
+      "sha256": "4e2e79bbe834ba9b3532eed12b85bea34f495f2f5248b1622c8232d2822502dc"
     },
     {
       "path": "ROADMAP.md",
@@ -59,13 +64,13 @@
     },
     {
       "path": "SPEECH_FIX.md",
-      "bytes": 1559,
-      "sha256": "780d3f1e0ee582f05b10182c6920e47b7ecb4acc181f56b735f2d4a3f1deb134"
+      "bytes": 1521,
+      "sha256": "69a69d830019321546866fcffaf6992495fe71203ff7b33b6d4e9152e2e5af65"
     },
     {
       "path": "THIRD_PARTY_MODELS.md",
-      "bytes": 7124,
-      "sha256": "c47de5f5fa46b4b59719d74223549cee7052fb0014632154e2a9a7c3128e97c4"
+      "bytes": 8181,
+      "sha256": "2b82a785fa7e637e46671d5e20cd8edc8bcac30cfc896c283d7d98595a382016"
     },
     {
       "path": "VALIDATION.md",
@@ -74,8 +79,8 @@
     },
     {
       "path": "app/build.gradle.kts",
-      "bytes": 5221,
-      "sha256": "6f8ee77df1a261bfcf9e7dc9f37b68828a2ae095835a0a40b84e5a993d5ce4f2"
+      "bytes": 5114,
+      "sha256": "c775b94c1384504188f9d485e5e1c8b75ddf9a36edd3ed09357476ea746f82ea"
     },
     {
       "path": "app/libs/sherpa-onnx-1.13.8.aar",
@@ -84,8 +89,8 @@
     },
     {
       "path": "app/src/androidTest/java/com/eiliot/app/NativeSpeechDeviceTest.kt",
-      "bytes": 13703,
-      "sha256": "753eaf3c6048db0e304cb3b240025081fe212a65810043e0e3675c43aee8033c"
+      "bytes": 13479,
+      "sha256": "19284a3e1d0e82502b31b41ad761004297e6c1ebd51de98a778bd9db8aa4af4e"
     },
     {
       "path": "app/src/androidTest/java/com/eiliot/app/SavedSpeechComparisonTest.kt",
@@ -169,13 +174,13 @@
     },
     {
       "path": "app/src/main/assets/models/kws-phone/keywords-hey.txt",
-      "bytes": 36,
-      "sha256": "8ae5e84cc43c63ede272780aef36def41a7efd28af87a725af39085035411850"
+      "bytes": 35,
+      "sha256": "d2aad9e1c3fe0073d60d980f5aa2e1bc1c29de9b56750548a91641c8b45df492"
     },
     {
       "path": "app/src/main/assets/models/kws-phone/keywords.txt",
-      "bytes": 61,
-      "sha256": "7632be3107ad4ff0e10031aeca0a97b9c1a8ae4d2821962530b7fa59c53aef0c"
+      "bytes": 59,
+      "sha256": "965b4265188c9306c8f17d3ab5a0b6a8fd46ea5625dc8221a1295a7ea0cdbd94"
     },
     {
       "path": "app/src/main/assets/models/kws-phone/tokens.txt",
@@ -204,8 +209,8 @@
     },
     {
       "path": "app/src/main/assets/models/kws/keywords-hey.txt",
-      "bytes": 35,
-      "sha256": "c4ed0328538ab5cc9b3dbeae9d3a2f80970e428a093ad723df32836b18e8155b"
+      "bytes": 34,
+      "sha256": "6196aa668e9351eb128fc34476ba32de514480f213a419c80b91a585bea152a5"
     },
     {
       "path": "app/src/main/assets/models/kws/keywords.txt",
@@ -219,8 +224,8 @@
     },
     {
       "path": "app/src/main/assets/models/manifest.json",
-      "bytes": 64770,
-      "sha256": "4e1f0b7ab93a153591fe188a1ae2c2ac7261ea1847342560245a050906b38552"
+      "bytes": 62850,
+      "sha256": "85bc38010baab8aa5e7e6d3648627d2f6c7e8e1944f40c8c93f5fe607da84430"
     },
     {
       "path": "app/src/main/assets/models/silero_vad.onnx",
@@ -569,8 +574,8 @@
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/lang/art/lfn",
-      "bytes": 135,
-      "sha256": "394874fd9022e37cdc307c3386e81f1c0c133a8e9c5fdff74888b519f2c6d648"
+      "bytes": 127,
+      "sha256": "90a808fd09b6c0376193e919789f0a778d17b1e355294189a65d0863e9a1c868"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/lang/art/piqd",
@@ -1494,8 +1499,8 @@
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Alicia",
-      "bytes": 474,
-      "sha256": "6d3f60ec866706e9d4ab7da2a79eedb8c11b50f63620f87e58317f316ea3d58e"
+      "bytes": 453,
+      "sha256": "38c70dced8a2bf16f09db7901a208a86d0cf0818bcadef97a5a094b1afff96f0"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Andrea",
@@ -1504,28 +1509,28 @@
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Andy",
-      "bytes": 320,
-      "sha256": "0e13ba1a940cd9df7e65358c36445c9740f3d75f1360c7f7c71ab9f74b45edca"
+      "bytes": 301,
+      "sha256": "6fb7911e31ba77e1de90dbfa53ae63a0f1baf8859708da0f722c9dade16e7881"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Annie",
-      "bytes": 315,
-      "sha256": "40f0f829c5c6e7abf4a02a21f128a572756d6f6693014c26d09a5c29ede5ec33"
+      "bytes": 298,
+      "sha256": "29fd281b9ad5369561a38884691b93d4061be3585c688d62bc29fe160a4d5dcf"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/AnxiousAndy",
-      "bytes": 361,
-      "sha256": "7dfe126f517b76cc78269618dbee2c30d324bea9460b400938756ec93995eaf8"
+      "bytes": 342,
+      "sha256": "90d89c21d69f087c325daaaa63ed5c82ca690e7c3a3b844eaa05e7378d044ae1"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Demonic",
-      "bytes": 3858,
-      "sha256": "241b0e78362bd3208bb586b65bdf52330e1e8322f8f226c4790c4abeb47cfb09"
+      "bytes": 3793,
+      "sha256": "c1cc5ac04d2e0b1ea86899efc787fc5b89419a2c35222c4efa115c24c0688aba"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Denis",
-      "bytes": 305,
-      "sha256": "a09fe9f7a4e478d2ba1e139c2995633e2b99de9abdaaa82307954599b0e3d6fd"
+      "bytes": 286,
+      "sha256": "81afe9e13c2abc943325fe139fa38743f93a76e61744b2ae498346a7c6dbb8eb"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Diogo",
@@ -1534,13 +1539,13 @@
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Gene",
-      "bytes": 281,
-      "sha256": "06258dae680cde2122a4939dbd4f23ed4ea145b7475068bf7dd4d466090afd2a"
+      "bytes": 264,
+      "sha256": "2cf02c0a190704ca8d9051e51cfb8ce05fb8c0ceca5a6d2c7692011eb2855f41"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Gene2",
-      "bytes": 283,
-      "sha256": "bcdb3039296eea37398e4423dc9bb6849cda9c5c812b83702ebc49682c649f57"
+      "bytes": 266,
+      "sha256": "9670061055bbf9e85a8b307955ecd584bafddb54c9a2a6beae6884b69ed2a406"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Henrique",
@@ -1554,28 +1559,28 @@
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Jacky",
-      "bytes": 267,
-      "sha256": "41884ed9b66160aeb5a0dc418370a59fe39ead0013d93e023e6d607ef01c1a6e"
+      "bytes": 250,
+      "sha256": "7f46cbe7e1f1af7d2bcd2e4c8274cd19e4dbb42c23e1a7647cb6526620f2994a"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Lee",
-      "bytes": 338,
-      "sha256": "a1584887cddb40c10e04992fb770025b52e66b70504656094f80975f1d6bbf6b"
+      "bytes": 318,
+      "sha256": "0f174fc9a7c8f606391eb1424a84d4b9fe00facd98439692c79bbe4d44276a6c"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Marco",
-      "bytes": 467,
-      "sha256": "04025677360c0270f094bbb6716b83c8284902f6da9b496bedbbf590963835fb"
+      "bytes": 444,
+      "sha256": "5fbf6394e4f352376f476e4f3e27cfb6d1063567f696540c338e8782b02e1625"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Mario",
-      "bytes": 270,
-      "sha256": "a94ac65d132030df496e8aa364d5cde5f2eafa4b6b3ae361a2901d512c6029d8"
+      "bytes": 253,
+      "sha256": "08898d77dd933a4e9f122501e7627a221904aa7908cf37c78ca8df4d4519b2f3"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Michael",
-      "bytes": 270,
-      "sha256": "4409be23ef5fedf4c8bffbfaa8a802a342824d7e97f1d92938336a25f92f0ebe"
+      "bytes": 253,
+      "sha256": "b56041014e395cdcc01a898bf953d0f76acc96989f59e542dc6d8ccc829535d3"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Mike",
@@ -1584,8 +1589,8 @@
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Mr serious",
-      "bytes": 3193,
-      "sha256": "794abd78deb07ce9b03419d20f7744df4c0151d5abff7981217e9d0926a2f240"
+      "bytes": 3143,
+      "sha256": "c4522fbc0acdc8f3ec43e2927bca7c7a9141f619eac5858291ad5505f7307689"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Nguyen",
@@ -1614,18 +1619,18 @@
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Storm",
-      "bytes": 420,
-      "sha256": "e817c7d1ce10de527ebc19c0835f580cb584c3ae7d36d30a4f414482602e7b89"
+      "bytes": 397,
+      "sha256": "4b11444cf3cc949f44ebf08e86b61adf189ff9f5e382ebaa768dd5c097834bf7"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/Tweaky",
-      "bytes": 3189,
-      "sha256": "c34d1c1d8b7922ceb886b95ad6ab534ca048f9c47e19698ec2aae5cf0c32cdbc"
+      "bytes": 3139,
+      "sha256": "d42853c6b5cb9c4d6715f4ce04a9e9da620d79624edcce45007b72bd4c189a78"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/UniRobot",
-      "bytes": 417,
-      "sha256": "23dba52c2d1cb332db6225304818d85488f110a668ddcdbfd7f0438afe37794b"
+      "bytes": 398,
+      "sha256": "c9c276ee984bccae4780d2017049cb237919565f3914d821c9e9585257699189"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/adam",
@@ -1654,8 +1659,8 @@
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/aunty",
-      "bytes": 358,
-      "sha256": "0aede4d1ca614f32c348f3d728eab58322ccd016e8531234fdc3dfcf00e32bf1"
+      "bytes": 339,
+      "sha256": "a917590bd972ff8dba753cda37cfe5adc9faa93a23d7611345e0768049508490"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/belinda",
@@ -1669,8 +1674,8 @@
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/boris",
-      "bytes": 224,
-      "sha256": "f23d0a6ee2eeb7e3340506d61d422b691fb04f4e98977ea15c1e0ee5715846d5"
+      "bytes": 209,
+      "sha256": "0368580bd2b0d2eb3d674216018c79fd2873c3037a86973a2239fd65e5d0efa4"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/caleb",
@@ -1749,8 +1754,8 @@
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/ian",
-      "bytes": 3168,
-      "sha256": "c0722c7954d3e6582e3f5b3f584140675ab060ac3c6cac5dd11a74592db5550a"
+      "bytes": 3117,
+      "sha256": "71941d5c3234a610332b14483de809bdee88af2fc5a2d345a9ccd91a3a3245c5"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/iven",
@@ -1774,13 +1779,13 @@
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/john",
-      "bytes": 3186,
-      "sha256": "bfbcc1cec33ef0581fdeb4955fbcd0d824a5d4be5493d731e4a2ef7f8f3ba670"
+      "bytes": 3136,
+      "sha256": "ee96974df48c36afa08060dd131cd8235e157a2c3a7cd6b1dd95f04ef59624f9"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/kaukovalta",
-      "bytes": 361,
-      "sha256": "b9f6016145835c3999bcd5872b8a53442729bd903591781ea3340746b3b4956b"
+      "bytes": 346,
+      "sha256": "2ca787d1828da0384649f9d570028808d4106425340eb80b92515b8e3a38eb46"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/klatt",
@@ -1864,13 +1869,13 @@
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/max",
-      "bytes": 225,
-      "sha256": "c88f70a60a19e76a6774dfbd7664be639b9aa8aa587c680834c305ffa434aaaf"
+      "bytes": 210,
+      "sha256": "347152de7a2376c9b087be62537fa0bde7d141c206f2dfd15820d2bad3d8e50a"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/michel",
-      "bytes": 404,
-      "sha256": "c0068ad9cb792dfb78aedbdff9c3cec68e5083736bae0c33bf19088186101087"
+      "bytes": 382,
+      "sha256": "2a1192b8d8a1770575bb1289063cadc6b6e56d6b68e9a389d959fb9a1e1ace20"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/miguel",
@@ -1884,8 +1889,8 @@
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/norbert",
-      "bytes": 3189,
-      "sha256": "35b9923e15caf36280542270282bd2392c6d86ef5db9a8be7be92ce2241a46cb"
+      "bytes": 3139,
+      "sha256": "bbbc4a2894c18be4b9e56880949373bdd2646728da28028e2f2d9e2918c953b0"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/pablo",
@@ -1904,18 +1909,18 @@
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/quincy",
-      "bytes": 354,
-      "sha256": "e9945bee7b4f3240221866f497bf2511a886ed7702d8389688a03c2ea120caf0"
+      "bytes": 334,
+      "sha256": "83ea85df121ceba98edc5cd574db2a46684031eb106528b8fba5f70301fd9bb6"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/rob",
-      "bytes": 265,
-      "sha256": "fbfffcdb0afb2e3b70f886c02282feae22509d77fe6e7103daf907f7a356595d"
+      "bytes": 248,
+      "sha256": "607b68ffd5ed015dd86fa18816de23ecd438fe9e1097424ca3c4955481044d54"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/robert",
-      "bytes": 274,
-      "sha256": "72604f85afe5bb52a5ce7e3427b196e1e3e426a14a64e2d93b6617e248a46417"
+      "bytes": 257,
+      "sha256": "002af12747ae0c942156da2052b9ba50237fa74dc18725cb4b48843ed5d18635"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/robosoft",
@@ -1984,8 +1989,8 @@
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/travis",
-      "bytes": 383,
-      "sha256": "7d5a34be05778ee850d97b0491a62db7683c058d660ff2afc71c08c87360f30d"
+      "bytes": 360,
+      "sha256": "31484ad79535a92d682d228e128b81deaa3476256655367e83b75bd198b32435"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/victor",
@@ -2004,8 +2009,8 @@
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/voices/!v/zac",
-      "bytes": 275,
-      "sha256": "edaf508b2cfbfd6088a163dcc78d5f6a26850a7d39a5a0e5128b09526f56b6db"
+      "bytes": 260,
+      "sha256": "f9a0b66a29bc9b7d2def01d7947d5a279d3b1b2e12d6542a2d4596612a981df1"
     },
     {
       "path": "app/src/main/assets/models/tts/espeak-ng-data/yue_dict",
@@ -2024,8 +2029,8 @@
     },
     {
       "path": "app/src/main/assets/voice-engine.json",
-      "bytes": 326,
-      "sha256": "19eec0155042a9e81650086c56c8db4912882e2bb154a2379593526694d793c3"
+      "bytes": 325,
+      "sha256": "e8b991cfda3c2536bd6baf6b28f5b1790101f6e0e570fec36ee28ef9d27db40a"
     },
     {
       "path": "app/src/main/assets/whisper-LICENSE.txt",
@@ -2124,8 +2129,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/core/WakeListener.kt",
-      "bytes": 20071,
-      "sha256": "9b0fdbf04e5a9b2771d2cf0c665c63dc972224bc94383c0f12cb9b5521aff3c4"
+      "bytes": 19769,
+      "sha256": "70eb6f3cf2da35fce737635f61ec293f91cb74f61289983afc5a025c96bc7426"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/data/CryptoVault.kt",
@@ -2369,8 +2374,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/VoiceCalibrationDialog.kt",
-      "bytes": 28133,
-      "sha256": "1664825961ffc968614669e214981a903d9ef3e1fa9c5e79cb20f7ff30bbfe91"
+      "bytes": 27744,
+      "sha256": "1db84cb9e5ce9a0678d11bfafffa109a3e23213e18fe69f58d723fbe4d1321b9"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/AcousticWake.kt",
@@ -2429,8 +2434,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/VoiceAudioInput.kt",
-      "bytes": 4243,
-      "sha256": "a8bf7905cad44fc904c3b39700eeb64ee66e2cbecd40232ee44e6662f367ac4c"
+      "bytes": 4176,
+      "sha256": "67a258f9eadcbc20709af451b7c516eed5d17aa865c8188a9bf5d9d9d517ed27"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/VoiceIo.kt",
@@ -2449,8 +2454,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/WakeCalibration.kt",
-      "bytes": 17874,
-      "sha256": "ca9691bb95d357d9e50c3514af0a3b606c621b4cfec5c57f6471c7232df481e1"
+      "bytes": 17560,
+      "sha256": "6c5c768a64107e0f826f1512f9ef309b954684aae21e14be8bc394e19191e2fd"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/WakeCapturePreference.kt",
@@ -2469,8 +2474,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/NativeSpeechClient.kt",
-      "bytes": 12568,
-      "sha256": "91b9d5594c8675e0ed449c5b380940f84b4fd1a4ec700b40ca6970cfd44505b5"
+      "bytes": 12348,
+      "sha256": "7fbe1e672d5a73a85c7cb7fcbceb9eea1804602a57b9b950187159e7cfcb0afb"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/NativeTtsCallback.java",
@@ -2479,13 +2484,13 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/RemoteWakeDetector.kt",
-      "bytes": 3416,
-      "sha256": "0dbe2acdde5fed0cce7a1c321503afeba5a30d269a12cc38c6862cff371f9c1e"
+      "bytes": 3332,
+      "sha256": "6acaf39ba7ef343984b9993b19cab6fbf4bbf837973ce7b9020a76647227be91"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/SpeechEngineService.kt",
-      "bytes": 10691,
-      "sha256": "99b2656cd29766c103059f1b3d0a8bce098f41476e0baf6e76b8426c5ee77e86"
+      "bytes": 10548,
+      "sha256": "471b1d641b43a38cdb858612d5f04218cbb0a25bb61524ac494bbf11e165b7be"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/SpeechWire.kt",
@@ -2659,13 +2664,13 @@
     },
     {
       "path": "app/src/test/java/com/eiliot/app/WakeCalibrationPolicyTest.kt",
-      "bytes": 3609,
-      "sha256": "1036a8302e9aed7b68a906a7b89b1cd67862e529ba8ced2a4c57f0216c9992de"
+      "bytes": 3550,
+      "sha256": "2ba318e881f19c996c3fd6ad98f4f88ed8e629c63d1563edb9b69cd4ffe4a39f"
     },
     {
       "path": "app/src/test/java/com/eiliot/app/WakeCapturePreferenceTest.kt",
-      "bytes": 1822,
-      "sha256": "d22d83e51954c23f51a10c08d3d53dda3aba14f7d7338bf2ef821dd44bd767bb"
+      "bytes": 1784,
+      "sha256": "5b6072a4637a6178a2f04e811b523edf9cbcbe746130b6deadbb8039745ab1e7"
     },
     {
       "path": "app/src/test/java/com/eiliot/app/WhisperTokenTransportTest.kt",
@@ -2684,8 +2689,8 @@
     },
     {
       "path": "docs/VOICE_IMPLEMENTATION_STATUS.md",
-      "bytes": 25291,
-      "sha256": "c4a77277fbe4d1d4de39ec743ee8482d04adce8cacf5c48e4baa4652c60b6312"
+      "bytes": 24891,
+      "sha256": "9e0c0fd531969ad25fa475267392bca55af94777ad6af8f4cb3be44f59529e04"
     },
     {
       "path": "docs/archive/0.6.0/FEATURE_REVIEW.md",
@@ -2726,6 +2731,21 @@
       "path": "docs/archive/0.6.1/VALIDATION.md",
       "bytes": 7402,
       "sha256": "e3c2c9744f23b4105c7d2bc2879a25bad059adc9ec50bbfc2cbbeb10ef2f2d4b"
+    },
+    {
+      "path": "docs/brand/README.md",
+      "bytes": 944,
+      "sha256": "7f3207b41882fa560b859e9c491b62a2fe1a9760258bf39061f3cdba814590bd"
+    },
+    {
+      "path": "docs/brand/elliot-hero.png",
+      "bytes": 1542516,
+      "sha256": "50cedfe93731b92ab7011620ae67f381510be564320f7fb15dfb157ca881c808"
+    },
+    {
+      "path": "docs/licenses/espeak-ng-GPL-3.0.txt",
+      "bytes": 35147,
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
     },
     {
       "path": "docs/ui/0.6.0/capabilities-360-overview.png",
@@ -2979,18 +2999,18 @@
     },
     {
       "path": "docs/validation/0.6.2/ELLIOT-0.6.1-bug-report.md",
-      "bytes": 3347,
-      "sha256": "3b2a0fc7552a93b1f7429119a7c44e83640bd6fc8513ca7e5d04692f91681661"
+      "bytes": 3346,
+      "sha256": "8f51b5698585cb78e252f47c4e5fc4f79d22ca383767466146b73e4383e21ffe"
     },
     {
       "path": "docs/validation/0.6.2/ELLIOT-0.6.1-crash-evidence.txt",
-      "bytes": 2453,
-      "sha256": "749f1a7f040c974d9c5f505b6369062ad534c08a1a75ff768f6b0a3fecb09f6f"
+      "bytes": 2442,
+      "sha256": "61c5ec8055fa63b24c9235cfe8d61931f89c4e7e0bfaf3c6547d68df06302ccc"
     },
     {
       "path": "docs/validation/0.6.2/ELLIOT-0.6.1-process-exits.txt",
-      "bytes": 1842,
-      "sha256": "7ef6357312c4265511a844ecc7348b6a328486a0ebc51ba82fab55232972eadf"
+      "bytes": 1818,
+      "sha256": "1ec27bf85e9bfe90eab21d8ea017814eb218b1de99f3a027f2e46aca81171280"
     },
     {
       "path": "docs/validation/0.6.2/ELLIOT_original_package_v0.6.2_unsigned.apk.badging.txt",
@@ -3059,13 +3079,13 @@
     },
     {
       "path": "evaluation/voice/README.md",
-      "bytes": 4857,
-      "sha256": "ae357d96f9fc30df9ac5c71d2630348d0b854a581d437a69c76082ea0c39f1ed"
+      "bytes": 4860,
+      "sha256": "f0eab1caf9f2b1c89d5daf508e710a5f2d4ddbfde3820ecdbe3324f4a2fe11b1"
     },
     {
       "path": "evaluation/voice/model-candidates.json",
-      "bytes": 3217,
-      "sha256": "d53faaf0740049dc648c97f3a6bbde789a0e618407b5c34909d93114b612b3fe"
+      "bytes": 3132,
+      "sha256": "13a789f3d22393a69544aa6e425ee368bdd78aa4fa17e1a9562b5c28774aca02"
     },
     {
       "path": "evaluation/voice/prompts.json",
@@ -3094,8 +3114,8 @@
     },
     {
       "path": "gradlew.bat",
-      "bytes": 2260,
-      "sha256": "0008d785920c9ff5cab17403e0270ccc7ceee8e169b6d67a82d96a5475fec5c9"
+      "bytes": 2176,
+      "sha256": "2f18fc6abd50803de7b3a225038d284268904c9d13caa6cf81f99365dc876479"
     },
     {
       "path": "settings.gradle.kts",
@@ -3129,8 +3149,8 @@
     },
     {
       "path": "tools/voice_smoke.py",
-      "bytes": 4410,
-      "sha256": "69832348d77219226cdc1a22eef06c643b2cfea6461444b1c56f484bfe378ad8"
+      "bytes": 4356,
+      "sha256": "d4fab7d5a29cb481ec20d850932e5c6595c3ac036907273d62d1686f9ccc0cb8"
     },
     {
       "path": "vps/setup-android-sdk.sh",

@@ -1,59 +1,139 @@
-# ELLIOT 0.6.2 — native speech crash repair
+<p align="center">
+  <img src="docs/brand/elliot-hero.png" width="100%" alt="ELLIOT, voice companion for Android. A cyan waveform threads through a dark glass orb." />
+</p>
 
-Version code **10**. Built from delivered 0.6.1 source (code 9). Minimum API 26 (Android 8.0), target/compile API 36 (Android 16). App label ELLIOT, compatibility package `com.eiliot.app.preview` and previous delivered signer retained. The original package `com.eiliot.app` remains available as an unsigned build requiring the owner's original key.
+<h1 align="center">ELLIOT for Android</h1>
 
-## What this fixes
+<p align="center">
+  <strong>Say “Hey Elliot”. Ask about your phone. Hear the answer.</strong>
+</p>
 
-The 0.6.1 shared speech configuration forced the first-generation Zipformer loader onto the second-generation wake model. The loader asked for `attention_dims` and exited with status 255. Native process exit bypassed Kotlin catch handlers and Android restarted the core service. The old host smoke test auto-detected KWS instead, so it did not exercise that Android configuration.
+<p align="center">
+  <a href="https://github.com/modhack2003/ELLIOT_ANDROID/releases/tag/v0.6.3-dev.24"><img src="https://img.shields.io/badge/preview-0.6.3--dev.24-20D8E5?style=flat-square" alt="Preview 0.6.3-dev.24" /></a>
+  <img src="https://img.shields.io/badge/Android-8.0%2B-54D88D?style=flat-square&logo=android&logoColor=white" alt="Android 8.0 or later" />
+  <img src="https://img.shields.io/badge/Kotlin-Jetpack%20Compose-9D8AFF?style=flat-square&logo=kotlin&logoColor=white" alt="Kotlin and Jetpack Compose" />
+  <img src="https://img.shields.io/badge/speech-on--device-14AABF?style=flat-square" alt="On-device speech" />
+</p>
 
-0.6.2 uses a shared `assets/voice-engine.json` contract: KWS is explicitly `zipformer2`; transcription is `zipformer`. Checks validate real model hashes, encoder metadata, companion files and keyword tokens before JNI. The same contract drives the pinned native host test, including an isolated negative test reproducing the old exit 255.
+<p align="center">
+  <a href="#try-the-preview">Try the preview</a> &nbsp;·&nbsp;
+  <a href="#meet-the-app">Meet the app</a> &nbsp;·&nbsp;
+  <a href="#how-voice-works">How voice works</a> &nbsp;·&nbsp;
+  <a href="#build-from-source">Build from source</a>
+</p>
 
-All Sherpa/ONNX inference now runs in the non-exported, same-UID `:speech` service process. The main app owns microphone capture, hardware echo effects, AudioTrack playback, live speech/wake turn ownership, conversation, tools and UI. Binder transports16kHz frames/results and bounded PCM callbacks; a native worker exit disconnects speech while the main interface stays available by design. Android execution/device acceptance remains explicitly separate from host checks.
+ELLIOT is a voice and text companion for Android. Say the wake phrase, tap the microphone, or type. Built-in commands can check your battery, set a timer, and change media volume offline. Wake detection, bundled speech recognition, and bundled voice playback run on the phone. For broader conversations, you can select a supported on-device or cloud provider in Settings.
 
-A version/model/config scoped fence records interrupted worker startup and observed worker death. Successful handshake clears the pending marker so normal main-process lifecycle does not permanently block a healthy engine. Observed worker failure blocks automatic native retry until **Repair offline voice** in Settings. Recovery unbinds the old worker, clears the fence, repairs files from APK assets, and prepares speech again. Old worker handles and callbacks cannot act on a replacement session. Off unbinds the worker; its destruction terminates any outstanding native work. No general in-app approval step is introduced.
+## Try the preview
 
-## Install/update
+[**Download the ARM64 preview APK and read the release notes**](https://github.com/modhack2003/ELLIOT_ANDROID/releases/tag/v0.6.3-dev.24)
 
-Use **ELLIOT_v0.6.2.apk** for the reported ARM64 Xiaomi 24066PC95I. It is a complete installable APK, not an archive fragment. Install over the previous signed 0.6.1 in the same profile. **Do not uninstall or clear storage** to update; notes/settings/history retain their existing identity.
+1. Install the APK on an **ARM64 Android 8.0+** device. To update in place, Android requires the same package ID and signing certificate.
+2. Open **ELLIOT**, tap **Resume**, grant microphone access, and enable **Voice & wake word** in Settings.
+3. Say **“Hey Elliot”**, pause, and ask **“What is my battery level?”** You can also tap the microphone to start a request.
+4. For an optional speech model, open **Settings → Check speech recognition**, select a pack and language, and choose **Use for live requests** once the pack is ready.
 
-A universal APK is included for other supported processor architectures. APKs use lossless resource/JNI compression and Android's normal native-library extraction. Real model bytes are extracted/checked before use; acoustic weights and model licenses have not changed. ABI-specific and universal builds come from the same code.
+The preview uses the package ID `com.eiliot.app.preview`. Android may ask you to authorize installation from your download source.
 
-After installation: open ELLIOT, tap Resume, verify it stays open, then try Hey Elliot and a simple volume/timer command. Test wake interruption and Live Call separately. If speech fails, keep the app open and use Settings → Repair offline voice. Text, phone/web tools, memory and global Off remain available subject to their existing settings/grants.
+## Meet the app
 
-## Retained capabilities and UI
+<table>
+  <thead>
+    <tr>
+      <th width="33%">Companion</th>
+      <th width="33%">Vault</th>
+      <th width="33%">Settings</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="center"><img src="docs/ui/0.6.2/companion-360-1x.png" width="240" alt="Companion conversation with the microphone, Live Call, and navigation controls" /></td>
+      <td align="center"><img src="docs/ui/0.6.2/vault-360-1x.png" width="240" alt="Vault with Notes, History, and Web feed tabs and an erase control" /></td>
+      <td align="center"><img src="docs/ui/0.6.2/settings-360-1x.png" width="240" alt="Settings with intelligence provider selection and voice options" /></td>
+    </tr>
+    <tr>
+      <td>Talk, type, or open Live Call.</td>
+      <td>Manage notes, history, and saved references.</td>
+      <td>Choose voice, provider, and privacy controls.</td>
+    </tr>
+  </tbody>
+</table>
 
-All 16 tools, direct matching-request authorization, optional action review, male selected voice, scheduled spoken check-ins and notice policies, memory/write controls, Nano/cloud/offline routing, background reference learning, bounded floating orb/captions, large text, three-tab shell and long-message reader remain. The UI improvement in this repair release is useful speech recovery with an app interface that is independent of native inference. No model/voice feature is removed to avoid the crash.
+<sub>Actual Jetpack Compose renders from 0.6.2 with sample data. Current voice options have since expanded.</sub>
 
-## Reproduce checks
+| Feature | What you can do |
+| --- | --- |
+| **Personal wake phrase** | Calibrate “Hey Elliot” using your pronunciation. Fresh examples and control phrases must pass before a profile can be saved. |
+| **Voice in a noisy room** | Compare the same wake recording with and without enhanced noise reduction. Eligible full-phrase profiles can listen before that filter while commands still use it. |
+| **Offline phone commands** | Ask for battery status, set a timer, adjust volume, or open an app. Actions depend on the permissions you grant. |
+| **Optional multilingual speech** | Download Whisper Small or Large-v3 Turbo. Choose Indian English, Hindi-English, Bengali-English, or Auto for short requests. |
+| **Your choice of conversation mode** | Use offline commands, on-device Nano on supported phones, or a configured cloud provider for broader conversation. |
 
-Requires a full JDK21 (a JRE is insufficient), Gradle8.11.1, Android SDK36/build tools35.0.0 and network for fresh dependencies. Set local SDK path in your own `local.properties`.
+## How voice works
 
-```bash
-./gradlew --no-watch-fs --no-build-cache --max-workers=1 :app:testReleaseUnitTest :app:lintRelease :app:lintPreview
-./gradlew --no-watch-fs --no-build-cache --max-workers=1 clean :app:assemblePreview :app:assembleRelease :app:assemblePreviewAndroidTest
+```mermaid
+flowchart LR
+    MIC["Android microphone"] --> FILTER["Optional GTCRN<br/>noise reduction"]
+    FILTER --> WAKE["Hey Elliot<br/>Zipformer keyword spotting"]
+    MIC -. Calibrated bypass .-> WAKE
+    FILTER --> CAPTURE["Capture request"]
+    WAKE --> CAPTURE
+    TAP["Tap to talk"] --> CAPTURE
+    CAPTURE --> STT["On-device speech to text<br/>Zipformer or Whisper"]
+    STT --> ROUTE{"Request routing"}
+    ROUTE --> LOCAL["Offline phone tool"]
+    ROUTE --> CHAT["Configured conversation provider"]
+    LOCAL --> REPLY["Text and spoken reply"]
+    CHAT --> REPLY
+
+    classDef audio fill:#0b2330,stroke:#26cfe4,color:#ebfbff,stroke-width:2px
+    classDef route fill:#231a38,stroke:#a992ef,color:#f1eaff,stroke-width:2px
+    class MIC,WAKE,CAPTURE,FILTER,STT,TAP audio
+    class ROUTE,LOCAL,CHAT,REPLY route
 ```
 
-`preview` is the internal compatibility build type, with no Preview UI branding. Source excludes the delivered signing key. A newly generated local debug key cannot update the delivered APK. Release/original-package artifacts remain unsigned until externally signed with the proper owner key.
+The wake detector runs while the microphone listener is active. For eligible calibrated profiles, the wake path can use input before GTCRN while request audio still goes through it. A private `:speech` process isolates Sherpa-onnx native inference from the app UI. Cloud conversation is optional and can send recognized text and relevant context to the selected provider.
 
-For actual Android JNI/Binder checks on a dedicated test device/profile:
+### What the Vivo test verified
+
+| Check | Observed result |
+| --- | --- |
+| **Wake from a seat beside the table** | With the phone upright and the calibrated wake path listening before GTCRN, “Hey Elliot” opened listening and “Hey Ellie” was ignored in the live check. |
+| **Live Indian English request** | Whisper Turbo recognized the battery question and the local phone-status command returned the answer. Model load and transcription took about **10 seconds** in that run. |
+| **Still under evaluation** | The flat-table recording missed. Performance across rooms, distances, and speakers remains unmeasured. Hindi-English and Bengali-English modes are selectable and need further live accuracy testing. |
+
+See the [voice evaluation guide](evaluation/voice/README.md) for the test procedure and [speech recovery notes](SPEECH_FIX.md) for the earlier native-worker crash fix.
+
+## Build from source
+
+Use **JDK 21**, **Android SDK 36**, and **Build Tools 35.0.0**. Set your SDK location in an untracked `local.properties` file or through your Android SDK environment.
 
 ```bash
-./gradlew --no-watch-fs --no-build-cache --max-workers=1 :app:connectedPreviewAndroidTest
+git clone https://github.com/modhack2003/ELLIOT_ANDROID.git
+cd ELLIOT_ANDROID
+./gradlew :app:assemblePreview -PvoiceArm64Only=true
+./gradlew :app:testPreviewUnitTest
 ```
 
-Instrumentation prepares actual engines, checks worker PID isolation, processes silence/synthesized PCM, kills the worker, and checks failure/retry behavior. It turns the companion off before each test and does not erase notes/history. These tests must run on a test device; compilation alone is not execution or microphone/AEC certification.
+On Windows PowerShell, use `.\gradlew.bat` in place of `./gradlew`. The ARM64 APK is built under `app/build/outputs/apk/preview/`. A locally signed preview uses your own debug signing key.
 
-Optional Linux CPU checks:
+<details>
+<summary><strong>Run native checks on a dedicated Android test device</strong></summary>
 
 ```bash
-python3 -m pip install sherpa-onnx==1.13.8 numpy
-python3 tools/voice_smoke.py
-# Expected to exit 255 and log missing attention_dims; run as a separate process:
-python3 tools/voice_smoke.py --regression-wrong-loader
+./gradlew :app:connectedPreviewAndroidTest -PvoiceArm64Only=true
 ```
 
-## Remaining limits
+Instrumentation runs the packaged speech engines and stops the companion service during setup. See the [voice evaluation guide](evaluation/voice/README.md) for optional model-pack tests and interpretation of results.
 
-The supplied ADB report establishes the 0.6.1 fault; no device is connected to this build session. Actual Xiaomi/MistOS/Android16 startup, Binder death/recovery, microphone, loudspeaker echo, latency, lock/background survival,1–2m recognition and physical accessibility acceptance remain handset gates until run. JNI tests are supplied/compiled; their execution status is recorded in VALIDATION.md. The fix is not a claim that every acoustic or OEM issue is resolved.
+</details>
 
-English recognition quality still needs evaluation; a passing smoke command is not an accuracy study. Six 32 ms VAD frames still impose 192 ms confirmation, so the earlier 150 ms onset-to-stop target is not certified. Ryan's model-card dataset terms and the pinned eSpeak-containing runtime's GPL obligations remain unresolved for commercial/proprietary/store distribution; see THIRD_PARTY_MODELS.md. This release changes no third-party licensing rights.
+## Project resources
+
+| Resource | Where to look |
+| --- | --- |
+| Architecture and implementation | [System design](EILIOT_SYSTEM_DESIGN.md) · [Android source](app/src/main/java/com/eiliot/app) |
+| Speech models and versions | [Model sources](MODEL_SOURCES.json) · [Voice evaluation](evaluation/voice/README.md) |
+| Terms and attribution | [Third-party models and runtime](THIRD_PARTY_MODELS.md) |
+
+The speech runtime, voices, and model weights carry their upstream terms. The Ryan voice model card lists noncommercial dataset terms. See the third-party notices before redistributing an app or model pack.

@@ -1,6 +1,6 @@
 # ELLIOT 0.6.2 speech callback fix
 
-Fixed and installed on Xiaomi 24066PC95I (ADB DEVICE_SERIAL_REDACTED), 31 October 2026.
+Fixed and installed on Xiaomi 24066PC95I on 31 October 2026.
 
 The native speech engine looked up invoke(float[]): java.lang.Integer on a
 generated Kotlin lambda and aborted when that exact method was unavailable.
