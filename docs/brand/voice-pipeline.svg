@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="680" viewBox="0 0 1280 680" role="img" aria-labelledby="title desc">
+  <title id="title">ELLIOT voice pipeline</title>
+  <desc id="desc">Android capture feeds GTCRN. Wake detection normally uses filtered input. Eligible calibrated profiles can bypass software GTCRN for wake while request audio remains filtered. Wake or tapping starts request capture, then on-device STT, routing and reply.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1">
+      <stop stop-color="#06121E"/>
+      <stop offset="1" stop-color="#0D1527"/>
+    </linearGradient>
+    <linearGradient id="edge">
+      <stop stop-color="#36DCE3"/>
+      <stop offset="1" stop-color="#B4A1FF"/>
+    </linearGradient>
+    <radialGradient id="halo">
+      <stop stop-color="#116479" stop-opacity=".24"/>
+      <stop offset="1" stop-color="#116479" stop-opacity="0"/>
+    </radialGradient>
+    <marker id="arrow0" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M1 1L7 4L1 7" fill="none" stroke="#4DDCE3" stroke-width="1.5"/>
+    </marker>
+    <marker id="arrow1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M1 1L7 4L1 7" fill="none" stroke="#B4A1FF" stroke-width="1.5"/>
+    </marker>
+  </defs>
+  <rect width="1280" height="680" rx="26" fill="url(#bg)"/>
+  <ellipse cx="934.4" cy="150" rx="420" ry="220" fill="url(#halo)"/>
+  <rect x=".5" y=".5" width="1279" height="679" rx="26" fill="none" stroke="#223446"/>
+  <g font-family="Segoe UI, Arial, sans-serif">
+    <text x="48" y="52" font-size="13" fill="#72CCD5" font-weight="600" letter-spacing="2.5">INSIDE THE VOICE PIPELINE</text>
+    <text x="48" y="102" font-size="38" fill="#E8F5FB" font-weight="600">Follow the sound.</text>
+    <text x="48" y="137" font-size="19" fill="#A5BBCB" font-weight="400">Wake detection and command recognition have separate jobs and filter settings.</text>
+    <path d="M264 344 H330" fill="none" stroke="#4DDCE3" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow0)"/>
+    <path d="M435 288 V270 H624" fill="none" stroke="#4DDCE3" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow0)"/>
+    <path d="M156 288 V198 Q156 180 174 180 H580 Q600 180 600 198 V220 H624" fill="none" stroke="#B4A1FF" stroke-width="2" stroke-linejoin="round" stroke-dasharray="7 7" marker-end="url(#arrow1)"/>
+    <path d="M540 344 H564 Q580 344 580 360 V428 Q580 444 596 444 H624" fill="none" stroke="#4DDCE3" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow0)"/>
+    <path d="M754 308 V390" fill="none" stroke="#4DDCE3" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow0)"/>
+    <path d="M884 444 H968" fill="none" stroke="#4DDCE3" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow0)"/>
+    <path d="M1100 498 V542" fill="none" stroke="#4DDCE3" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow0)"/>
+    <text x="210" y="166" font-size="16" fill="#C5B6FF" font-weight="400">Eligible profile · wake before GTCRN</text>
+    <text x="442" y="254" font-size="14" fill="#93B9C7" font-weight="400">Default wake input</text>
+    <text x="772" y="354" font-size="15" fill="#93B9C7" font-weight="400">Opens listening</text>
+    <rect x="48" y="288" width="216" height="112" rx="22" fill="#0C1B2A" stroke="#254455"/>
+    <text x="72" y="321" font-size="12" fill="#6ECBD6" font-weight="600" letter-spacing="1.5">01 / CAPTURE</text>
+    <text x="72" y="353" font-size="25" fill="#E8F5FB" font-weight="600">Android mic</text>
+    <text x="72" y="381" font-size="15" fill="#A5BBCB" font-weight="400">Direct input + Android NS</text>
+    <rect x="330" y="288" width="210" height="112" rx="22" fill="#0C1B2A" stroke="#254455"/>
+    <text x="354" y="321" font-size="12" fill="#6ECBD6" font-weight="600" letter-spacing="1.5">02 / FILTER</text>
+    <text x="354" y="353" font-size="25" fill="#E8F5FB" font-weight="600">GTCRN</text>
+    <text x="354" y="381" font-size="15" fill="#A5BBCB" font-weight="400">Enhanced noise reduction</text>
+    <rect x="624" y="190" width="260" height="118" rx="22" fill="#171D33" stroke="#635A8C"/>
+    <text x="648" y="221" font-size="12" fill="#BFA9FF" font-weight="600" letter-spacing="1.5">WAKE PHRASE</text>
+    <text x="648" y="254" font-size="28" fill="#E8F5FB" font-weight="600">“Hey Elliot”</text>
+    <text x="648" y="282" font-size="16" fill="#B9B6D4" font-weight="400">Saved pronunciation profile</text>
+    <rect x="624" y="390" width="260" height="108" rx="22" fill="#0C1B2A" stroke="#254455"/>
+    <text x="648" y="422" font-size="12" fill="#6ECBD6" font-weight="600" letter-spacing="1.5">03 / LISTEN</text>
+    <text x="648" y="454" font-size="25" fill="#E8F5FB" font-weight="600">Capture request</text>
+    <text x="648" y="480" font-size="16" fill="#A5BBCB" font-weight="400">Wake or tap to start</text>
+    <rect x="968" y="390" width="264" height="108" rx="22" fill="#0C1B2A" stroke="#254455"/>
+    <text x="992" y="422" font-size="12" fill="#6ECBD6" font-weight="600" letter-spacing="1.5">04 / TRANSCRIBE</text>
+    <text x="992" y="454" font-size="25" fill="#E8F5FB" font-weight="600">On-device STT</text>
+    <text x="992" y="480" font-size="15" fill="#A5BBCB" font-weight="400">Zipformer or optional Whisper</text>
+    <rect x="48" y="444" width="492" height="166" rx="22" fill="#0B1725" stroke="#23364A"/>
+    <text x="72" y="480" font-size="12" fill="#6ECBD6" font-weight="600" letter-spacing="1.2">THE CALIBRATED VIVO CONFIGURATION</text>
+    <text x="72" y="514" font-size="19" fill="#E8F5FB" font-weight="400">Wake can listen before software denoising.</text>
+    <text x="72" y="545" font-size="19" fill="#E8F5FB" font-weight="400">Request audio still uses enhanced filtering.</text>
+    <text x="72" y="582" font-size="15" fill="#A5BBCB" font-weight="400">Solid paths are standard. Dashed path is optional.</text>
+    <rect x="624" y="542" width="608" height="68" rx="22" fill="#141D32" stroke="#455075"/>
+    <text x="648" y="583" font-size="20" fill="#E8F5FB" font-weight="400">Offline tool or chosen conversation provider → reply</text>
+    <text x="48" y="651" font-size="12" fill="#6ECBD6" font-weight="600" letter-spacing="1.6">SHERPA-ONNX</text>
+    <text x="213" y="651" font-size="16" fill="#A5BBCB" font-weight="400">Native inference runs in the private :speech process.</text>
+  </g>
+</svg>

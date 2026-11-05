@@ -59,8 +59,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 7754,
-      "sha256": "13eb6cf74df9546ac02f489af8e772c69cfd3e02d7b5d9336434e5ed9d10c02c"
+      "bytes": 10847,
+      "sha256": "101d2f85e23a67721406fd2a2b37d8422b3204879435d378d2cf7790116258b4"
     },
     {
       "path": "ROADMAP.md",
@@ -2739,13 +2739,28 @@
     },
     {
       "path": "docs/brand/README.md",
-      "bytes": 944,
-      "sha256": "7f3207b41882fa560b859e9c491b62a2fe1a9760258bf39061f3cdba814590bd"
+      "bytes": 1643,
+      "sha256": "94999d901993d5c401014eef89d3e875825d8fe6eb383294db0ae921b6568562"
     },
     {
       "path": "docs/brand/elliot-hero.png",
       "bytes": 1542516,
       "sha256": "50cedfe93731b92ab7011620ae67f381510be564320f7fb15dfb157ca881c808"
+    },
+    {
+      "path": "docs/brand/elliot-signal.gif",
+      "bytes": 123264,
+      "sha256": "68ec06c4b8dc763f19586365f1672b4ba84f6379ea425f1c7f3a6aeadd4bca15"
+    },
+    {
+      "path": "docs/brand/speech-modes.svg",
+      "bytes": 4084,
+      "sha256": "2f6e96ca45999f2fdea6492d63b9c87f00c5302a2c317cc928fbc87b809efbf9"
+    },
+    {
+      "path": "docs/brand/voice-pipeline.svg",
+      "bytes": 6438,
+      "sha256": "77011a979e838f3844e2ff1939d2cdd04b1b7ab428ed2ccda92bd59a8d1ec4af"
     },
     {
       "path": "docs/licenses/espeak-ng-GPL-3.0.txt",

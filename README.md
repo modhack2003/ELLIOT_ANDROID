@@ -18,11 +18,25 @@
 <p align="center">
   <a href="#quick-start">Quick start</a> &nbsp;·&nbsp;
   <a href="#meet-the-app">Meet the app</a> &nbsp;·&nbsp;
+  <a href="#speech-modes">Speech modes</a> &nbsp;·&nbsp;
   <a href="#how-voice-works">How voice works</a> &nbsp;·&nbsp;
+  <a href="#development-snapshot">Project status</a> &nbsp;·&nbsp;
   <a href="#build-from-source">Build from source</a>
 </p>
 
+<p align="center">
+  <a href="#how-voice-works"><img src="docs/brand/elliot-signal.gif" width="100%" alt="Decorative animated cyan waveform" /></a>
+</p>
+
 ELLIOT is a voice and text companion for Android. Say the wake phrase, tap the microphone, or type. Built-in commands can check your battery, set a timer, and change media volume offline. Wake detection, bundled speech recognition, and bundled voice playback run on the phone. For broader conversations, you can select a supported on-device or cloud provider in Settings.
+
+<table>
+  <tr>
+    <td width="33%" valign="top"><strong>🎙️ Talk</strong><br /><br />Wake, tap, or type.</td>
+    <td width="33%" valign="top"><strong>🧠 Speech</strong><br /><br />Bundled STT or optional Whisper.</td>
+    <td width="33%" valign="top"><strong>⚙️ Control</strong><br /><br />Tune capture, filters, and providers.</td>
+  </tr>
+</table>
 
 ## Quick start
 
@@ -38,9 +52,9 @@ The preview uses the package ID `com.eiliot.app.preview`.
 <table>
   <thead>
     <tr>
-      <th width="33%">Companion</th>
-      <th width="33%">Vault</th>
-      <th width="33%">Settings</th>
+      <th width="33%">01 &nbsp; Companion</th>
+      <th width="33%">02 &nbsp; Vault</th>
+      <th width="33%">03 &nbsp; Settings</th>
     </tr>
   </thead>
   <tbody>
@@ -50,9 +64,9 @@ The preview uses the package ID `com.eiliot.app.preview`.
       <td align="center"><img src="docs/ui/0.6.2/settings-360-1x.png" width="240" alt="Settings with intelligence provider selection and voice options" /></td>
     </tr>
     <tr>
-      <td>Talk, type, or open Live Call.</td>
-      <td>Manage notes, history, and saved references.</td>
-      <td>Choose voice, provider, and privacy controls.</td>
+      <td align="center"><strong>Your conversation</strong><br />Talk, type, or open Live Call.</td>
+      <td align="center"><strong>Your saved context</strong><br />Manage notes, history, and references.</td>
+      <td align="center"><strong>Your preferences</strong><br />Choose voice, provider, and privacy controls.</td>
     </tr>
   </tbody>
 </table>
@@ -67,7 +81,35 @@ The preview uses the package ID `com.eiliot.app.preview`.
 | **Optional multilingual speech** | Download Whisper Small or Large-v3 Turbo. Choose Indian English, Hindi-English, Bengali-English, or Auto for short requests. |
 | **Your choice of conversation mode** | Use offline commands, on-device Nano on supported phones, or a configured cloud provider for broader conversation. |
 
+## Speech modes
+
+<p align="center">
+  <img src="docs/brand/speech-modes.svg" width="100%" alt="Optional Whisper language modes. Indian English, Hindi-English and Bengali-English are selectable. Auto is also available. Live accuracy is under evaluation." />
+</p>
+
+Choose a language setting and an optional **Whisper Small** or **Large-v3 Turbo** pack for short requests. The same model family handles these settings. Wake calibration adapts phrase matching separately. Hindi-English and Bengali-English still need more real-speech accuracy testing.
+
+<details>
+<summary><strong>Compare the speech engine options</strong></summary>
+
+| Engine | Role in the app | Current evidence |
+| --- | --- | --- |
+| **Bundled Zipformer** | Default streaming English STT and Live Call | Runs offline. Misheard the live battery question in an earlier Vivo test. |
+| **Whisper Small** | Optional multilingual short requests | Downloadable pack. Bengali-English results have included word errors and incomplete output. |
+| **Whisper Large-v3 Turbo int8** | Optional multilingual short requests | Recognized the live Indian English battery question. Load and transcription took about 10 seconds in that run. |
+
+</details>
+
 ## How voice works
+
+<p align="center">
+  <img src="docs/brand/voice-pipeline.svg" width="100%" alt="Android microphone audio passes through GTCRN. Eligible calibrated profiles can use input before GTCRN for wake detection. Wake or tapping opens request capture. Requests use on-device STT, then an offline tool or the chosen conversation provider." />
+</p>
+
+The wake detector runs while the microphone listener is active. For eligible calibrated profiles, the wake path can use input before GTCRN while request audio still goes through it. A private `:speech` process isolates Sherpa-onnx native inference from the app UI. Cloud conversation is optional and can send recognized text and relevant context to the selected provider.
+
+<details>
+<summary><strong>Explore the request-routing diagram</strong></summary>
 
 ```mermaid
 flowchart LR
@@ -90,15 +132,29 @@ flowchart LR
     class ROUTE,LOCAL,CHAT,REPLY route
 ```
 
-The wake detector runs while the microphone listener is active. For eligible calibrated profiles, the wake path can use input before GTCRN while request audio still goes through it. A private `:speech` process isolates Sherpa-onnx native inference from the app UI. Cloud conversation is optional and can send recognized text and relevant context to the selected provider.
+</details>
 
-### What the Vivo test verified
+## Development snapshot
+
+The current source is **0.6.3-dev.24**. These observations come from the Vivo checks recorded in the [agent handoff](AGENTS.md).
 
 | Check | Observed result |
 | --- | --- |
-| **Wake from a seat beside the table** | With the phone upright and the calibrated wake path listening before GTCRN, “Hey Elliot” opened listening and “Hey Ellie” was ignored in the live check. |
-| **Live Indian English request** | Whisper Turbo recognized the battery question and the local phone-status command returned the answer. Model load and transcription took about **10 seconds** in that run. |
-| **Still under evaluation** | The flat-table recording missed. Performance across rooms, distances, and speakers remains unmeasured. Hindi-English and Bengali-English modes are selectable and need further live accuracy testing. |
+| 🟢 **Wake from a seat beside the table** | With the phone upright and the calibrated wake path listening before GTCRN, “Hey Elliot” opened listening and “Hey Ellie” was ignored in the live check. |
+| 🟢 **Live Indian English request** | Whisper Turbo recognized the battery question and the local phone-status command returned the answer. Model load and transcription took about **10 seconds** in that run. |
+| 🟠 **Still under evaluation** | The flat-table recording missed. Performance across rooms, distances, and speakers remains unmeasured. Hindi-English and Bengali-English modes are selectable and need further live accuracy testing. |
+
+### Next validation targets
+
+```mermaid
+flowchart LR
+    A["01 · Capture quality<br/>Flat + upright / quiet + fan"] --> B["02 · Wake reliability<br/>Real wakes + similar phrases"]
+    B --> C["03 · Language accuracy<br/>Indian English + mixed speech"]
+    C --> D["04 · Device behavior<br/>Latency + memory + power"]
+
+    classDef next fill:#101f30,stroke:#5b8ca8,color:#e8f5fb,stroke-width:2px
+    class A,B,C,D next
+```
 
 See the [voice evaluation guide](evaluation/voice/README.md) for the test procedure and [speech recovery notes](SPEECH_FIX.md) for the earlier native-worker crash fix.
 
@@ -130,6 +186,7 @@ Instrumentation runs the packaged speech engines and stops the companion service
 
 | Resource | Where to look |
 | --- | --- |
+| Current issues and next steps | [Agent handoff](AGENTS.md) |
 | Architecture and implementation | [System design](EILIOT_SYSTEM_DESIGN.md) · [Android source](app/src/main/java/com/eiliot/app) |
 | Speech models and versions | [Model sources](MODEL_SOURCES.json) · [Voice evaluation](evaluation/voice/README.md) |
 | Terms and attribution | [Third-party models and runtime](THIRD_PARTY_MODELS.md) |
