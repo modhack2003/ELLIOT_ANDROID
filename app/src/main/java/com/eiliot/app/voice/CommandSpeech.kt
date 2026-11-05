@@ -4,7 +4,7 @@ import android.content.Context
 
 data class CommandSpeech(val model: MultilingualModelPack.Spec, val language: String) {
     init {
-        require(model in listOf(MultilingualModelPack.SMALL, MultilingualModelPack.TURBO))
+        require(model in MultilingualModelPack.models)
         require(language in languages)
     }
 
