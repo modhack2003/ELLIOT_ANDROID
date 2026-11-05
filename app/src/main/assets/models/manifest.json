@@ -68,13 +68,13 @@
     },
     {
       "path": "kws-phone/keywords-hey.txt",
-      "bytes": 36,
-      "sha256": "8ae5e84cc43c63ede272780aef36def41a7efd28af87a725af39085035411850"
+      "bytes": 35,
+      "sha256": "d2aad9e1c3fe0073d60d980f5aa2e1bc1c29de9b56750548a91641c8b45df492"
     },
     {
       "path": "kws-phone/keywords.txt",
-      "bytes": 61,
-      "sha256": "7632be3107ad4ff0e10031aeca0a97b9c1a8ae4d2821962530b7fa59c53aef0c"
+      "bytes": 59,
+      "sha256": "965b4265188c9306c8f17d3ab5a0b6a8fd46ea5625dc8221a1295a7ea0cdbd94"
     },
     {
       "path": "kws-phone/tokens.txt",
@@ -103,8 +103,8 @@
     },
     {
       "path": "kws/keywords-hey.txt",
-      "bytes": 35,
-      "sha256": "c4ed0328538ab5cc9b3dbeae9d3a2f80970e428a093ad723df32836b18e8155b"
+      "bytes": 34,
+      "sha256": "6196aa668e9351eb128fc34476ba32de514480f213a419c80b91a585bea152a5"
     },
     {
       "path": "kws/keywords.txt",
@@ -463,8 +463,8 @@
     },
     {
       "path": "tts/espeak-ng-data/lang/art/lfn",
-      "bytes": 135,
-      "sha256": "394874fd9022e37cdc307c3386e81f1c0c133a8e9c5fdff74888b519f2c6d648"
+      "bytes": 127,
+      "sha256": "90a808fd09b6c0376193e919789f0a778d17b1e355294189a65d0863e9a1c868"
     },
     {
       "path": "tts/espeak-ng-data/lang/art/piqd",
@@ -1388,8 +1388,8 @@
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Alicia",
-      "bytes": 474,
-      "sha256": "6d3f60ec866706e9d4ab7da2a79eedb8c11b50f63620f87e58317f316ea3d58e"
+      "bytes": 453,
+      "sha256": "38c70dced8a2bf16f09db7901a208a86d0cf0818bcadef97a5a094b1afff96f0"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Andrea",
@@ -1398,28 +1398,28 @@
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Andy",
-      "bytes": 320,
-      "sha256": "0e13ba1a940cd9df7e65358c36445c9740f3d75f1360c7f7c71ab9f74b45edca"
+      "bytes": 301,
+      "sha256": "6fb7911e31ba77e1de90dbfa53ae63a0f1baf8859708da0f722c9dade16e7881"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Annie",
-      "bytes": 315,
-      "sha256": "40f0f829c5c6e7abf4a02a21f128a572756d6f6693014c26d09a5c29ede5ec33"
+      "bytes": 298,
+      "sha256": "29fd281b9ad5369561a38884691b93d4061be3585c688d62bc29fe160a4d5dcf"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/AnxiousAndy",
-      "bytes": 361,
-      "sha256": "7dfe126f517b76cc78269618dbee2c30d324bea9460b400938756ec93995eaf8"
+      "bytes": 342,
+      "sha256": "90d89c21d69f087c325daaaa63ed5c82ca690e7c3a3b844eaa05e7378d044ae1"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Demonic",
-      "bytes": 3858,
-      "sha256": "241b0e78362bd3208bb586b65bdf52330e1e8322f8f226c4790c4abeb47cfb09"
+      "bytes": 3793,
+      "sha256": "c1cc5ac04d2e0b1ea86899efc787fc5b89419a2c35222c4efa115c24c0688aba"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Denis",
-      "bytes": 305,
-      "sha256": "a09fe9f7a4e478d2ba1e139c2995633e2b99de9abdaaa82307954599b0e3d6fd"
+      "bytes": 286,
+      "sha256": "81afe9e13c2abc943325fe139fa38743f93a76e61744b2ae498346a7c6dbb8eb"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Diogo",
@@ -1428,13 +1428,13 @@
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Gene",
-      "bytes": 281,
-      "sha256": "06258dae680cde2122a4939dbd4f23ed4ea145b7475068bf7dd4d466090afd2a"
+      "bytes": 264,
+      "sha256": "2cf02c0a190704ca8d9051e51cfb8ce05fb8c0ceca5a6d2c7692011eb2855f41"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Gene2",
-      "bytes": 283,
-      "sha256": "bcdb3039296eea37398e4423dc9bb6849cda9c5c812b83702ebc49682c649f57"
+      "bytes": 266,
+      "sha256": "9670061055bbf9e85a8b307955ecd584bafddb54c9a2a6beae6884b69ed2a406"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Henrique",
@@ -1448,28 +1448,28 @@
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Jacky",
-      "bytes": 267,
-      "sha256": "41884ed9b66160aeb5a0dc418370a59fe39ead0013d93e023e6d607ef01c1a6e"
+      "bytes": 250,
+      "sha256": "7f46cbe7e1f1af7d2bcd2e4c8274cd19e4dbb42c23e1a7647cb6526620f2994a"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Lee",
-      "bytes": 338,
-      "sha256": "a1584887cddb40c10e04992fb770025b52e66b70504656094f80975f1d6bbf6b"
+      "bytes": 318,
+      "sha256": "0f174fc9a7c8f606391eb1424a84d4b9fe00facd98439692c79bbe4d44276a6c"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Marco",
-      "bytes": 467,
-      "sha256": "04025677360c0270f094bbb6716b83c8284902f6da9b496bedbbf590963835fb"
+      "bytes": 444,
+      "sha256": "5fbf6394e4f352376f476e4f3e27cfb6d1063567f696540c338e8782b02e1625"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Mario",
-      "bytes": 270,
-      "sha256": "a94ac65d132030df496e8aa364d5cde5f2eafa4b6b3ae361a2901d512c6029d8"
+      "bytes": 253,
+      "sha256": "08898d77dd933a4e9f122501e7627a221904aa7908cf37c78ca8df4d4519b2f3"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Michael",
-      "bytes": 270,
-      "sha256": "4409be23ef5fedf4c8bffbfaa8a802a342824d7e97f1d92938336a25f92f0ebe"
+      "bytes": 253,
+      "sha256": "b56041014e395cdcc01a898bf953d0f76acc96989f59e542dc6d8ccc829535d3"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Mike",
@@ -1478,8 +1478,8 @@
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Mr serious",
-      "bytes": 3193,
-      "sha256": "794abd78deb07ce9b03419d20f7744df4c0151d5abff7981217e9d0926a2f240"
+      "bytes": 3143,
+      "sha256": "c4522fbc0acdc8f3ec43e2927bca7c7a9141f619eac5858291ad5505f7307689"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Nguyen",
@@ -1508,18 +1508,18 @@
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Storm",
-      "bytes": 420,
-      "sha256": "e817c7d1ce10de527ebc19c0835f580cb584c3ae7d36d30a4f414482602e7b89"
+      "bytes": 397,
+      "sha256": "4b11444cf3cc949f44ebf08e86b61adf189ff9f5e382ebaa768dd5c097834bf7"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/Tweaky",
-      "bytes": 3189,
-      "sha256": "c34d1c1d8b7922ceb886b95ad6ab534ca048f9c47e19698ec2aae5cf0c32cdbc"
+      "bytes": 3139,
+      "sha256": "d42853c6b5cb9c4d6715f4ce04a9e9da620d79624edcce45007b72bd4c189a78"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/UniRobot",
-      "bytes": 417,
-      "sha256": "23dba52c2d1cb332db6225304818d85488f110a668ddcdbfd7f0438afe37794b"
+      "bytes": 398,
+      "sha256": "c9c276ee984bccae4780d2017049cb237919565f3914d821c9e9585257699189"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/adam",
@@ -1548,8 +1548,8 @@
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/aunty",
-      "bytes": 358,
-      "sha256": "0aede4d1ca614f32c348f3d728eab58322ccd016e8531234fdc3dfcf00e32bf1"
+      "bytes": 339,
+      "sha256": "a917590bd972ff8dba753cda37cfe5adc9faa93a23d7611345e0768049508490"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/belinda",
@@ -1563,8 +1563,8 @@
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/boris",
-      "bytes": 224,
-      "sha256": "f23d0a6ee2eeb7e3340506d61d422b691fb04f4e98977ea15c1e0ee5715846d5"
+      "bytes": 209,
+      "sha256": "0368580bd2b0d2eb3d674216018c79fd2873c3037a86973a2239fd65e5d0efa4"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/caleb",
@@ -1643,8 +1643,8 @@
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/ian",
-      "bytes": 3168,
-      "sha256": "c0722c7954d3e6582e3f5b3f584140675ab060ac3c6cac5dd11a74592db5550a"
+      "bytes": 3117,
+      "sha256": "71941d5c3234a610332b14483de809bdee88af2fc5a2d345a9ccd91a3a3245c5"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/iven",
@@ -1668,13 +1668,13 @@
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/john",
-      "bytes": 3186,
-      "sha256": "bfbcc1cec33ef0581fdeb4955fbcd0d824a5d4be5493d731e4a2ef7f8f3ba670"
+      "bytes": 3136,
+      "sha256": "ee96974df48c36afa08060dd131cd8235e157a2c3a7cd6b1dd95f04ef59624f9"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/kaukovalta",
-      "bytes": 361,
-      "sha256": "b9f6016145835c3999bcd5872b8a53442729bd903591781ea3340746b3b4956b"
+      "bytes": 346,
+      "sha256": "2ca787d1828da0384649f9d570028808d4106425340eb80b92515b8e3a38eb46"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/klatt",
@@ -1758,13 +1758,13 @@
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/max",
-      "bytes": 225,
-      "sha256": "c88f70a60a19e76a6774dfbd7664be639b9aa8aa587c680834c305ffa434aaaf"
+      "bytes": 210,
+      "sha256": "347152de7a2376c9b087be62537fa0bde7d141c206f2dfd15820d2bad3d8e50a"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/michel",
-      "bytes": 404,
-      "sha256": "c0068ad9cb792dfb78aedbdff9c3cec68e5083736bae0c33bf19088186101087"
+      "bytes": 382,
+      "sha256": "2a1192b8d8a1770575bb1289063cadc6b6e56d6b68e9a389d959fb9a1e1ace20"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/miguel",
@@ -1778,8 +1778,8 @@
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/norbert",
-      "bytes": 3189,
-      "sha256": "35b9923e15caf36280542270282bd2392c6d86ef5db9a8be7be92ce2241a46cb"
+      "bytes": 3139,
+      "sha256": "bbbc4a2894c18be4b9e56880949373bdd2646728da28028e2f2d9e2918c953b0"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/pablo",
@@ -1798,18 +1798,18 @@
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/quincy",
-      "bytes": 354,
-      "sha256": "e9945bee7b4f3240221866f497bf2511a886ed7702d8389688a03c2ea120caf0"
+      "bytes": 334,
+      "sha256": "83ea85df121ceba98edc5cd574db2a46684031eb106528b8fba5f70301fd9bb6"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/rob",
-      "bytes": 265,
-      "sha256": "fbfffcdb0afb2e3b70f886c02282feae22509d77fe6e7103daf907f7a356595d"
+      "bytes": 248,
+      "sha256": "607b68ffd5ed015dd86fa18816de23ecd438fe9e1097424ca3c4955481044d54"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/robert",
-      "bytes": 274,
-      "sha256": "72604f85afe5bb52a5ce7e3427b196e1e3e426a14a64e2d93b6617e248a46417"
+      "bytes": 257,
+      "sha256": "002af12747ae0c942156da2052b9ba50237fa74dc18725cb4b48843ed5d18635"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/robosoft",
@@ -1878,8 +1878,8 @@
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/travis",
-      "bytes": 383,
-      "sha256": "7d5a34be05778ee850d97b0491a62db7683c058d660ff2afc71c08c87360f30d"
+      "bytes": 360,
+      "sha256": "31484ad79535a92d682d228e128b81deaa3476256655367e83b75bd198b32435"
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/victor",
@@ -1898,8 +1898,8 @@
     },
     {
       "path": "tts/espeak-ng-data/voices/!v/zac",
-      "bytes": 275,
-      "sha256": "edaf508b2cfbfd6088a163dcc78d5f6a26850a7d39a5a0e5128b09526f56b6db"
+      "bytes": 260,
+      "sha256": "f9a0b66a29bc9b7d2def01d7947d5a279d3b1b2e12d6542a2d4596612a981df1"
     },
     {
       "path": "tts/espeak-ng-data/yue_dict",

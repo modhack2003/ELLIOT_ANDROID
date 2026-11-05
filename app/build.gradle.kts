@@ -52,7 +52,12 @@ android {
             // Native Android runtimes from different SDK sandboxes must not share a JVM.
             test.setForkEvery(1)
             test.systemProperty("robolectric.dependency.repo.url", "https://repo.maven.apache.org/maven2")
-            listOf("http.proxyHost", "http.proxyPort", "https.proxyHost", "https.proxyPort", "javax.net.ssl.trustStore").forEach { property ->
+            // Forward select JVM properties to the forked test workers when present. The Robolectric
+            // and user.home entries let the suite run in CI sandboxes whose default home is read-only,
+            // by relocating the Robolectric download lock and dependency cache to a writable path.
+            // All entries are no-ops unless the matching property is set, so local behavior is unchanged.
+            listOf("http.proxyHost", "http.proxyPort", "https.proxyHost", "https.proxyPort", "javax.net.ssl.trustStore",
+                "robolectric.dependency.dir", "robolectric.dependency.repo.url", "user.home").forEach { property ->
                 System.getProperty(property)?.let { test.systemProperty(property, it) }
             }
             test.jvmArgs("--add-opens=java.base/java.lang=ALL-UNNAMED", "--add-opens=java.base/java.util=ALL-UNNAMED",
