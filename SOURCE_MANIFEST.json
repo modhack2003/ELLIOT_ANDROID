@@ -13,6 +13,11 @@
       "sha256": "a773ea491a6180dab1b9f7751c4ab366b0c4e5874bc9476622db6ba5bd562181"
     },
     {
+      "path": "AGENTS.md",
+      "bytes": 9265,
+      "sha256": "4f8e008d3f4d40bbdb1c2951b1f22fae7dcf62e888c3797f51f6b5550c332ce9"
+    },
+    {
       "path": "BUILD_PLAN.md",
       "bytes": 9035,
       "sha256": "0b0120628f34b73aead17c649182eb03cc2a4e393dee35c534cf4661243de585"
