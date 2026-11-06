@@ -9,8 +9,8 @@
     },
     {
       "path": ".github/workflows/android-release.yml",
-      "bytes": 8631,
-      "sha256": "74aaf74a16e6f3f953cda8c49edfc764cf44de029c06e5906f93110469657782"
+      "bytes": 10692,
+      "sha256": "3290e6ce36b9fef6a43de4e0abb8ca2065ba93f93044ef7575ca1930ece9f2e9"
     },
     {
       "path": ".gitignore",
