@@ -49,7 +49,7 @@ val LocalSystemMotionOff = staticCompositionLocalOf<Boolean?> { null }
         SectionLabel("Orb & appearance")
         Text("Make room for your day.",style=MaterialTheme.typography.titleLarge,color=EiliotColors.TextPrimary)
         Text("Keep captions close and the rest of your phone usable.",fontSize=14.sp,color=EiliotColors.TextSecondary,modifier=Modifier.padding(top=6.dp))
-        AndroidView(factory={ ArcCoreView(it) },update={ it.setState(OrbState.IDLE);it.setPresentation(a.motion,a.haptics);it.setPaused(!enabled);it.alpha=a.opacity },modifier=Modifier.size(a.sizeDp.dp).padding(vertical=4.dp))
+        AndroidView(factory={ ArcCoreView(it).apply { setContrastDisc(false) } },update={ it.setState(OrbState.IDLE);it.setPresentation(a.motion,a.haptics);it.setPaused(!enabled);it.alpha=a.opacity },modifier=Modifier.size(a.sizeDp.dp).padding(vertical=4.dp))
         TextButton(onClick={expanded=!expanded},modifier=Modifier.heightIn(min=48.dp)) { Text(if(expanded) "Hide appearance options" else "Customize orb & captions") }
         if(expanded) {
         Text("Orb size",color=EiliotColors.TextPrimary,fontSize=16.sp)

@@ -77,7 +77,7 @@ import kotlinx.coroutines.*
     val redraw=revision
     if(calibrating)VoiceCalibrationDialog(transcriptionOnly=checkingStt) {calibrating=false;changed()}
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(18.dp),verticalArrangement=Arrangement.spacedBy(16.dp)) {
-        item {Text("Make him yours.",style=MaterialTheme.typography.headlineSmall,color=EiliotColors.TextPrimary,maxLines=1,overflow=TextOverflow.Ellipsis)}
+        item {ScreenTitle("Make him yours.","Control room")}
         item {GlassPanel {
             Row(Modifier.fillMaxWidth().clickable {connect=!connect}.heightIn(min=48.dp),verticalAlignment=Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {

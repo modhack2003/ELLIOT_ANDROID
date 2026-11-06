@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.eiliot.app.core.*
@@ -44,7 +43,6 @@ import kotlinx.coroutines.*
     val voice by NeuralSpeechPlayer.ready.collectAsStateWithLifecycle()
     val assetStatus by ModelAssets.status.collectAsStateWithLifecycle()
     val voiceStatus by NeuralSpeechPlayer.status.collectAsStateWithLifecycle()
-    val appearance=LocalOverlayAppearance.current
     val permission=rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         mic=context.checkSelfPermission(Manifest.permission.RECORD_AUDIO)==PackageManager.PERMISSION_GRANTED
     }
@@ -63,8 +61,8 @@ import kotlinx.coroutines.*
     }
     Column(Modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()).padding(24.dp),verticalArrangement=Arrangement.spacedBy(20.dp),horizontalAlignment=Alignment.CenterHorizontally) {
         Spacer(Modifier.height(8.dp))
-        AndroidView(factory={ArcCoreView(it)},update={it.setPresentation(appearance.motion,false)},modifier=Modifier.size(100.dp))
-        Text("Meet ELLIOT",style=MaterialTheme.typography.headlineLarge,color=EiliotColors.TextPrimary,maxLines=1,overflow=TextOverflow.Ellipsis)
+        HoloStage(OrbState.IDLE,128.dp,description="ELLIOT presence")
+        Text("Meet ELLIOT",style=MaterialTheme.typography.headlineLarge,color=EiliotColors.TextPrimary,maxLines=1,overflow=TextOverflow.Ellipsis,modifier=Modifier.aurora(LocalHoloClock.current,speed=.05f))
         Text("Your companion, ready for everyday life.",color=EiliotColors.TextSecondary)
         LinearProgressIndicator(progress={ (step+1)/3f },modifier=Modifier.fillMaxWidth())
         Text("STEP ${step+1} OF 3",color=EiliotColors.Teal)

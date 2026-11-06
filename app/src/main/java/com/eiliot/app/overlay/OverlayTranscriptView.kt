@@ -17,7 +17,9 @@ data class TranscriptActions(val open: () -> Unit, val off: () -> Unit, val clos
     val send: (String) -> Boolean, val focus: () -> Unit, val draft: (String) -> Unit)
 
 object OverlayPalette {
-    val Surface = Color.rgb(16,26,42)
+    val Surface = Color.rgb(6,10,26)
+    val SurfaceTop = Color.rgb(16,24,54)
+    val Edge = Color.argb(190,0,229,255)
     val Text = Color.rgb(231,238,246)
     val Secondary = Color.rgb(182,196,213)
     val Accent = Color.rgb(83,213,208)
@@ -45,7 +47,7 @@ class OverlayTranscriptView(context: Context, val mode: OverlayPanelMode, privat
     init {
         orientation = VERTICAL
         setPadding(dp(12),dp(8),dp(12),dp(8)); elevation = dp(8).toFloat()
-        background = GradientDrawable().apply { setColor(OverlayPalette.Surface); cornerRadius=dp(24).toFloat();setStroke(dp(1),OverlayPalette.Accent) }
+        background = GradientDrawable(GradientDrawable.Orientation.TL_BR, intArrayOf(OverlayPalette.SurfaceTop, OverlayPalette.Surface)).apply { cornerRadius=dp(26).toFloat();setStroke(dp(1),OverlayPalette.Edge) }
         val head=LinearLayout(context).apply { gravity=Gravity.CENTER_VERTICAL }
         val more=button("•••","More ELLIOT actions") { }
         more.setOnClickListener { actions.more(more) };moreButton=more
