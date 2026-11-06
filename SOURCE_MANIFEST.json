@@ -59,8 +59,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 10847,
-      "sha256": "101d2f85e23a67721406fd2a2b37d8422b3204879435d378d2cf7790116258b4"
+      "bytes": 15583,
+      "sha256": "5bcfd2c0133045e99c6513f2a9e55f60b5baac75bd0f20c29978b4f46b1a598b"
     },
     {
       "path": "ROADMAP.md",
@@ -2739,28 +2739,38 @@
     },
     {
       "path": "docs/brand/README.md",
-      "bytes": 1643,
-      "sha256": "94999d901993d5c401014eef89d3e875825d8fe6eb383294db0ae921b6568562"
+      "bytes": 1796,
+      "sha256": "532b1b3e7ee383e26015e3d3c4ddd7518c42243ea072a95d6cee58093ec793e4"
     },
     {
-      "path": "docs/brand/elliot-hero.png",
-      "bytes": 1542516,
-      "sha256": "50cedfe93731b92ab7011620ae67f381510be564320f7fb15dfb157ca881c808"
+      "path": "docs/brand/generate_art.py",
+      "bytes": 35076,
+      "sha256": "ceb8be7700544d64d742bc0d9730c39d3736cc0e540136ddf34338eaa46f242c"
     },
     {
-      "path": "docs/brand/elliot-signal.gif",
-      "bytes": 123264,
-      "sha256": "68ec06c4b8dc763f19586365f1672b4ba84f6379ea425f1c7f3a6aeadd4bca15"
+      "path": "docs/brand/holo-core-states.svg",
+      "bytes": 339400,
+      "sha256": "3c06670471f058c7bc6b6e3833fd62027965a76b0984e548c5a694ccdd6dec5d"
+    },
+    {
+      "path": "docs/brand/singularity-hero.svg",
+      "bytes": 218835,
+      "sha256": "36c95b95f1592d52565dece8aec7a5bfb42ef71defd1dd3627194a874b0041e0"
+    },
+    {
+      "path": "docs/brand/singularity-signal.svg",
+      "bytes": 14254,
+      "sha256": "0eea0994ab52df2ecca95a18d8a76e81bb080d2ea9785bac1ea078549915c394"
     },
     {
       "path": "docs/brand/speech-modes.svg",
-      "bytes": 4084,
-      "sha256": "2f6e96ca45999f2fdea6492d63b9c87f00c5302a2c317cc928fbc87b809efbf9"
+      "bytes": 25017,
+      "sha256": "f19ee17d18eb0609d29d488ce9f7c705df46fa2d9f0c665e80111f5948c46983"
     },
     {
       "path": "docs/brand/voice-pipeline.svg",
-      "bytes": 6438,
-      "sha256": "77011a979e838f3844e2ff1939d2cdd04b1b7ab428ed2ccda92bd59a8d1ec4af"
+      "bytes": 28711,
+      "sha256": "4ac99296c79e8bb89c11f4bf36dfba486037995099620cc93a48082dd6025556"
     },
     {
       "path": "docs/licenses/espeak-ng-GPL-3.0.txt",
@@ -3001,6 +3011,11 @@
       "path": "docs/ui/singularity/settings-360-1x.png",
       "bytes": 233827,
       "sha256": "2086b8266479004d58a9629493f999ff77cf7ead497f8d082d707094637c35c2"
+    },
+    {
+      "path": "docs/ui/singularity/vault-360-1x.png",
+      "bytes": 245463,
+      "sha256": "7d0589a837c4446dbccf9d434677c129cc0c79fcfec492465671472fde8ca83c"
     },
     {
       "path": "docs/validation/0.6.1/asr-decoder-comparison.log",
