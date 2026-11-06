@@ -131,48 +131,44 @@ import kotlinx.coroutines.*
                 if(it)arm()else {WakeListener.stop();VoiceIo.stopListening()}
                 changed()
             }
-            if(!voiceReady)TextButton(onClick={ModelAssets.retry(context);com.eiliot.app.voice.remote.NativeSpeechClient.retry(context)}) {Text("Repair offline voice",maxLines=1)}
+            // The status text points here for worker failures too, so offer it in that state as well.
+            if(!voiceReady || com.eiliot.app.voice.remote.NativeSpeechClient.blocked(context))
+                TextButton(onClick={ModelAssets.retry(context);com.eiliot.app.voice.remote.NativeSpeechClient.retry(context)}) {Text("Repair offline voice",maxLines=1)}
             ControlSwitch("Listen after a reply","A short follow-up window without another wake phrase",store.followUpEnabled) {store.followUpEnabled=it;changed()}
             TextButton(onClick={SentinelRuntime.startAndArmMic(context){checkingStt=false;calibrating=true}},enabled=enabled) {Text("Calibrate my wake phrase")}
-            TextButton(onClick={SentinelRuntime.startAndArmMic(context){checkingStt=true;calibrating=true}},enabled=enabled) {Text("Check speech recognition")}
+            TextButton(onClick={SentinelRuntime.startAndArmMic(context){checkingStt=true;calibrating=true}},enabled=enabled) {Text("Speech recognition & languages")}
             if(VoiceCalibrationStore.load(context)!=null)TextButton(onClick={
                 VoiceCalibrationStore.clear(context);WakeListener.stop();WakeListener.start(context);changed()
             }) {Text("Reset wake calibration")}
             TextButton(onClick={voiceOptions=!voiceOptions}) {Text(if(voiceOptions)"Hide voice options" else "Voice options",maxLines=1)}
             if(voiceOptions) {
-                val calibrated=VoiceCalibrationStore.load(context)
-                ControlSwitch("Require Hey Elliot","Use the full wake phrase for hands-free listening.",WakeCapturePreference.requireHey(context)) {
-                    WakeCapturePreference.setRequireHey(context,it)
-                    WakeListener.stop();WakeListener.start(context);changed()
-                }
-                ControlSwitch("Direct microphone","Use the microphone without call processing for wake listening. Changing this clears sensitivity calibration.",
-                    calibrated?.referenceCapture?:WakeCapturePreference.reference(context)) {
-                    WakeCapturePreference.setReference(context,it)
-                    WakeListener.stop();WakeListener.start(context);changed()
-                }
-                ControlSwitch("Reduce background noise","Request a noise filter on the Direct microphone. Changing this clears sensitivity calibration.",WakeCapturePreference.noiseReduction(context)) {
-                    WakeCapturePreference.setNoiseReduction(context,it)
-                    WakeListener.stop();WakeListener.start(context);changed()
-                }
-                ControlSwitch("Enhanced noise reduction","Locally reduce fan and AC noise. Changing this clears sensitivity calibration.",WakeCapturePreference.softwareNoiseReduction(context)) {
-                    WakeCapturePreference.setSoftwareNoiseReduction(context,it)
-                    WakeListener.stop();WakeListener.start(context);changed()
-                }
-                if(calibrated?.canBypassWakeFilter==true) {
-                    ControlSwitch("Use enhanced filter for wake phrase","Requests keep enhanced noise reduction in either mode.",!calibrated.wakeBeforeEnhanced) {
-                        VoiceCalibrationStore.save(context,calibrated.copy(wakeBeforeEnhanced=!it))
-                        WakeListener.stop();WakeListener.start(context);changed()
-                    }
-                }
                 Text("ELLIOT · Ryan · offline male voice",color=EiliotColors.TextSecondary,maxLines=1,overflow=TextOverflow.Ellipsis)
                 Text("Speed",color=EiliotColors.TextSecondary);Slider(rate,{rate=it;store.ttsRate=it},valueRange=.7f..1.4f)
                 Text("Pitch",color=EiliotColors.TextSecondary);Slider(pitch,{pitch=it;store.ttsPitch=it},valueRange=.7f..1.3f)
                 TextButton(onClick={VoiceIo.speak("I'm ELLIOT. I'm here when you need me.")},enabled=enabled) {Text("Hear my voice",maxLines=1)}
-                if(!voiceReady)maleVoices.filter {it.id!=NeuralSpeechPlayer.VOICE_ID}.forEach {v->
-                    Row(verticalAlignment=Alignment.CenterVertically) {
-                        RadioButton(store.ttsVoice==v.id,{store.ttsVoice=v.id;VoiceIo.applyVoice(v.id,pitch,rate);changed()})
-                        Text(v.language,color=EiliotColors.TextSecondary,maxLines=1,overflow=TextOverflow.Ellipsis)
+                if(!voiceReady && maleVoices.isNotEmpty()) {
+                    Text("Offline voice unavailable. Choose a system voice:",color=EiliotColors.TextSecondary,fontSize=13.sp)
+                    maleVoices.filter {it.id!=NeuralSpeechPlayer.VOICE_ID}.forEach {v->
+                        Row(verticalAlignment=Alignment.CenterVertically) {
+                            RadioButton(store.ttsVoice==v.id,{store.ttsVoice=v.id;VoiceIo.applyVoice(v.id,pitch,rate);changed()})
+                            Text(v.id,color=EiliotColors.TextSecondary,maxLines=1,overflow=TextOverflow.Ellipsis)
+                        }
                     }
+                }
+                HorizontalDivider(Modifier.padding(vertical=12.dp),color=EiliotColors.Teal.copy(alpha=.2f))
+                SectionLabel("Microphone",EiliotColors.Teal)
+                ControlSwitch("Require Hey Elliot","Listen for the full phrase instead of the name alone. Clears wake calibration.",WakeCapturePreference.requireHey(context)) {
+                    WakeCapturePreference.setRequireHey(context,it)
+                    WakeListener.stop();WakeListener.start(context);changed()
+                }
+                ControlSwitch("Direct microphone","Skip call processing so speech from across the room is not flattened. Clears wake calibration.",
+                    WakeCapturePreference.reference(context)) {
+                    WakeCapturePreference.setReference(context,it)
+                    WakeListener.stop();WakeListener.start(context);changed()
+                }
+                ControlSwitch("Reduce fan and AC noise","Filter steady background noise locally. The wake phrase is matched before this filter. Clears wake calibration.",WakeCapturePreference.softwareNoiseReduction(context)) {
+                    WakeCapturePreference.setSoftwareNoiseReduction(context,it)
+                    WakeListener.stop();WakeListener.start(context);changed()
                 }
             }
         }}

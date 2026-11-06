@@ -26,6 +26,11 @@ object WhisperTokenTransport {
     @Synchronized fun prepare(source:File,cache:File):File {
         check(cache.isDirectory || cache.mkdirs())
         val target=File(cache,"whisper-hex-tokens-v1.txt")
+        val stamp=File(cache,"whisper-hex-tokens-v1.stamp")
+        // Rewriting tens of thousands of tokens is slow, and the source pack is immutable once
+        // verified, so reuse the prepared table instead of rebuilding it for every request.
+        val identity="${source.length()}:${source.lastModified()}"
+        if(target.isFile && target.length()>0 && runCatching {stamp.readText()}.getOrNull()==identity)return target
         val stage=File(cache,"whisper-hex-tokens-v1.tmp")
         stage.bufferedWriter(Charsets.US_ASCII).use {out->
             source.forEachLine(Charsets.US_ASCII) {line->
@@ -34,7 +39,9 @@ object WhisperTokenTransport {
                 out.append(encodeToken(parts[0])).append(' ').append(parts[1]).append('\n')
             }
         }
+        target.delete()
         check(stage.renameTo(target)){"Could not prepare speech text decoder"}
+        runCatching {stamp.writeText(identity)}
         return target
     }
 

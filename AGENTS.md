@@ -32,6 +32,25 @@ Read the [build and usage guide](README.md) and [voice evaluation guide](evaluat
 4. **Test device behavior before changing defaults.** Exercise locked screen, screen-off idle, foreground/background transitions, microphone contention, permission changes, and repeated wake/request cycles. Record idle power use and peak memory on the Vivo and another handset. Compare model load, audio endpointing, and decoder time separately before adding model preloading or changing the default recognizer.
 5. **Evaluate further personalization after measuring the baseline.** The current guided setup adapts wake matching and leaves command STT unchanged. Evaluate whether an optional local enrollment or vocabulary bias improves held-out commands. Track any change in unwanted wakes, and make saved personalization removable.
 
+## Voice runtime: resident recognizer and capture fixes
+
+Four defects were fixed in code. None of them is an accuracy change, and none has been measured on a handset.
+
+- **The multilingual recognizer was rebuilt for every single request.** Each utterance re-read and SHA-256 hashed the whole pack (about 375 MB for Small, 1.04 GB for Turbo), rewrote the 816 KB token table, built a fresh ONNX session, then released all of it. That is the bulk of the ~10 s recorded for one live request; only decoding is irreducible. One recognizer is now resident in the worker, keyed by model and language, the way `OfflineTts` already was: `SpeechEngineService` pins it and evicts the previous pack when the selection changes, so at most one is loaded. `WhisperPool` is the client-side handle; callers must not release it. `WakeListener` warms the selected pack while the microphone arms, so the first request also pays decoding only. Full hash verification still happens at download time and on first load per process, not per request; after that the cheap length-and-marker check runs. **Measure the warm and cold request latency on the Vivo before trusting any of this.**
+- **A request spoken without a pause lost its opening words.** `CommandUtterance` discarded every frame until it saw 256 ms of continuous quiet, so "hey Elliot what is my battery" (no gap) was partly thrown away. It now keeps a 500 ms pre-roll while waiting and leaves the wait in one of two ways: a genuine pause clears the pre-roll, because anything before the pause is the wake phrase; 800 ms of unbroken speech keeps it, because that is the request. The invariant that the wake phrase must never reach the recognizer is covered by `CommandUtteranceTest` and `VoiceLatencyAndCaptureTest`.
+- **The transcript keeps the spoken address in the continuous case**, so `TranscriptNormalizer.stripWakeAddress` removes a leading "hey/ok/hi Elliot" before offline commands are matched exactly. A bare wake phrase is left intact, and a mid-sentence mention is never stripped.
+- **Selecting an offline pack disabled tap-to-talk** ("Offline command listening is unavailable") and silenced follow-up listening. Both now fall back to the device recognizer when the offline listener is unavailable.
+
+Uncalibrated listening now matches the wake phrase **before** software denoising when the full phrase is required, which is the routing recorded as working; saved profiles keep their own stored routing. Eligible profiles are saved with that routing instead of needing a separate switch.
+
+## Voice settings surface
+
+Removed because they could not work or could not be understood: **Reduce background noise** (inert unless Direct microphone was on, since the Processed path already enables the suppressor) and **Use enhanced filter for wake phrase** (an inverted switch, visible only when three invisible preconditions held, describing the other path). The wake-routing field it wrote is still honored for existing profiles.
+
+**Check speech recognition** is now **Speech recognition & languages**: it was the only route to the command model and language, under a name that read like a self-test. **Repair offline voice** now also appears when the worker crash-fence is set, which is the state the status text tells people to fix. The engineering bench (wake replay, GTCRN A/B, table-distance check, WAV export, cleaned playback) and the unquantized decoder pack are behind `-PvoiceDiagnostics=true`. Orphaned APIs `VoiceIo.confirmMale`, `removeMale`, `listVoices` and `audition` were deleted; nothing could reach them, so the "confirmed male voice" list could never grow. The system-voice fallback list remains and now shows the voice name rather than repeating the locale.
+
+Still unmeasured, and unchanged by this work: wake recall at tabletop distance, unwanted wakes per hour, real Hindi-English and Bengali-English accuracy, and barge-in while ELLIOT speaks (interrupting still needs the wake phrase outside Live Call, because there is no software echo cancellation and the Direct capture path disables the hardware canceller).
+
 ## Interface ("Singularity")
 
 The app UI and the orb were redesigned. Renders from the Robolectric shell tests are in [docs/ui/singularity](docs/ui/singularity).

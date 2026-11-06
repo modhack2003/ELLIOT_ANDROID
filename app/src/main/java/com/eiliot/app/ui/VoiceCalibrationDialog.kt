@@ -238,8 +238,8 @@ import kotlinx.coroutines.*
                 status="${if(useWhisper)model.label else "English Zipformer"} is checking recording $clipNumber…"
                 val started=android.os.SystemClock.elapsedRealtime()
                 val text=if(useWhisper)withContext(Dispatchers.IO) {
-                    val recognizer=com.eiliot.app.voice.remote.RemoteWhisper(selectedLanguage,model.id)
-                    try {recognizer.transcribe(audio)}finally{runCatching{recognizer.release()}}
+                    // Same pooled recognizer the live path uses, so a check reflects real latency.
+                    com.eiliot.app.voice.remote.WhisperPool.get(selectedLanguage,model.id).transcribe(audio)
                 }else WakeCalibration.transcribe(audio)
                 val seconds=(android.os.SystemClock.elapsedRealtime()-started)/1000.0
                 val label=if(useWhisper)"${model.label} · ${selectedLanguage.ifEmpty {"Auto"}}"else "English Zipformer"
@@ -259,7 +259,7 @@ import kotlinx.coroutines.*
                     else if(requireHey)"Use your usual voice and microphone. Speak each prompt after Speak now. Calibration compares pronunciation and sound patterns. The recordings stay in memory."
                     else "We compare two microphone paths using your normal accent. Audio stays in memory and is discarded when you close.")
                 Text(status)
-                if(transcriptionOnly && savedWake!=null && ready && !busy) {
+                if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS && transcriptionOnly && savedWake!=null && ready && !busy) {
                     Button(onClick={checkTableWake()}){Text("Record table wake check")}
                 }
                 if(!transcriptionOnly && step>=initialSteps)assessments.forEach {result->
@@ -281,13 +281,21 @@ import kotlinx.coroutines.*
                 if(!transcriptionOnly && validated && candidate?.setting?.acousticProfile!=null)
                     Text("Saving keeps derived sound patterns on this phone. Say “Hey Elliot” on its own, then wait for listening before speaking your request. Reset wake calibration removes the patterns.")
                 if(!transcriptionOnly && validated)Button(onClick={
-                    try {VoiceCalibrationStore.save(context,checkNotNull(candidate).setting);onClose()}
+                    // Wake listens before software denoising wherever the profile allows it; that is
+                    // the routing recorded as working, so it is applied on save rather than hidden
+                    // behind an extra switch.
+                    try {
+                        val chosen=checkNotNull(candidate).setting
+                        VoiceCalibrationStore.save(context,chosen.copy(wakeBeforeEnhanced=chosen.canBypassWakeFilter));onClose()
+                    }
                     catch(e:Exception){status="The setting could not be saved. Please retry or close this check."}
                 },enabled=!busy){Text("Save calibrated setting")}
                 if(transcriptionOnly && ready && !busy) {
                     Text("Speech model")
                     Text("Live requests use ${liveSpeech?.label ?: "the built-in English recognizer"}.")
-                    MultilingualModelPack.models.forEach {model->
+                    MultilingualModelPack.models.filter {
+                        com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS || it!=MultilingualModelPack.TURBO_FULL_DECODER
+                    }.forEach {model->
                         FilterChip(multilingual && selectedPack==model,{
                             multilingual=true;selectedPack=model;packReady=MultilingualModelPack.available(context,model)
                         },label={Text(model.label)})
@@ -340,14 +348,16 @@ import kotlinx.coroutines.*
                     }
                 }
                 if(transcriptionOnly && ready && !busy) {
-                    Button(onClick={checkWake(true)}){Text("Record wake check")}
-                    if(lastClip!=null)Button(onClick={checkWake(false)}){Text("Recheck wake on recording")}
-                    if(lastClip!=null && !clipEnhanced)Button(onClick={cleanWake()}){Text("Clean and recheck wake")}
+                    if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS) {
+                        Button(onClick={checkWake(true)}){Text("Record wake check")}
+                        if(lastClip!=null)Button(onClick={checkWake(false)}){Text("Recheck wake on recording")}
+                        if(lastClip!=null && !clipEnhanced)Button(onClick={cleanWake()}){Text("Clean and recheck wake")}
+                    }
                     Button(onClick={checkSentence(true)},enabled=!multilingual || packReady){Text("Record sentence")}
                     if(lastClip!=null)Button(onClick={checkSentence(false)},enabled=!multilingual || packReady){Text("Transcribe last recording")}
                 }
                 if(transcript.isNotBlank())Text(transcript)
-                if(transcriptionOnly && lastClip!=null && !exported && exportFile!=null)TextButton(onClick={
+                if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS && transcriptionOnly && lastClip!=null && !exported && exportFile!=null)TextButton(onClick={
                     val clip=checkNotNull(lastClip).copyOf();busy=true
                     job=scope.launch {
                         try {
@@ -373,7 +383,7 @@ import kotlinx.coroutines.*
                         finally {busy=false}
                     }
                 },enabled=!busy){Text("Play last recording")}
-                if(cleanedClip!=null)TextButton(onClick={
+                if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS && cleanedClip!=null)TextButton(onClick={
                     busy=true
                     job=scope.launch {
                         try {WakeCalibration.play(checkNotNull(cleanedClip));status="Cleaned playback complete. Compare it with the original recording."}

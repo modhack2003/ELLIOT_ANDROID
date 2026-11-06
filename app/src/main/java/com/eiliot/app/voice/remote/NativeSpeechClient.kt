@@ -88,6 +88,7 @@ object NativeSpeechClient {
     }
     @Synchronized private fun disconnect(clean:Boolean) {
         generation++;remote=null;initializing=false
+        WhisperPool.drop()
         if(clean)fence?.finish()
         val app=context;val old=connection;connection=null
         if(app!=null && old!=null)runCatching {app.unbindService(old)}
@@ -160,6 +161,32 @@ class RemotePronunciationRecognizer:RemoteDecoder("wake_phones") {
     fun tokens(stream:RemoteStream):List<String> =
         rpc("phone_tokens",args(stream)).getStringArray("tokens")?.toList().orEmpty()
 }
+/**
+ * One live multilingual recognizer, reused across requests.
+ *
+ * The worker keeps the loaded pack resident, so re-requesting the same model and language is a
+ * cheap handle lookup instead of a multi-second rebuild. Callers must not release the result;
+ * the pool is dropped when the speech session changes or the selection changes.
+ */
+object WhisperPool {
+    private var key:String?=null
+    private var instance:RemoteWhisper?=null
+    private var session=Long.MIN_VALUE
+
+    @Synchronized fun get(language:String,model:String):RemoteWhisper {
+        val wanted="$model|$language"
+        instance?.let {if(key==wanted && session==NativeSpeechClient.session)return it}
+        val fresh=RemoteWhisper(language,model)
+        key=wanted;instance=fresh;session=NativeSpeechClient.session
+        return fresh
+    }
+
+    /** Warm the recognizer so the first spoken request does not pay the load. */
+    @Synchronized fun warm(language:String,model:String) {runCatching {get(language,model)}}
+
+    @Synchronized fun drop() {key=null;instance=null;session=Long.MIN_VALUE}
+}
+
 class RemoteWhisper(language:String="en",model:String=com.eiliot.app.voice.MultilingualModelPack.SMALL.id):RemoteDecoder("whisper",Bundle().apply {putString("language",language);putString("model",model)}) {
     /** The pinned backend truncates at 30 seconds; reject overlong clips explicitly. */
     fun transcribe(audio:FloatArray):String {

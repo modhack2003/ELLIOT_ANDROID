@@ -16,6 +16,12 @@ class SpeechEngineService:Service() {
     private val ttsLock=Any()
     private var tts:OfflineTts?=null
     private var initialized=false
+    /** Recognizers that outlive a single request, keyed by model and language. */
+    private val resident=ConcurrentHashMap<String,Long>()
+    /** Handles the client may not release; the worker owns their lifetime. */
+    private val pinned=ConcurrentHashMap.newKeySet<Long>()
+    /** Packs already hash-verified in this process. */
+    private val verified=ConcurrentHashMap.newKeySet<String>()
     private lateinit var root:File
     private lateinit var contract:VoiceModelContract
     private fun hold(value:Any)=ids.incrementAndGet().also {objects[it]=value}
@@ -69,13 +75,31 @@ class SpeechEngineService:Service() {
                 maxActivePaths=4,enableEndpoint=false
             ))))
             "phone_tokens"->out.putStringArray("tokens",obj<OnlineRecognizer>(id).getResult(obj(sid)).tokens)
-            "whisper"->{
+            // Building this recognizer costs seconds: a multi-hundred-megabyte pack is read and
+            // hashed, the token table is rewritten and an ONNX session is created. Keep one
+            // resident so only decoding is paid per request, the way the TTS engine already works.
+            "whisper"->synchronized(resident) {
                 val language=a.getString("language").orEmpty();require(language in setOf("","en","hi","bn"))
                 val spec=MultilingualModelPack.spec(a.getString("model")?:MultilingualModelPack.SMALL.id)
-                val pack=MultilingualModelPack.verify(applicationContext,spec)
-                out.putLong("id",hold(OfflineRecognizer(config=OfflineRecognizerConfig(modelConfig=OfflineModelConfig(
+                val key="${spec.id}|$language"
+                val cached=resident[key]?.takeIf { objects.containsKey(it) }
+                if(cached!=null) {out.putLong("id",cached);return@synchronized}
+                // Only one multilingual recognizer stays loaded; switching packs frees the old weights.
+                for((other,id) in resident.entries.toList()) {
+                    if(other==key)continue
+                    resident.remove(other);pinned.remove(id)
+                    (objects.remove(id) as? OfflineRecognizer)?.let {runCatching {it.release()}}
+                }
+                // Full hashing is a download-time and first-load guarantee, not a per-request one.
+                val pack=if(verified.add(spec.id))MultilingualModelPack.verify(applicationContext,spec)
+                    else MultilingualModelPack.directory(applicationContext,spec).also {
+                        check(MultilingualModelPack.available(applicationContext,spec)) {"Prepare multilingual speech in Settings first"}
+                    }
+                val id=hold(OfflineRecognizer(config=OfflineRecognizerConfig(modelConfig=OfflineModelConfig(
                     whisper=OfflineWhisperModelConfig(encoder=File(pack,spec.encoder).path,decoder=File(pack,spec.decoder).path,language=language,task="transcribe"),
-                    tokens=WhisperTokenTransport.prepare(File(pack,spec.tokens),File(cacheDir,"whisper-text/${spec.id}")).path,numThreads=4,provider="cpu")))))
+                    tokens=WhisperTokenTransport.prepare(File(pack,spec.tokens),File(cacheDir,"whisper-text/${spec.id}")).path,numThreads=4,provider="cpu"))))
+                resident[key]=id;pinned.add(id)
+                out.putLong("id",id)
             }
             "vad"->out.putLong("id",hold(Vad(config=VadModelConfig(sileroVadModelConfig=SileroVadModelConfig(model="${root.path}/silero_vad.onnx",threshold=.65f,minSilenceDuration=.5f,minSpeechDuration=.192f,windowSize=512),sampleRate=16000,numThreads=1))))
             "denoiser"->out.putLong("id",hold(OnlineSpeechDenoiser(config=OnlineSpeechDenoiserConfig(model=OfflineSpeechDenoiserModelConfig(
@@ -116,7 +140,8 @@ class SpeechEngineService:Service() {
             "endpoint"->out.putBoolean("value",obj<OnlineRecognizer>(id).isEndpoint(obj(sid)))
             "reset"->when(val owner=objects[id]) {is KeywordSpotter->owner.reset(obj(sid));is OnlineRecognizer->owner.reset(obj(sid));is Vad->owner.reset();else->error("Invalid reset")}
             "compute"->{val pcm=checkNotNull(a.getFloatArray("pcm"));require(pcm.size==512);out.putFloat("value",obj<Vad>(id).compute(pcm))}
-            "release"->when(val item=objects.remove(id)) {is OnlineStream->item.release();is OfflineStream->item.release();is KeywordSpotter->item.release();is OnlineRecognizer->item.release();is OfflineRecognizer->item.release();is OnlineSpeechDenoiser->item.release();is Vad->item.release()}
+            // Streams are still released normally; only the resident recognizers are pinned.
+            "release"->if(id !in pinned) when(val item=objects.remove(id)) {is OnlineStream->item.release();is OfflineStream->item.release();is KeywordSpotter->item.release();is OnlineRecognizer->item.release();is OfflineRecognizer->item.release();is OnlineSpeechDenoiser->item.release();is Vad->item.release()}
             "tts"->synchronized(ttsLock) {
                 if(tts==null)tts=OfflineTts(config=OfflineTtsConfig(model=OfflineTtsModelConfig(vits=OfflineTtsVitsModelConfig(model="${root.path}/tts/model.onnx",tokens="${root.path}/tts/tokens.txt",dataDir="${root.path}/tts/espeak-ng-data"),numThreads=contract.threads,provider="cpu"),maxNumSentences=1))
                 out.putInt("rate",tts!!.sampleRate());out.putInt("speakers",tts!!.numSpeakers())
