@@ -1,0 +1,222 @@
+# Builds the ARM64 preview APK, runs the unit tests, and publishes a GitHub Release.
+#
+#   Pull request          -> build + test, APK kept as a workflow artifact (no release)
+#   Push a tag  v*         -> build + test, publish the release for that tag
+#   Run workflow (manual)  -> build + test, publish a release (tag defaults to v<versionName>)
+#
+# Signing: the preview build is signed with the Android debug key. Store a
+# base64-encoded debug.keystore in the ANDROID_DEBUG_KEYSTORE_BASE64 secret so
+# every release has the same signature and installs as an update. Without it,
+# each run creates a new key and users must uninstall before installing.
+name: Android APK release
+
+on:
+  pull_request:
+    paths:
+      - "app/**"
+      - "gradle/**"
+      - "*.gradle.kts"
+      - "gradle.properties"
+      - ".github/workflows/android-release.yml"
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (leave empty for v<versionName>)"
+        required: false
+        default: ""
+      prerelease:
+        description: "Mark as a pre-release"
+        type: boolean
+        default: true
+      run_tests:
+        description: "Run unit tests before building"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-release-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Build ARM64 preview APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    outputs:
+      version_name: ${{ steps.version.outputs.version_name }}
+      version_code: ${{ steps.version.outputs.version_code }}
+      tag: ${{ steps.version.outputs.tag }}
+      apk: ${{ steps.package.outputs.apk }}
+      stable_key: ${{ steps.signing.outputs.stable }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: android-actions/setup-android@v4
+
+      - name: Install Android SDK 36 and Build Tools 35.0.0
+        run: sdkmanager --install "platforms;android-36" "build-tools;35.0.0" "platform-tools" > /dev/null
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Cache Robolectric Android runtimes
+        uses: actions/cache@v6
+        with:
+          path: ~/.m2/repository/org/robolectric
+          key: robolectric-${{ hashFiles('app/build.gradle.kts') }}
+          restore-keys: robolectric-
+
+      - name: Read version
+        id: version
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          name=$(sed -nE 's/^\s*versionName\s*=\s*"([^"]+)".*/\1/p' app/build.gradle.kts | head -1)
+          code=$(sed -nE 's/^\s*versionCode\s*=\s*([0-9]+).*/\1/p' app/build.gradle.kts | head -1)
+          test -n "$name" && test -n "$code" || { echo "::error::Could not read versionName/versionCode"; exit 1; }
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            tag="${GITHUB_REF_NAME}"
+            if [ "$tag" != "v$name" ]; then
+              echo "::error::Tag $tag does not match versionName $name. Tag the commit as v$name, or update versionName."
+              exit 1
+            fi
+          else
+            tag="${INPUT_TAG:-v$name}"
+          fi
+          case "$tag" in v*) ;; *) echo "::error::Release tags must start with v"; exit 1;; esac
+          echo "version_name=$name" >> "$GITHUB_OUTPUT"
+          echo "version_code=$code" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Building ELLIOT $name (code $code) for tag $tag"
+
+      - name: Restore signing key
+        id: signing
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_DEBUG_KEYSTORE_BASE64 }}
+        run: |
+          mkdir -p ~/.android
+          if [ -n "$KEYSTORE" ]; then
+            echo "$KEYSTORE" | base64 --decode > ~/.android/debug.keystore
+            echo "stable=true" >> "$GITHUB_OUTPUT"
+            echo "Using the debug keystore from ANDROID_DEBUG_KEYSTORE_BASE64."
+          else
+            echo "stable=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::ANDROID_DEBUG_KEYSTORE_BASE64 is not set. This APK is signed with a new key and will not install over earlier builds."
+          fi
+
+      - name: Unit tests
+        if: github.event_name != 'workflow_dispatch' || inputs.run_tests
+        run: ./gradlew :app:testPreviewUnitTest --stacktrace
+
+      - name: Build ARM64 preview APK
+        run: ./gradlew :app:assemblePreview -PvoiceArm64Only=true --stacktrace
+
+      - name: Package APK
+        id: package
+        env:
+          VERSION: ${{ steps.version.outputs.version_name }}
+        run: |
+          src=$(ls app/build/outputs/apk/preview/*arm64-v8a*.apk | head -1)
+          test -f "$src" || { echo "::error::APK not found"; exit 1; }
+          mkdir -p dist
+          apk="ELLIOT-${VERSION}-arm64-v8a-preview.apk"
+          cp "$src" "dist/$apk"
+          (cd dist && sha256sum "$apk" > "$apk.sha256")
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "dist/$apk" | grep -E "Signer #1 certificate (DN|SHA-256)" | tee dist/signer.txt
+          echo "apk=$apk" >> "$GITHUB_OUTPUT"
+          ls -la dist
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: elliot-apk
+          path: dist/
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reports
+          path: |
+            app/build/reports/tests/
+            app/build/test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  release:
+    name: Publish GitHub Release
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: elliot-apk
+          path: dist
+
+      - name: Write release notes
+        env:
+          VERSION: ${{ needs.build.outputs.version_name }}
+          CODE: ${{ needs.build.outputs.version_code }}
+          APK: ${{ needs.build.outputs.apk }}
+          STABLE: ${{ needs.build.outputs.stable_key }}
+        run: |
+          {
+            echo "## ELLIOT ${VERSION}"
+            echo
+            echo "ARM64 preview build (version code ${CODE}) from commit \`${GITHUB_SHA::7}\`, built by GitHub Actions."
+            echo
+            echo "### Install"
+            echo "1. Download \`${APK}\` on an **ARM64 Android 8.0+** phone."
+            echo "2. Allow installs from your browser or file manager when Android asks."
+            echo "3. Open **ELLIOT**, tap **Resume**, and grant microphone access."
+            echo
+            echo "The package ID is \`com.eiliot.app.preview\`, so it installs alongside a release build."
+            echo
+            if [ "$STABLE" != "true" ]; then
+              echo "> [!WARNING]"
+              echo "> This build is signed with a one-off key. If an earlier ELLIOT preview is installed, uninstall it first. Uninstalling deletes ELLIOT's local data on the phone."
+              echo
+            fi
+            echo "### Verify"
+            echo '```'
+            cat dist/*.sha256
+            cat dist/signer.txt
+            echo '```'
+            echo
+            echo "Speech models and voices carry their upstream terms. See [THIRD_PARTY_MODELS.md](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_SHA}/THIRD_PARTY_MODELS.md)."
+          } > notes.md
+          cat notes.md
+
+      - name: Create or update the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.build.outputs.tag }}
+          VERSION: ${{ needs.build.outputs.version_name }}
+          PRERELEASE: ${{ github.event_name == 'workflow_dispatch' && inputs.prerelease || contains(needs.build.outputs.version_name, '-') }}
+        run: |
+          flags=()
+          [ "$PRERELEASE" = "true" ] && flags+=(--prerelease)
+          files=(dist/*.apk dist/*.sha256)
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release upload "$TAG" "${files[@]}" --clobber --repo "$GITHUB_REPOSITORY"
+            gh release edit "$TAG" --notes-file notes.md --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" "${files[@]}" --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" --title "ELLIOT ${VERSION}" --notes-file notes.md "${flags[@]}"
+          fi
+          echo "Release: https://github.com/${GITHUB_REPOSITORY}/releases/tag/${TAG}" >> "$GITHUB_STEP_SUMMARY"
