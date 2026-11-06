@@ -30,7 +30,7 @@ import kotlinx.coroutines.*
     val canSave=store.memoryEnabled && !erasing
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(18.dp),verticalArrangement=Arrangement.spacedBy(14.dp)) {
         item {
-            Text("Your vault",style=MaterialTheme.typography.headlineSmall,color=EiliotColors.TextPrimary,maxLines=1,overflow=TextOverflow.Ellipsis)
+            ScreenTitle("Your vault","Encrypted memory")
             Text(if(canSave)"Notes, conversations and useful discoveries." else "Saving is off. Your existing records are still here.",color=EiliotColors.TextSecondary)
         }
         item {Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(6.dp)) {

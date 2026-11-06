@@ -46,6 +46,69 @@ object EiliotIcons {
         }.build()
     }
 
+    private fun stroked(name: String, block: androidx.compose.ui.graphics.vector.PathBuilder.() -> Unit): ImageVector =
+        ImageVector.Builder(name = name, defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)
+            .path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 1.7f,
+                strokeLineCap = androidx.compose.ui.graphics.StrokeCap.Round,
+                strokeLineJoin = androidx.compose.ui.graphics.StrokeJoin.Round,
+                pathBuilder = block,
+            ).build()
+
+    /** Companion: a core inside a tilted orbit. */
+    val Orb: ImageVector by lazy {
+        stroked("EiliotOrb") {
+            // Core.
+            moveTo(16f, 12f)
+            arcTo(4f, 4f, 0f, true, true, 8f, 12f)
+            arcTo(4f, 4f, 0f, true, true, 16f, 12f)
+            close()
+            // Orbit ellipse.
+            moveTo(21.5f, 12f)
+            arcTo(9.5f, 3.6f, 0f, true, true, 2.5f, 12f)
+            arcTo(9.5f, 3.6f, 0f, true, true, 21.5f, 12f)
+            close()
+        }
+    }
+
+    /** Vault: a hexagonal safe with a keyhole. */
+    val Vault: ImageVector by lazy {
+        stroked("EiliotVault") {
+            moveTo(12f, 2.5f)
+            lineTo(20.3f, 7.25f)
+            lineTo(20.3f, 16.75f)
+            lineTo(12f, 21.5f)
+            lineTo(3.7f, 16.75f)
+            lineTo(3.7f, 7.25f)
+            close()
+            moveTo(13.6f, 10.4f)
+            arcTo(1.6f, 1.6f, 0f, true, true, 10.4f, 10.4f)
+            arcTo(1.6f, 1.6f, 0f, true, true, 13.6f, 10.4f)
+            close()
+            moveTo(12f, 12f)
+            lineTo(12f, 15.2f)
+        }
+    }
+
+    /** Settings: three tuning sliders. */
+    val Tune: ImageVector by lazy {
+        stroked("EiliotTune") {
+            moveTo(4f, 6f); lineTo(20f, 6f)
+            moveTo(4f, 12f); lineTo(20f, 12f)
+            moveTo(4f, 18f); lineTo(20f, 18f)
+            moveTo(10.8f, 6f)
+            arcTo(1.8f, 1.8f, 0f, true, true, 7.2f, 6f)
+            arcTo(1.8f, 1.8f, 0f, true, true, 10.8f, 6f)
+            moveTo(17.3f, 12f)
+            arcTo(1.8f, 1.8f, 0f, true, true, 13.7f, 12f)
+            arcTo(1.8f, 1.8f, 0f, true, true, 17.3f, 12f)
+            moveTo(9.3f, 18f)
+            arcTo(1.8f, 1.8f, 0f, true, true, 5.7f, 18f)
+            arcTo(1.8f, 1.8f, 0f, true, true, 9.3f, 18f)
+        }
+    }
+
     /** Power — wake the Sentinel Core. */
     val Power: ImageVector by lazy {
         ImageVector.Builder(

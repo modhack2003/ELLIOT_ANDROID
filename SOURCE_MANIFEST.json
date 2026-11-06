@@ -14,8 +14,8 @@
     },
     {
       "path": "AGENTS.md",
-      "bytes": 9265,
-      "sha256": "4f8e008d3f4d40bbdb1c2951b1f22fae7dcf62e888c3797f51f6b5550c332ce9"
+      "bytes": 10534,
+      "sha256": "c9913e3851faf22600cf53f898cbeb75893c4ef67d3d8437cb1fed562afe1b45"
     },
     {
       "path": "BUILD_PLAN.md",
@@ -2049,8 +2049,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/MainActivity.kt",
-      "bytes": 2973,
-      "sha256": "ef6eef3caf88b2af6aa2c6582f7689d29c08dfb4202938923982d3c5f571ba1f"
+      "bytes": 8509,
+      "sha256": "e8f8a719534eb228ba2fe04f5e205fb5b2fc2cee91c70671a44f9fcce0d616b1"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/agent/EiliotPersona.kt",
@@ -2188,24 +2188,19 @@
       "sha256": "b5000709f4e620d637777738250e37ce2f58b3b4b543fdc04dcce43f6da217c8"
     },
     {
-      "path": "app/src/main/java/com/eiliot/app/overlay/ArcCoreCanvasRenderer.kt",
-      "bytes": 12556,
-      "sha256": "2f1420467c5ec49a5925f26df778160d8ad91a89f3001dfb1b1cc60d31d36663"
-    },
-    {
-      "path": "app/src/main/java/com/eiliot/app/overlay/ArcCoreShaders.kt",
-      "bytes": 11234,
-      "sha256": "fbf57b25ed3c0955bb45bbe2f3a7953f9acd82ac2d6d62fb028720cde60dda48"
-    },
-    {
       "path": "app/src/main/java/com/eiliot/app/overlay/ArcCoreView.kt",
-      "bytes": 9576,
-      "sha256": "57040c4607a52e89881087b09cf28d0ed9e2889ea34628c5da6bf8df8ac7ef7e"
+      "bytes": 12831,
+      "sha256": "e77c1dc636a390174d24f5cc07c193b6c37f53ebbcb0385e7d7c862515d6f990"
+    },
+    {
+      "path": "app/src/main/java/com/eiliot/app/overlay/HoloCoreRenderer.kt",
+      "bytes": 21124,
+      "sha256": "f455c43ba2a667a7f8ecca416039cc5835c864c16e92fcd73cd5b24327a33431"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/overlay/OrbState.kt",
-      "bytes": 1760,
-      "sha256": "5dd7e0f5e14ffcce2a9734ba1bf7c4638ad599dc1bd0e7c4c3427ebd8e8ad991"
+      "bytes": 1825,
+      "sha256": "3c73a86bd88744704c57af29fa8bd2a0675e7e04ef28b797552fe58e08b72dcf"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/overlay/OverlayCommands.kt",
@@ -2229,8 +2224,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/overlay/OverlayTranscriptView.kt",
-      "bytes": 8227,
-      "sha256": "101cd73705db32fe468b718ae1a509de7aa61cf91c4180fccbb2638bcca2aaa2"
+      "bytes": 8369,
+      "sha256": "c6c45168874861e586c8e30db7b46d51aa30686ff6b704b729e6090ff19c5877"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/overlay/OverlayWindowController.kt",
@@ -2294,18 +2289,18 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/ConversationComponents.kt",
-      "bytes": 8312,
-      "sha256": "70e274db6dbce7aa7a4a0dfd63e5b5566473724936b626840f703de6fdcad8d6"
+      "bytes": 10665,
+      "sha256": "0bf9393de0ebf1ba51bacaf31ea21317a8355d3ea5f75070662dcf867b9c8e98"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/EiliotIcons.kt",
-      "bytes": 2754,
-      "sha256": "7c7ea4e2771213ebd28abd4a141112ca57b19e9164d73ea03fd4b41dba8af80e"
+      "bytes": 5116,
+      "sha256": "5a7d8d3d8ebc9b5ffd37f5d03f15e3ada079c06fb35f73b9f32c50e9f14e60bd"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/EiliotTheme.kt",
-      "bytes": 5668,
-      "sha256": "ba6fb1824e8da092ecd0c1820a2c75e803b4de03da1bc16b3aeee9d16ed16771"
+      "bytes": 7795,
+      "sha256": "15c7fe3c3bddeb850ca382dbb23ac8cb4d9cf172e53b3f52e36fc7f7a79feb46"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/FriendlyStatus.kt",
@@ -2314,8 +2309,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/Glass.kt",
-      "bytes": 2436,
-      "sha256": "f9da1fba48149c716d254e45ea23840e9b47607a41e9016a77250073c5fc7333"
+      "bytes": 3613,
+      "sha256": "8a756acb1b30cf6c32504a94ce9feec543dd7987e1eba9eeee067f388616449d"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/HandsFreeControls.kt",
@@ -2323,14 +2318,19 @@
       "sha256": "16ec11042e41139aea895372c6f5c1d674219567ff3019fa64c7c733093c9d88"
     },
     {
+      "path": "app/src/main/java/com/eiliot/app/ui/Holo.kt",
+      "bytes": 19087,
+      "sha256": "868d971ea302e0e8532514a2be9cd32cc4940607096df15aadbed417940f36bb"
+    },
+    {
       "path": "app/src/main/java/com/eiliot/app/ui/HomeScreen.kt",
-      "bytes": 11420,
-      "sha256": "5d5fed5743cc6ac3215e90dc7cad4dd63bcc6e3c666fe75adc9e8a74aa3908ce"
+      "bytes": 19829,
+      "sha256": "71f95508de3d128dda9b5e57ceee86048b1ec8cdedc7502d5412d9e36f59fa75"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/HudComponents.kt",
-      "bytes": 12214,
-      "sha256": "12ec3fb33028dd233df7afe4cd4656e56c43e75792601de40b5880aca4b623eb"
+      "bytes": 13388,
+      "sha256": "cbe41f0697d8c8dd61ce5d2c3c9cd01a87bdec6605490ba5777ddf3c0ba6b552"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/LearningScreen.kt",
@@ -2349,13 +2349,13 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/OnboardingScreen.kt",
-      "bytes": 9914,
-      "sha256": "437bd3a68c2e1148e65ef6003a1c13a6cbf12a2289f8737f77c64274a7e710a9"
+      "bytes": 9812,
+      "sha256": "033cfbafa06425e54ab32568e10a1784e1ebfe6ae80acd3638f42a21f943db93"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/OrbAppearanceControls.kt",
-      "bytes": 7095,
-      "sha256": "f27825d4eed61b88f6203b6504bc91627a1a20511835c8821ffcabbc225c7e2b"
+      "bytes": 7128,
+      "sha256": "9e895797be2acb1855b796851446f789c006d7e44842ee3898ca1b0cce9e5b27"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/OutputFormat.kt",
@@ -2369,13 +2369,13 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/SettingsScreen.kt",
-      "bytes": 19353,
-      "sha256": "5a237ee9cb9b4a2f7544617958d82aaa595f7dfe362da9bacd17f0414029207b"
+      "bytes": 19257,
+      "sha256": "f948b9e3723a3afd6e85746fec7eddefaae49a34f8d814582873a32971185fe5"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/VaultScreen.kt",
-      "bytes": 6984,
-      "sha256": "92ca6fef1b1fff60fb17e086391dc6239a382f7623fa6ebf559bff649a700f91"
+      "bytes": 6892,
+      "sha256": "c8c9bbca4074d075e4ae51277105c79d998399b73e4d404f7b0c7c3fb0ef93f5"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/VoiceCalibrationDialog.kt",
@@ -2981,6 +2981,26 @@
       "path": "docs/ui/capabilities-large-text.png",
       "bytes": 62589,
       "sha256": "d4d39382c5072ee39cd06d6be37f8a5a967fcccd3d861a7f721bd27bae5a7969"
+    },
+    {
+      "path": "docs/ui/singularity/companion-360-1x.png",
+      "bytes": 263024,
+      "sha256": "e755fd28421e33c6264aa19200d27c5bc111bd778eb4181677bb0d9bf8fb24d5"
+    },
+    {
+      "path": "docs/ui/singularity/companion-840-wide.png",
+      "bytes": 671689,
+      "sha256": "9b287fe47ff895b8b30971aeb690eeb0b33dfc779147cf5b9a11e15183edfdaf"
+    },
+    {
+      "path": "docs/ui/singularity/overlay-orb-portrait.png",
+      "bytes": 51978,
+      "sha256": "5b01f85213c970093e2162e5f30c708dcbbf3fd520c97799404768f627b95602"
+    },
+    {
+      "path": "docs/ui/singularity/settings-360-1x.png",
+      "bytes": 233827,
+      "sha256": "2086b8266479004d58a9629493f999ff77cf7ead497f8d082d707094637c35c2"
     },
     {
       "path": "docs/validation/0.6.1/asr-decoder-comparison.log",

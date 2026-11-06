@@ -32,6 +32,15 @@ Read the [build and usage guide](README.md) and [voice evaluation guide](evaluat
 4. **Test device behavior before changing defaults.** Exercise locked screen, screen-off idle, foreground/background transitions, microphone contention, permission changes, and repeated wake/request cycles. Record idle power use and peak memory on the Vivo and another handset. Compare model load, audio endpointing, and decoder time separately before adding model preloading or changing the default recognizer.
 5. **Evaluate further personalization after measuring the baseline.** The current guided setup adapts wake matching and leaves command STT unchanged. Evaluate whether an optional local enrollment or vocabulary bias improves held-out commands. Track any change in unwanted wakes, and make saved personalization removable.
 
+## Interface ("Singularity")
+
+The app UI and the orb were redesigned. Renders from the Robolectric shell tests are in [docs/ui/singularity](docs/ui/singularity).
+
+- The orb is a 3D particle hologram drawn with Canvas only, in [HoloCoreRenderer.kt](app/src/main/java/com/eiliot/app/overlay/HoloCoreRenderer.kt). Each `OrbState` is a different form, and particles morph between forms. `ArcCoreView` keeps its public contract for `OverlayManager` and tests.
+- The floating overlay drives itself at about 30 fps and stops when calm. Inside the app the orb is ambient and gets its frames from Compose (`advanceFrame`) through an infinite-animation clock. Do not make the in-app orb schedule its own Choreographer loop: in Robolectric that loop never idles and the shell tests hang.
+- [Holo.kt](app/src/main/java/com/eiliot/app/ui/Holo.kt) holds the shared clock, tilt parallax (gravity sensor, registered only while resumed), the starfield backdrop, the hologram projector stage, and the 3D conversation depth. Reduced motion freezes all of it.
+- Verified in this environment: 181 unit tests and `assemblePreview -PvoiceArm64Only=true` with release lint. Not yet checked on a device: frame rate, battery use while the Companion screen is open, and how tilt parallax feels.
+
 ## Source map
 
 | Concern | Start here |

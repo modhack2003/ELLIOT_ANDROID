@@ -2,68 +2,78 @@ package com.eiliot.app.overlay
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.RuntimeShader
-import android.graphics.Shader
-import android.os.Build
 import android.provider.Settings
 import android.view.Choreographer
 import android.view.HapticFeedbackConstants
+import android.view.MotionEvent
+import android.view.VelocityTracker
 import android.view.View
-import androidx.annotation.RequiresApi
+import kotlin.math.abs
+import kotlin.math.exp
 
 /**
- * The ELLIOT "Arc Core" — the always-present hover orb rendered over every
- * screen via [android.view.WindowManager]. JARVIS-grade arc-reactor visuals:
- * a procedural energy core, segmented arc ring, HUD ticks, particle fields,
- * and six fully-articulated states ([OrbState]) that crossfade on the GPU.
+ * The ELLIOT orb: a 3D "Holo Core" particle hologram, used in the app and as
+ * the floating overlay above other apps. Rendering lives in [HoloCoreRenderer].
  *
- * Rendering:
- *  - API 33+ (the Android 16 target): one master AGSL [RuntimeShader] draws
- *    everything, including state crossfades, in a single full-view pass.
- *  - API 26–32 (or a non-hardware-accelerated canvas): [ArcCoreCanvasRenderer]
- *    reproduces the same scene with gradients/dashes/particles.
+ * Public contract (used by [OverlayManager] and the Compose screens):
+ *  - [setState] / [getState]: six states, each a different 3D form; changing
+ *    state morphs every particle from its current position.
+ *  - [setAmplitude]: live audio level 0..1 for LISTENING / SPEAKING.
+ *  - [setPresentation]: owner motion preference and haptics.
+ *  - [setPaused]: battery hook; freezes the loop, last frame stays visible.
+ *  - [setAmbient]: keep the idle hologram alive while it is the hero of a
+ *    visible screen. The floating overlay leaves this off so it is calm.
+ *  - [setInteractive]: let a finger spin the hologram with inertia. The
+ *    overlay leaves this off because its own touch listener drags the window.
+ *  - [setTilt]: device tilt -1..1 for parallax.
+ *  - [setContrastDisc]: faint dark disc so the orb reads over light apps.
  *
- * Motion & power:
- *  - Driven by [Choreographer] (vsync). No [android.animation.ValueAnimator]
- *    busy-loop; when calm (IDLE, settled, silent) it drops to ~30 fps.
- *  - Stops entirely when detached, hidden, [setPaused] (screen-off hook), or
- *    when the system animator scale is 0 (reduced-motion tier: states snap and
- *    a single static composed frame is drawn).
- *
- * Haptics: entering [OrbState.ALERT] fires a LONG_PRESS tick, then CLOCK_TICK
- * pulses stay synced to the radar pulse-ring cycle (respects system haptics).
- *
- * Public contract (used by the service layer / [OverlayManager]):
- *  - [setState] / [getState] — drive the six orb states.
- *  - [setAmplitude] — live audio level 0..1 for LISTENING/SPEAKING reactivity.
- *  - [setPaused] — battery hook; freezes the loop until resumed.
+ * Motion and power: as the overlay it drives itself with [Choreographer] at
+ * ~30 fps, and stops when detached, hidden, paused, calm, or when motion is
+ * reduced (system animator scale 0 or the owner's "reduced" choice). In
+ * ambient mode the owner supplies frames through [advanceFrame] instead.
+ * Reduced motion snaps state changes and draws a single still frame; a
+ * finger can still turn it, without inertia.
  */
 class ArcCoreView(context: Context) : View(context) {
 
+    private val renderer = HoloCoreRenderer()
+    private val frame = HoloCoreRenderer.Frame()
+
     private var state: OrbState = OrbState.IDLE
     private var prevState: OrbState = OrbState.IDLE
-
-    /** 0 = fully previous state, 1 = fully current. Snaps to 1 in reduced motion. */
     private var mix = 1f
-
     private var ampTarget = 0f
     private var ampSmooth = 0f
-
     private var timeSec = 0f
+
     private var attached = false
     private var running = false
     private var paused = false
-    private var calm = true
     private var reducedMotion = false
     private var ownerMotion = "system"
     private var ownerHaptics = true
+    private var ambient = false
+    private var interactive = false
     private var lastFrameNanos = 0L
     private var lastPulseBucket = -1
 
-    /** Null on API < 33, on shader-compile failure, or when unusable. */
-    private val shader: Shader? = if (USE_GPU_SHADER) ArcCoreShaders.createMasterShader() else null
-    private val shaderPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    // Spin (radians) and its inertia (radians per second).
+    private var spinYaw = 0f
+    private var spinPitch = 0f
+    private var velYaw = 0f
+    private var velPitch = 0f
+    private var touching = false
+    private var velocity: VelocityTracker? = null
+    private var lastX = 0f
+    private var lastY = 0f
+    private var travel = 0f
+
+    // Device tilt parallax.
+    private var tiltTargetX = 0f
+    private var tiltTargetY = 0f
+    private var tiltX = 0f
+    private var tiltY = 0f
 
     init {
         updateContentDescription()
@@ -71,18 +81,12 @@ class ArcCoreView(context: Context) : View(context) {
 
     // ------------------------------------------------------------------ API
 
-    /**
-     * Transition the orb to [newState] with a ~450 ms GPU crossfade.
-     * Safe to call from any state, mid-transition, or before the view is
-     * attached. Default state on attach is [OrbState.IDLE].
-     */
     fun setState(newState: OrbState) {
         if (newState == state) return
-        // Keep the visually dominant side as the crossfade source so an
-        // interrupted transition never pops.
         prevState = if (mix < 0.5f) prevState else state
         state = newState
         refreshReducedMotion()
+        renderer.snapshot()
         mix = if (reducedMotion) 1f else 0f
         if (newState == OrbState.ALERT) {
             lastPulseBucket = -1
@@ -102,26 +106,58 @@ class ArcCoreView(context: Context) : View(context) {
         syncLoop(); invalidate()
     }
 
-    /**
-     * Live audio amplitude (TTS for SPEAKING, mic for LISTENING), 0..1.
-     * Smoothed per-frame internally so callers may feed raw RMS values.
-     */
     fun setAmplitude(level: Float) {
         ampTarget = level.coerceIn(0f, 1f)
         if (reducedMotion) {
             ampSmooth = 0f
             invalidate()
+        } else {
+            syncLoop()
         }
     }
 
-    /**
-     * Battery hook for the service layer: pause the animation loop (screen
-     * off, doze, user-requested quiet). The last frame remains on screen.
-     */
     fun setPaused(p: Boolean) {
         if (paused == p) return
         paused = p
         syncLoop()
+    }
+
+    /**
+     * Ambient mode hands the clock to the owner: the view stops scheduling its
+     * own frames and animates only when [advanceFrame] is called. Compose
+     * screens drive it from an infinite-animation frame clock, which follows
+     * the platform's animation policy (tests and tooling can suspend it).
+     */
+    fun setAmbient(on: Boolean) {
+        if (ambient == on) return
+        ambient = on
+        lastFrameNanos = 0L
+        syncLoop()
+    }
+
+    /** One owner-driven frame in ambient mode. Ignored when paused, hidden or motion is reduced. */
+    fun advanceFrame(frameTimeNanos: Long) {
+        if (!ambient || !attached || paused || reducedMotion || !isShown) { lastFrameNanos = 0L; return }
+        val dt = if (lastFrameNanos == 0L) 0.016f else ((frameTimeNanos - lastFrameNanos) / 1e9f).coerceIn(0f, 0.1f)
+        lastFrameNanos = frameTimeNanos
+        advance(dt)
+        invalidate()
+    }
+
+    fun setInteractive(on: Boolean) {
+        interactive = on
+        isClickable = on || isClickable
+    }
+
+    fun setTilt(x: Float, y: Float) {
+        tiltTargetX = x.coerceIn(-1f, 1f)
+        tiltTargetY = y.coerceIn(-1f, 1f)
+        if (reducedMotion) { tiltX = 0f; tiltY = 0f }
+    }
+
+    fun setContrastDisc(on: Boolean) {
+        frame.contrastDisc = on
+        invalidate()
     }
 
     // ------------------------------------------------------------- lifecycle
@@ -138,6 +174,7 @@ class ArcCoreView(context: Context) : View(context) {
     override fun onDetachedFromWindow() {
         attached = false
         syncLoop()
+        velocity?.recycle(); velocity = null
         super.onDetachedFromWindow()
     }
 
@@ -151,16 +188,62 @@ class ArcCoreView(context: Context) : View(context) {
         syncLoop()
     }
 
+    // ----------------------------------------------------------------- touch
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (!interactive || !isEnabled) return super.onTouchEvent(event)
+        val size = maxOf(1, minOf(width, height)).toFloat()
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                parent?.requestDisallowInterceptTouchEvent(true)
+                velocity?.recycle()
+                velocity = VelocityTracker.obtain().also { it.addMovement(event) }
+                lastX = event.x; lastY = event.y; travel = 0f
+                touching = true; velYaw = 0f; velPitch = 0f
+                syncLoop()
+            }
+            MotionEvent.ACTION_MOVE -> {
+                velocity?.addMovement(event)
+                val dx = event.x - lastX
+                val dy = event.y - lastY
+                lastX = event.x; lastY = event.y
+                travel += abs(dx) + abs(dy)
+                spinYaw += dx / size * SPIN_PER_WIDTH
+                spinPitch = (spinPitch + dy / size * SPIN_PER_WIDTH * 0.6f).coerceIn(-MAX_PITCH, MAX_PITCH)
+                invalidate()
+            }
+            MotionEvent.ACTION_UP -> {
+                touching = false
+                velocity?.let { v ->
+                    v.addMovement(event); v.computeCurrentVelocity(1000)
+                    if (!reducedMotion) {
+                        velYaw = (v.xVelocity / size * SPIN_PER_WIDTH).coerceIn(-MAX_SPIN, MAX_SPIN)
+                        velPitch = (v.yVelocity / size * SPIN_PER_WIDTH * 0.6f).coerceIn(-MAX_SPIN, MAX_SPIN)
+                    }
+                    v.recycle()
+                }
+                velocity = null
+                if (travel < TAP_SLOP * resources.displayMetrics.density) performClick()
+                else if (abs(velYaw) > 4f && ownerHaptics) performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                syncLoop()
+            }
+            MotionEvent.ACTION_CANCEL -> {
+                touching = false
+                velocity?.recycle(); velocity = null
+                syncLoop()
+            }
+        }
+        return true
+    }
+
+    override fun performClick(): Boolean = super.performClick()
+
     // -------------------------------------------------------------- frame loop
 
     private val frameCallback = object : Choreographer.FrameCallback {
         override fun doFrame(frameTimeNanos: Long) {
             if (!running) return
-            val dt = if (lastFrameNanos == 0L) {
-                0.016f
-            } else {
-                ((frameTimeNanos - lastFrameNanos) / 1e9f).coerceIn(0f, 0.1f)
-            }
+            val dt = if (lastFrameNanos == 0L) 0.016f else ((frameTimeNanos - lastFrameNanos) / 1e9f).coerceIn(0f, 0.1f)
             lastFrameNanos = frameTimeNanos
             advance(dt)
             syncLoop()
@@ -171,13 +254,16 @@ class ArcCoreView(context: Context) : View(context) {
 
     private fun scheduleNext() {
         if (!running) return
-        // Cap to ~30 fps everywhere — much lighter on mid-range GPUs, still smooth.
+        // ~30 fps keeps the floating overlay light; the in-app hologram is ambient and owner-driven.
         Choreographer.getInstance().postFrameCallbackDelayed(frameCallback, 32L)
     }
 
+    private fun spinning() = abs(velYaw) > 0.02f || abs(velPitch) > 0.02f || abs(spinPitch) > 0.01f
+
     private fun syncLoop() {
-        val shouldRun = attached && isShown && !paused && !reducedMotion &&
-            (ownerMotion == "expressive" || state != OrbState.IDLE || mix < 1f)
+        val shouldRun = attached && isShown && !paused && !reducedMotion && !ambient &&
+            (ownerMotion == "expressive" || state != OrbState.IDLE || mix < 1f ||
+                touching || spinning() || ampTarget > 0.02f)
         if (shouldRun && !running) {
             running = true
             lastFrameNanos = 0L
@@ -191,85 +277,79 @@ class ArcCoreView(context: Context) : View(context) {
     private fun advance(dt: Float) {
         timeSec += dt
         if (timeSec > TIME_WRAP_SECONDS) timeSec -= TIME_WRAP_SECONDS
-
-        if (mix < 1f) {
-            mix = (mix + dt / TRANSITION_SECONDS).coerceAtMost(1f)
-        }
+        if (mix < 1f) mix = (mix + dt / TRANSITION_SECONDS).coerceAtMost(1f)
         ampSmooth += (ampTarget - ampSmooth) * (dt * AMP_SMOOTH_RATE).coerceAtMost(1f)
 
+        if (!touching) {
+            spinYaw += velYaw * dt
+            spinPitch = (spinPitch + velPitch * dt).coerceIn(-MAX_PITCH, MAX_PITCH)
+            val decay = exp(-SPIN_DECAY * dt)
+            velYaw *= decay; velPitch *= decay
+            // Pitch eases home so the hologram always settles upright.
+            spinPitch += (0f - spinPitch) * (dt * 1.6f).coerceAtMost(1f)
+            if (abs(velYaw) < 0.02f) velYaw = 0f
+            if (abs(velPitch) < 0.02f) velPitch = 0f
+        }
+        if (spinYaw > 1000f || spinYaw < -1000f) spinYaw %= TAU
+        tiltX += (tiltTargetX - tiltX) * (dt * 4f).coerceAtMost(1f)
+        tiltY += (tiltTargetY - tiltY) * (dt * 4f).coerceAtMost(1f)
+
         if (state == OrbState.ALERT) {
-            // Haptic tick synced to the radar pulse-ring cycle (1.25 s).
             val bucket = (timeSec * 0.8f).toInt()
             if (bucket != lastPulseBucket) {
                 lastPulseBucket = bucket
                 if (ownerHaptics) performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
             }
         }
+        fillFrame()
+        renderer.step(dt, frame)
+    }
 
-        calm = state == OrbState.IDLE && mix >= 1f && ampTarget < 0.02f
+    private fun fillFrame() {
+        frame.time = timeSec
+        frame.state = state
+        frame.prev = prevState
+        frame.mix = mix
+        frame.amp = ampSmooth
+        frame.yaw = spinYaw + tiltX * TILT_YAW
+        frame.pitch = spinPitch + tiltY * TILT_PITCH
     }
 
     // ---------------------------------------------------------------- drawing
 
     override fun onDraw(canvas: Canvas) {
-        val w = width
-        val h = height
-        if (w <= 0 || h <= 0) return
-        if (USE_GPU_SHADER && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-            shader != null && canvas.isHardwareAccelerated
-        ) {
-            pushUniforms()
-            shaderPaint.shader = shader
-            canvas.drawPaint(shaderPaint)
-        } else {
-            ArcCoreCanvasRenderer.draw(
-                canvas, w, h, timeSec, state, prevState, mix, ampSmooth,
-            )
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun pushUniforms() {
-        val rs = shader as? RuntimeShader ?: return
-        rs.setFloatUniform("uSize", width.toFloat(), height.toFloat())
-        rs.setFloatUniform("uTime", timeSec)
-        rs.setFloatUniform("uAmp", ampSmooth)
-        rs.setIntUniform("uMode", state.ordinal)
-        rs.setIntUniform("uPrevMode", prevState.ordinal)
-        rs.setFloatUniform("uMix", mix)
+        if (width <= 0 || height <= 0) return
+        fillFrame()
+        renderer.draw(canvas, width, height, frame)
     }
 
     // ---------------------------------------------------------------- helpers
 
     private fun refreshReducedMotion() {
         reducedMotion = ownerMotion == "reduced" || try {
-            Settings.Global.getFloat(
-                context.contentResolver,
-                Settings.Global.ANIMATOR_DURATION_SCALE,
-                1f,
-            ) == 0f
+            Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f
         } catch (e: Exception) {
             false
         }
     }
 
     private fun updateContentDescription() {
-        contentDescription = "ELLIOT Arc Core — ${state.name.lowercase()}"
+        contentDescription = "ELLIOT orb, ${state.name.lowercase()}"
     }
 
     internal fun isAnimating() = running
 
     private companion object {
-        /** Use the per-pixel AGSL shader? Off = cheap Canvas renderer (far lighter). */
-        const val USE_GPU_SHADER = false
-
-        /** State crossfade duration. */
-        const val TRANSITION_SECONDS = 0.45f
-
-        /** First-order smoothing rate for the audio amplitude envelope. */
+        const val TRANSITION_SECONDS = 0.9f
         const val AMP_SMOOTH_RATE = 14f
-
-        /** Wrap the clock so fp32 trig stays precise across multi-hour uptime. */
         const val TIME_WRAP_SECONDS = 36000f
+        const val TAU = 6.2831855f
+        const val SPIN_PER_WIDTH = 3.6f
+        const val MAX_SPIN = 14f
+        const val MAX_PITCH = 0.9f
+        const val SPIN_DECAY = 1.6f
+        const val TAP_SLOP = 8f
+        const val TILT_YAW = 0.45f
+        const val TILT_PITCH = 0.30f
     }
 }
