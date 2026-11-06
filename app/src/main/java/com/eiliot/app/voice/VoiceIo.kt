@@ -90,31 +90,10 @@ object VoiceIo {
         }
         status.value = if (maleVoices.value.isEmpty()) "Your offline voice is getting ready" else "${maleVoices.value.size} confirmed male voice(s) · ${allVoices.value.size} installed"
     }
-    fun confirmMale(id: String) {
-        stopSpeaking()
-        val s = SentinelRuntime.store
-        s.confirmedMaleVoices = s.confirmedMaleVoices + id
-        refreshVoices(); s.ttsVoice = id; applyVoice(id, s.ttsPitch, s.ttsRate)
-    }
-    fun removeMale(id: String) {
-        val s = SentinelRuntime.store; s.confirmedMaleVoices = s.confirmedMaleVoices - id
-        if (s.ttsVoice == id) { stopSpeaking(); s.ttsVoice = "" }
-        refreshVoices()
-    }
-    fun listVoices(): List<String> = maleVoices.value.map { it.id }
     fun applyVoice(voiceName: String, pitch: Float, rate: Float) {
         val t = tts ?: return
         t.setPitch(pitch.coerceIn(0.7f, 1.3f)); t.setSpeechRate(rate.coerceIn(0.7f, 1.4f))
         if (maleVoices.value.any { it.id == voiceName }) t.voices?.firstOrNull { it.name == voiceName }?.let { t.voice = it }
-    }
-    /** Explicit audition only; unclassified voices are never selected for assistant speech. */
-    fun audition(id: String) {
-        if (!SentinelRuntime.alive()) { status.value = "Resume ELLIOT before testing a voice"; return }
-        val candidate = tts?.voices?.firstOrNull { it.name == id } ?: return
-        stopSpeaking(); tts?.voice = candidate
-        play("Listen to this sample, then confirm only if this is a male voice.", onDone = {
-            val s = SentinelRuntime.store; applyVoice(s.ttsVoice, s.ttsPitch, s.ttsRate)
-        })
     }
     fun canSpeak() = NeuralSpeechPlayer.ready.value || (ready && maleVoices.value.any { it.id == SentinelRuntime.store.ttsVoice })
     private var streamId=Long.MIN_VALUE

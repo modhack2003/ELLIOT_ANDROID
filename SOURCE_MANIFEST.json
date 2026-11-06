@@ -19,8 +19,8 @@
     },
     {
       "path": "AGENTS.md",
-      "bytes": 10534,
-      "sha256": "c9913e3851faf22600cf53f898cbeb75893c4ef67d3d8437cb1fed562afe1b45"
+      "bytes": 14614,
+      "sha256": "b37ae1c2a30eb5a1d715a2409de2e13f7d3237216051caa773291a40ee725800"
     },
     {
       "path": "BUILD_PLAN.md",
@@ -2094,8 +2094,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/core/EiliotBrain.kt",
-      "bytes": 21238,
-      "sha256": "75945947d9348564547635db68a5b4a19bc2152ac27231772ec9dd7f24e3f9f9"
+      "bytes": 21114,
+      "sha256": "220fe81002a443b28e4cebaa2487da5de6686f7b4f6b540a1206f8079adf76c1"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/core/EiliotNotificationListener.kt",
@@ -2139,8 +2139,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/core/WakeListener.kt",
-      "bytes": 19769,
-      "sha256": "70eb6f3cf2da35fce737635f61ec293f91cb74f61289983afc5a025c96bc7426"
+      "bytes": 20371,
+      "sha256": "be1fd0d42a3b4baf6169fead0848f5c606b7e16c573f5b763bb0f9640830d6a6"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/data/CryptoVault.kt",
@@ -2374,8 +2374,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/SettingsScreen.kt",
-      "bytes": 19257,
-      "sha256": "f948b9e3723a3afd6e85746fec7eddefaae49a34f8d814582873a32971185fe5"
+      "bytes": 18961,
+      "sha256": "f9c301eafa8375dbea661e32f2870d4d553b93fae0cd13eb8d5a99e594fc1c3b"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/VaultScreen.kt",
@@ -2384,8 +2384,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/ui/VoiceCalibrationDialog.kt",
-      "bytes": 27686,
-      "sha256": "189ab803b440293830956c96b2cd97899940027c0ec0fe7847d578b4bcab7a48"
+      "bytes": 28480,
+      "sha256": "d6355b167b383303cc2864d1cac363835cce4e37d58590086e22d65a02f8aef0"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/AcousticWake.kt",
@@ -2399,8 +2399,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/CommandUtterance.kt",
-      "bytes": 1739,
-      "sha256": "e20337f4202e3b85bb6fa9067b9688483b3d9766b2194625c0361d154a928122"
+      "bytes": 3148,
+      "sha256": "f265c0add111c6108ce27f8823f75501d923011767e1554d74108ebca5f401cc"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/DiagnosticWav.kt",
@@ -2439,8 +2439,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/TranscriptNormalizer.kt",
-      "bytes": 706,
-      "sha256": "621fe20416cd054bfd20e9b6b48ad0dc2e6e71627408f47f2f6e2bb21f9a64e4"
+      "bytes": 1468,
+      "sha256": "f49da4832f2df338b6e2dc71da289890c5528a9d6ba4ae0f36506e2b7aa3adba"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/VoiceAudioInput.kt",
@@ -2449,8 +2449,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/VoiceIo.kt",
-      "bytes": 18382,
-      "sha256": "45c476886ae2e0289be399173ec065685d5c9a88c08a79dcf93765566aeefd05"
+      "bytes": 17301,
+      "sha256": "d72c1a2b5115755acb614c030e4d322cf5e824aa5973ae93512ebaf8df64ad38"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/VoiceModelContract.kt",
@@ -2479,13 +2479,13 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/WhisperTokenTransport.kt",
-      "bytes": 2279,
-      "sha256": "74c7c1ed497cd60972e28b16eb11906c6128613091db464c72473f6d100eb0dc"
+      "bytes": 2783,
+      "sha256": "478626f9749a73deb9becabd9f9df07b6e874d0f05461f97151d6e2da2bc72f1"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/NativeSpeechClient.kt",
-      "bytes": 12348,
-      "sha256": "7fbe1e672d5a73a85c7cb7fcbceb9eea1804602a57b9b950187159e7cfcb0afb"
+      "bytes": 13457,
+      "sha256": "4cf048cea166d8e0b382d45cf25416d65e8aa3dacf24dcbd7ee9dfc061d5f513"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/NativeTtsCallback.java",
@@ -2499,8 +2499,8 @@
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/SpeechEngineService.kt",
-      "bytes": 10548,
-      "sha256": "471b1d641b43a38cdb858612d5f04218cbb0a25bb61524ac494bbf11e165b7be"
+      "bytes": 12410,
+      "sha256": "e6ffe34cac8baf3d33ae64c71929ddfaefca78a93cc0c18fc4da224328a8913d"
     },
     {
       "path": "app/src/main/java/com/eiliot/app/voice/remote/SpeechWire.kt",
@@ -2666,6 +2666,11 @@
       "path": "app/src/test/java/com/eiliot/app/VoiceAndroidTest.kt",
       "bytes": 6055,
       "sha256": "31d0b837a4b715b59d4de880d13e70d4ddb232a75661c86317afba466e3fb9e3"
+    },
+    {
+      "path": "app/src/test/java/com/eiliot/app/VoiceLatencyAndCaptureTest.kt",
+      "bytes": 4284,
+      "sha256": "b7e050151f345cf1af75437be82a1968e3488478c067627da1af3822015cd589"
     },
     {
       "path": "app/src/test/java/com/eiliot/app/VoiceModelContractTest.kt",

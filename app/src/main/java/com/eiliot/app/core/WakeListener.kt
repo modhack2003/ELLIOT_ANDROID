@@ -120,12 +120,19 @@ object WakeListener {
                     (WakeCapturePreference.reference(SentinelRuntime.context) || com.eiliot.app.BuildConfig.VOICE_REFERENCE_CAPTURE)
                 val reduceNoise=calibration?.noiseReduction?:WakeCapturePreference.noiseReduction(SentinelRuntime.context)
                 val enhanced=calibration?.softwareNoiseReduction?:WakeCapturePreference.softwareNoiseReduction(SentinelRuntime.context)
-                val wakeBeforeEnhanced=wakeSetting.wakeBeforeEnhanced
+                // Saved profiles keep their own routing; without one, match the wake phrase before
+                // software denoising, which is the routing recorded as working.
+                val wakeBeforeEnhanced=if(calibration!=null)wakeSetting.wakeBeforeEnhanced else enhanced && wakeSetting.requireHey
                 val reducer=if(enhanced)RemoteDenoiser()else null;noiseReducer=reducer
                 val assembled=PcmFrameBuffer();enhancedFrames=assembled
                 audio=VoiceAudioInput(SentinelRuntime.context,direct,reduceNoise) { }
                 ensureActive();check(gen==generation && SentinelRuntime.alive(epoch))
                 input=audio;ready=true
+                // Load the selected multilingual pack while the microphone arms, so even the first
+                // spoken request pays decoding only.
+                CommandSpeech.load(SentinelRuntime.context)?.let {selection->
+                    launch(Dispatchers.IO) {WhisperPool.warm(selection.language,selection.model.id)}
+                }
                 if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS)android.util.Log.i("ElliotWake", "capture ready; direct=$direct; live=${liveCall.value}; wake=${SentinelRuntime.store.wakeEnabled}; echo=${audio.echoEnabled}; noise=${audio.noiseEnabled}; gain=${audio.gainEnabled}; enhanced=$enhanced; wakeBeforeEnhanced=$wakeBeforeEnhanced; wakeProfile=${wakeSetting.label}; requireHey=${wakeSetting.requireHey}")
                 var diagnosticAt=android.os.SystemClock.elapsedRealtime()
                 var diagnosticFrames=0
@@ -223,8 +230,8 @@ object WakeListener {
                                     previous?.join()
                                     ensureActive()
                                     val started=android.os.SystemClock.elapsedRealtime()
-                                    val whisper=RemoteWhisper(commandSpeech.language,commandSpeech.model.id)
-                                    val raw=try {whisper.transcribe(pcm)}finally {runCatching {whisper.release()}}
+                                    // Pooled: the loaded pack stays resident, so only decoding is paid here.
+                                    val raw=WhisperPool.get(commandSpeech.language,commandSpeech.model.id).transcribe(pcm)
                                     if(com.eiliot.app.BuildConfig.VOICE_DIAGNOSTICS) {
                                         android.util.Log.i("ElliotWake","command model=${commandSpeech.model.id}; language=${commandSpeech.language}; samples=${pcm.size}; elapsedMs=${android.os.SystemClock.elapsedRealtime()-started}; recognized=${raw.isNotBlank()}")
                                     }
