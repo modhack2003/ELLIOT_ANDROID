@@ -19,6 +19,9 @@ on:
       - "gradle.properties"
       - ".github/workflows/android-release.yml"
   push:
+    # Every merge into main publishes a build. versionName is static, so these get a unique
+    # +build.N tag; pushing v<versionName> yourself still makes the plain versioned release.
+    branches: [main]
     tags: ["v*"]
   workflow_dispatch:
     inputs:
@@ -51,6 +54,9 @@ jobs:
       version_name: ${{ steps.version.outputs.version_name }}
       version_code: ${{ steps.version.outputs.version_code }}
       tag: ${{ steps.version.outputs.tag }}
+      label: ${{ steps.version.outputs.label }}
+      channel: ${{ steps.version.outputs.channel }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
       apk: ${{ steps.package.outputs.apk }}
       stable_key: ${{ steps.signing.outputs.stable }}
     steps:
@@ -79,24 +85,41 @@ jobs:
         id: version
         env:
           INPUT_TAG: ${{ inputs.tag }}
+          INPUT_PRERELEASE: ${{ inputs.prerelease }}
         run: |
           name=$(sed -nE 's/^\s*versionName\s*=\s*"([^"]+)".*/\1/p' app/build.gradle.kts | head -1)
           code=$(sed -nE 's/^\s*versionCode\s*=\s*([0-9]+).*/\1/p' app/build.gradle.kts | head -1)
           test -n "$name" && test -n "$code" || { echo "::error::Could not read versionName/versionCode"; exit 1; }
+          prerelease=true
           if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            # An explicit version tag is the real release for that version.
+            channel=release
             tag="${GITHUB_REF_NAME}"
             if [ "$tag" != "v$name" ]; then
               echo "::error::Tag $tag does not match versionName $name. Tag the commit as v$name, or update versionName."
               exit 1
             fi
+            case "$name" in *-*) prerelease=true;; *) prerelease=false;; esac
+          elif [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            # A merge into main. versionName does not change per merge, so the run number keeps
+            # the tag unique instead of overwriting the previous release.
+            channel=merge
+            tag="v$name+build.${GITHUB_RUN_NUMBER}"
           else
+            channel=manual
             tag="${INPUT_TAG:-v$name}"
+            [ "${INPUT_PRERELEASE}" = "false" ] && prerelease=false
           fi
           case "$tag" in v*) ;; *) echo "::error::Release tags must start with v"; exit 1;; esac
+          # Build metadata is valid in a tag but awkward in a filename.
+          label=$(printf '%s' "${tag#v}" | tr '+' '-')
           echo "version_name=$name" >> "$GITHUB_OUTPUT"
           echo "version_code=$code" >> "$GITHUB_OUTPUT"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
-          echo "Building ELLIOT $name (code $code) for tag $tag"
+          echo "label=$label" >> "$GITHUB_OUTPUT"
+          echo "channel=$channel" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+          echo "Building ELLIOT $name (code $code) as $channel for tag $tag"
 
       - name: Restore signing key
         id: signing
@@ -123,12 +146,13 @@ jobs:
       - name: Package APK
         id: package
         env:
-          VERSION: ${{ steps.version.outputs.version_name }}
+          LABEL: ${{ steps.version.outputs.label }}
         run: |
           src=$(ls app/build/outputs/apk/preview/*arm64-v8a*.apk | head -1)
           test -f "$src" || { echo "::error::APK not found"; exit 1; }
           mkdir -p dist
-          apk="ELLIOT-${VERSION}-arm64-v8a-preview.apk"
+          # The label carries the build number, so APKs from different merges do not collide.
+          apk="ELLIOT-${LABEL}-arm64-v8a-preview.apk"
           cp "$src" "dist/$apk"
           (cd dist && sha256sum "$apk" > "$apk.sha256")
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "dist/$apk" | grep -E "Signer #1 certificate (DN|SHA-256)" | tee dist/signer.txt
@@ -174,11 +198,18 @@ jobs:
           CODE: ${{ needs.build.outputs.version_code }}
           APK: ${{ needs.build.outputs.apk }}
           STABLE: ${{ needs.build.outputs.stable_key }}
+          CHANNEL: ${{ needs.build.outputs.channel }}
         run: |
           {
-            echo "## ELLIOT ${VERSION}"
-            echo
-            echo "ARM64 preview build (version code ${CODE}) from commit \`${GITHUB_SHA::7}\`, built by GitHub Actions."
+            if [ "$CHANNEL" = "merge" ]; then
+              echo "## ELLIOT ${VERSION} · build ${GITHUB_RUN_NUMBER}"
+              echo
+              echo "Automatic build from a merge into \`main\`. ARM64 preview, version code ${CODE}, commit \`${GITHUB_SHA::7}\`."
+            else
+              echo "## ELLIOT ${VERSION}"
+              echo
+              echo "ARM64 preview build (version code ${CODE}) from commit \`${GITHUB_SHA::7}\`, built by GitHub Actions."
+            fi
             echo
             echo "### Install"
             echo "1. Download \`${APK}\` on an **ARM64 Android 8.0+** phone."
@@ -207,16 +238,24 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.build.outputs.tag }}
           VERSION: ${{ needs.build.outputs.version_name }}
-          PRERELEASE: ${{ github.event_name == 'workflow_dispatch' && inputs.prerelease || contains(needs.build.outputs.version_name, '-') }}
+          CHANNEL: ${{ needs.build.outputs.channel }}
+          PRERELEASE: ${{ needs.build.outputs.prerelease }}
         run: |
           flags=()
           [ "$PRERELEASE" = "true" ] && flags+=(--prerelease)
+          if [ "$CHANNEL" = "merge" ]; then
+            title="ELLIOT ${VERSION} · build ${GITHUB_RUN_NUMBER}"
+          else
+            title="ELLIOT ${VERSION}"
+          fi
           files=(dist/*.apk dist/*.sha256)
+          # Creating the tag with github.token does not start another workflow run, so the
+          # tag trigger above cannot loop back into this job.
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
             gh release upload "$TAG" "${files[@]}" --clobber --repo "$GITHUB_REPOSITORY"
             gh release edit "$TAG" --notes-file notes.md --repo "$GITHUB_REPOSITORY"
           else
             gh release create "$TAG" "${files[@]}" --repo "$GITHUB_REPOSITORY" \
-              --target "$GITHUB_SHA" --title "ELLIOT ${VERSION}" --notes-file notes.md "${flags[@]}"
+              --target "$GITHUB_SHA" --title "$title" --notes-file notes.md "${flags[@]}"
           fi
           echo "Release: https://github.com/${GITHUB_REPOSITORY}/releases/tag/${TAG}" >> "$GITHUB_STEP_SUMMARY"
